@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: openSCADA j-Interop Dependencies
+Bundle-SymbolicName: org.openscada.jinterop.deps
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: openSCADA
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: jcifs;version="1.2.25",
+ jcifs.netbios;version="1.2.25",
+ jcifs.ntlmssp;version="1.2.25",
+ jcifs.smb;version="1.2.25",
+ jcifs.util;version="1.2.25"
+Export-Package: com.iwombat.foundation,
+ com.iwombat.foundation.uuid,
+ com.iwombat.util,
+ gnu.crypto,
+ gnu.crypto.hash,
+ gnu.crypto.prng,
+ gnu.crypto.util,
+ ndr,
+ net.sourceforge.jtds.util,
+ rpc,
+ rpc.core,
+ rpc.ncacn_np,
+ rpc.pdu,
+ rpc.security.ntlm
