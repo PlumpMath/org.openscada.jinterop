@@ -16,3 +16,20 @@ Import-Package: com.iwombat.foundation,
  rpc.ncacn_np,
  rpc.pdu,
  rpc.security.ntlm
+Export-Package: org.jinterop.dcom.common;version="2.0.8";uses:="rpc.core",
+ org.jinterop.dcom.core;version="2.0.8";
+  uses:="rpc,
+   ndr,
+   rpc.core,
+   org.jinterop.dcom.common",
+ org.jinterop.dcom.impls;version="2.0.8";uses:="org.jinterop.dcom.core",
+ org.jinterop.dcom.impls.automation;version="2.0.8";uses:="org.jinterop.dcom.core,org.jinterop.dcom.common",
+ org.jinterop.dcom.test;version="2.0.8";uses:="org.jinterop.dcom.core,org.jinterop.dcom.impls.automation",
+ org.jinterop.dcom.transport;version="2.0.8";
+  uses:="rpc.security.ntlm,
+   ndr,
+   rpc,
+   org.jinterop.dcom.common,
+   rpc.core",
+ org.jinterop.winreg;version="2.0.8";uses:="ndr,org.jinterop.dcom.common",
+ org.jinterop.winreg.smb;version="2.0.8";uses:="rpc,org.jinterop.dcom.common,org.jinterop.winreg"
