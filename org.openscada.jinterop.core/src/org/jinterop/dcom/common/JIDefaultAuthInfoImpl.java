@@ -37,26 +37,29 @@ public final class JIDefaultAuthInfoImpl implements IJIAuthInfo
      * @param username
      * @param password
      */
-    public JIDefaultAuthInfoImpl ( String domain, String username, String password )
+    public JIDefaultAuthInfoImpl ( final String domain, final String username, final String password )
     {
         this.username = username;
         this.password = password;
         this.domain = domain;
     }
 
+    @Override
     public String getUserName ()
     {
-        return username;
+        return this.username;
     }
 
+    @Override
     public String getPassword ()
     {
-        return password;
+        return this.password;
     }
 
+    @Override
     public String getDomain ()
     {
-        return domain;
+        return this.domain;
     }
 
 }

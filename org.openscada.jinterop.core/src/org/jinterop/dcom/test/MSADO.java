@@ -25,39 +25,39 @@ public class MSADO
 
     private JISession session = null;
 
-    public MSADO ( String address, String[] args ) throws JIException, UnknownHostException
+    public MSADO ( final String address, final String[] args ) throws JIException, UnknownHostException
     {
-        session = JISession.createSession ( args[1], args[2], args[3] );
-        comServer = new JIComServer ( JIProgId.valueOf ( "ADODB.Connection" ), address, session );
+        this.session = JISession.createSession ( args[1], args[2], args[3] );
+        this.comServer = new JIComServer ( JIProgId.valueOf ( "ADODB.Connection" ), address, this.session );
     }
 
     public void performOp () throws JIException, InterruptedException
     {
-        unknown = comServer.createInstance ();
-        dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( unknown.queryInterface ( IJIDispatch.IID ) );
-        IJITypeInfo typeInfo = dispatch.getTypeInfo ( 0 );
+        this.unknown = this.comServer.createInstance ();
+        this.dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( this.unknown.queryInterface ( IJIDispatch.IID ) );
+        final IJITypeInfo typeInfo = this.dispatch.getTypeInfo ( 0 );
         typeInfo.getFuncDesc ( 0 );
 
-        dispatch.callMethod ( "Open", new Object[] { new JIString ( "driver=Microsoft Access Driver (*.mdb);dbq=C:\\temp\\products.mdb" ), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), new Integer ( -1 ) } );
+        this.dispatch.callMethod ( "Open", new Object[] { new JIString ( "driver=Microsoft Access Driver (*.mdb);dbq=C:\\temp\\products.mdb" ), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), new Integer ( -1 ) } );
 
-        JIVariant variant[] = dispatch.callMethodA ( "Execute", new Object[] { new JIString ( "SELECT * FROM Products" ), new Integer ( -1 ) } );
+        JIVariant variant[] = this.dispatch.callMethodA ( "Execute", new Object[] { new JIString ( "SELECT * FROM Products" ), new Integer ( -1 ) } );
         if ( variant[0].isNull () )
         {
             System.out.println ( "Recordset is empty." );
         }
         else
         {
-            IJIDispatch resultSet = (IJIDispatch)JIObjectFactory.narrowObject ( variant[0].getObjectAsComObject () );
+            final IJIDispatch resultSet = (IJIDispatch)JIObjectFactory.narrowObject ( variant[0].getObjectAsComObject () );
             //variant = resultSet.get("EOF");
             while ( !resultSet.get ( "EOF" ).getObjectAsBoolean () )
             {
                 JIVariant variant2 = resultSet.get ( "Fields" );
-                IJIDispatch fields = (IJIDispatch)JIObjectFactory.narrowObject ( variant2.getObjectAsComObject () );
-                int count = fields.get ( "Count" ).getObjectAsInt ();
+                final IJIDispatch fields = (IJIDispatch)JIObjectFactory.narrowObject ( variant2.getObjectAsComObject () );
+                final int count = fields.get ( "Count" ).getObjectAsInt ();
                 for ( int i = 0; i < count; i++ )
                 {
                     variant = fields.get ( "Item", new Object[] { new Integer ( i ) } );
-                    IJIDispatch field = (IJIDispatch)JIObjectFactory.narrowObject ( variant[0].getObjectAsComObject () );
+                    final IJIDispatch field = (IJIDispatch)JIObjectFactory.narrowObject ( variant[0].getObjectAsComObject () );
                     variant2 = field.get ( "Value" );
                     Object val = null;
                     if ( variant2.getType () == JIVariant.VT_BSTR )
@@ -75,10 +75,10 @@ public class MSADO
 
         }
 
-        JISession.destroySession ( session );
+        JISession.destroySession ( this.session );
     }
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
 
         try
@@ -89,10 +89,10 @@ public class MSADO
                 return;
             }
             JISystem.setAutoRegisteration ( true );
-            MSADO test = new MSADO ( args[0], args );
+            final MSADO test = new MSADO ( args[0], args );
             test.performOp ();
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();

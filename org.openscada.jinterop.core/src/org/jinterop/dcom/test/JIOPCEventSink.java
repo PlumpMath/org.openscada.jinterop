@@ -26,24 +26,26 @@ public class JIOPCEventSink
 
     public JIOPCEventSink ()
     {
-        listeners = new HashSet ();
+        this.listeners = new HashSet ();
     }
 
-    public void addListener ( EventNotificationListener listener )
+    public void addListener ( final EventNotificationListener listener )
     {
         if ( listener == null )
-            throw new NullPointerException ( "The listener is null" );
-        synchronized ( listeners )
         {
-            listeners.add ( listener );
+            throw new NullPointerException ( "The listener is null" );
+        }
+        synchronized ( this.listeners )
+        {
+            this.listeners.add ( listener );
         }
     }
 
-    public void removeListener ( EventNotificationListener listener )
+    public void removeListener ( final EventNotificationListener listener )
     {
-        synchronized ( listeners )
+        synchronized ( this.listeners )
         {
-            listeners.remove ( listener );
+            this.listeners.remove ( listener );
         }
     }
 
@@ -70,20 +72,25 @@ public class JIOPCEventSink
      *         An EMPTY() array.
      * @throws JIException
      */
-    public Object[] onEvent ( final int clientSubscription, final int refresh, final int lastRefresh, int count, JIArray eventsArray ) throws JIException
+    public Object[] onEvent ( final int clientSubscription, final int refresh, final int lastRefresh, final int count, final JIArray eventsArray ) throws JIException
     {
         final JIStruct[] events;
         if ( count == 0 )
+        {
             events = new JIStruct[0];
+        }
         else
+        {
             events = (JIStruct[])eventsArray.getArrayInstance ();
+        }
         new Thread ( new Runnable () {
+            @Override
             public void run ()
             {
                 EventNotificationListener[] l;
-                synchronized ( listeners )
+                synchronized ( JIOPCEventSink.this.listeners )
                 {
-                    l = (EventNotificationListener[])listeners.toArray ( new EventNotificationListener[listeners.size ()] );
+                    l = (EventNotificationListener[])JIOPCEventSink.this.listeners.toArray ( new EventNotificationListener[JIOPCEventSink.this.listeners.size ()] );
                 }
                 for ( int i = 0; i < l.length; i++ )
                 {
@@ -103,14 +110,14 @@ public class JIOPCEventSink
      */
     public static final JIStruct fileTimeOutStruct ()
     {
-        JIStruct struct = new JIStruct ();
+        final JIStruct struct = new JIStruct ();
         try
         {
             struct.addMember ( Integer.class );//Low date time
             struct.addMember ( Integer.class );//High date time
             return struct;
         }
-        catch ( JIException e )
+        catch ( final JIException e )
         {// Can't occur
             throw new RuntimeException ( "Add member error" );
         }
@@ -125,7 +132,7 @@ public class JIOPCEventSink
      */
     private static final JIStruct outStruct ()
     {
-        JIStruct struct = new JIStruct ();
+        final JIStruct struct = new JIStruct ();
         try
         {
             struct.addMember ( Short.class );
@@ -148,27 +155,27 @@ public class JIOPCEventSink
             struct.addMember ( new JIPointer ( new JIString ( JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR ) ) );
             return struct;
         }
-        catch ( JIException e )
+        catch ( final JIException e )
         {// Can't occur
             throw new RuntimeException ( "Add member error" );
         }
     }
 
-    public static final JILocalCoClass getCoClass ( JIOPCEventSink instance )
+    public static final JILocalCoClass getCoClass ( final JIOPCEventSink instance )
     {
         //Define the onEvent method for this interface
-        JILocalParamsDescriptor oeParams = new JILocalParamsDescriptor ();
+        final JILocalParamsDescriptor oeParams = new JILocalParamsDescriptor ();
         oeParams.addInParamAsType ( Integer.class, JIFlags.FLAG_NULL );
         oeParams.addInParamAsType ( Integer.class, JIFlags.FLAG_NULL );
         oeParams.addInParamAsType ( Integer.class, JIFlags.FLAG_NULL );
         oeParams.addInParamAsType ( Integer.class, JIFlags.FLAG_NULL );
         oeParams.addInParamAsObject ( new JIArray ( outStruct (), null, 1, true ), JIFlags.FLAG_NULL );
-        JILocalMethodDescriptor oeMethod = new JILocalMethodDescriptor ( "onEvent", 0, oeParams );
+        final JILocalMethodDescriptor oeMethod = new JILocalMethodDescriptor ( "onEvent", 0, oeParams );
         //This identify the JIOPCEventSink and not the interface
-        JILocalInterfaceDefinition def = new JILocalInterfaceDefinition ( LOCAL_CLASS_IID, false );
+        final JILocalInterfaceDefinition def = new JILocalInterfaceDefinition ( LOCAL_CLASS_IID, false );
         def.addMethodDescriptor ( oeMethod );
-        JILocalCoClass coClass = ( instance == null ) ? new JILocalCoClass ( def, JIOPCEventSink.class ) : new JILocalCoClass ( def, instance );
-        ArrayList list = new ArrayList ();
+        final JILocalCoClass coClass = instance == null ? new JILocalCoClass ( def, JIOPCEventSink.class ) : new JILocalCoClass ( def, instance );
+        final ArrayList list = new ArrayList ();
         //Supported interface
         list.add ( OPC_IID );
         coClass.setSupportedEventInterfaces ( list );

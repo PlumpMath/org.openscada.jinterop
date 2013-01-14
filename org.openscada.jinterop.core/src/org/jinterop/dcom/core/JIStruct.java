@@ -40,12 +40,13 @@ public final class JIStruct implements Serializable
 
     private static final long serialVersionUID = 7708214775854162549L;
 
-    private List listOfMembers = new ArrayList ();
+    private final List listOfMembers = new ArrayList ();
 
-    private List listOfMaxCounts = new ArrayList (); //keeps a list of Max counts for each array dimension, arrays
-                                                     //following one another are inserted in sequential order.
+    private final List listOfMaxCounts = new ArrayList (); //keeps a list of Max counts for each array dimension, arrays
 
-    private List listOfDimensions = new ArrayList ();
+    //following one another are inserted in sequential order.
+
+    private final List listOfDimensions = new ArrayList ();
 
     private boolean arrayAdded = false;
 
@@ -57,10 +58,10 @@ public final class JIStruct implements Serializable
      * 
      * @param member
      */
-    public void addMember ( Object member ) throws JIException
+    public void addMember ( final Object member ) throws JIException
     {
         //null has to be allowed for members who would like to send null...NPE should not be thrown
-        addMember ( listOfMembers.size (), member );
+        addMember ( this.listOfMembers.size (), member );
     }
 
     /**
@@ -70,15 +71,15 @@ public final class JIStruct implements Serializable
      *            Zero based index
      * @param member
      */
-    public void addMember ( int position, Object member ) throws JIException
+    public void addMember ( final int position, Object member ) throws JIException
     {
         //null has to be allowed for members who would like to send null...NPE should not be thrown
         member = member == null ? new Integer ( 0 ) : member;
 
-        Class memberClass = member.getClass ();
+        final Class memberClass = member.getClass ();
 
         //An array has already been added , now a new member cannot be added
-        if ( arrayAdded && position == listOfMembers.size () && !memberClass.equals ( JIArray.class ) )
+        if ( this.arrayAdded && position == this.listOfMembers.size () && !memberClass.equals ( JIArray.class ) )
         {
             throw new JIException ( JIErrorCodes.JI_STRUCT_ARRAY_AT_END );
         }
@@ -88,19 +89,19 @@ public final class JIStruct implements Serializable
         {
             //this condition will also allow that if another nested struct has an array , this new array is added at the
             // very end.
-            if ( position != listOfMembers.size () )
+            if ( position != this.listOfMembers.size () )
             {
                 throw new JIException ( JIErrorCodes.JI_STRUCT_ARRAY_ONLY_AT_END );
             }
 
-            arrayAdded = true;
+            this.arrayAdded = true;
 
             //Fixed arrays like char[50] are serialzed\deserialized in place itself.
             if ( ( (JIArray)member ).isConformant () || ( (JIArray)member ).isVarying () )
             {
                 //since there could be two arrays.
-                listOfMaxCounts.addAll ( ( (JIArray)member ).getConformantMaxCounts () );
-                listOfDimensions.add ( new Integer ( ( (JIArray)member ).getDimensions () ) );
+                this.listOfMaxCounts.addAll ( ( (JIArray)member ).getConformantMaxCounts () );
+                this.listOfDimensions.add ( new Integer ( ( (JIArray)member ).getDimensions () ) );
             }
         }
 
@@ -108,33 +109,33 @@ public final class JIStruct implements Serializable
         if ( memberClass.equals ( JIStruct.class ) )
         {
             //if this has an array then , this struct has to be the last member in the struct list.
-            if ( ( (JIStruct)member ).arrayAdded && arrayAdded && position != ( listOfMembers.size () - 1 ) )
+            if ( ( (JIStruct)member ).arrayAdded && this.arrayAdded && position != this.listOfMembers.size () - 1 )
             {
                 throw new JIException ( JIErrorCodes.JI_STRUCT_INCORRECT_NESTED_STRUCT_POS );
             }
 
-            if ( arrayAdded && ( (JIStruct)member ).arrayAdded )
+            if ( this.arrayAdded && ( (JIStruct)member ).arrayAdded )
             {
                 //means that we have to move the maxcount of the internal struct to this struct.
-                arrayAdded = true;
-                listOfMaxCounts.addAll ( ( (JIStruct)member ).getArrayMaxCounts () );
+                this.arrayAdded = true;
+                this.listOfMaxCounts.addAll ( ( (JIStruct)member ).getArrayMaxCounts () );
                 ( (JIStruct)member ).listOfMaxCounts.clear (); //this is a "move" of max counts to the
                                                                //outer struct
 
-                listOfDimensions.addAll ( ( (JIStruct)member ).listOfDimensions );
+                this.listOfDimensions.addAll ( ( (JIStruct)member ).listOfDimensions );
                 ( (JIStruct)member ).listOfDimensions.clear ();
 
             }
-            else if ( !arrayAdded && ( (JIStruct)member ).arrayAdded )
+            else if ( !this.arrayAdded && ( (JIStruct)member ).arrayAdded )
             {
-                if ( position == listOfMembers.size () )
+                if ( position == this.listOfMembers.size () )
                 {
-                    arrayAdded = true;
-                    listOfMaxCounts.addAll ( ( (JIStruct)member ).getArrayMaxCounts () );
+                    this.arrayAdded = true;
+                    this.listOfMaxCounts.addAll ( ( (JIStruct)member ).getArrayMaxCounts () );
                     ( (JIStruct)member ).listOfMaxCounts.clear (); //this is a "move" of max counts to the
                                                                    //outer struct
 
-                    listOfDimensions.addAll ( ( (JIStruct)member ).listOfDimensions );
+                    this.listOfDimensions.addAll ( ( (JIStruct)member ).listOfDimensions );
                     ( (JIStruct)member ).listOfDimensions.clear ();
                 }
                 else
@@ -179,7 +180,7 @@ public final class JIStruct implements Serializable
         }
         //else the pointer will be serialized "inplace".
 
-        listOfMembers.add ( position, member );
+        this.listOfMembers.add ( position, member );
     }
 
     /**
@@ -187,24 +188,24 @@ public final class JIStruct implements Serializable
      * 
      * @param index
      */
-    public void removeMember ( int index )
+    public void removeMember ( final int index )
     {
-        Object member = listOfMembers.remove ( index );
+        final Object member = this.listOfMembers.remove ( index );
         if ( member instanceof JIArray )
         {
             //we need to remove it's max count values also.
-            listOfMaxCounts.removeAll ( ( (JIArray)member ).getConformantMaxCounts () );
+            this.listOfMaxCounts.removeAll ( ( (JIArray)member ).getConformantMaxCounts () );
 
         }
         else if ( member instanceof JIStruct && ( (JIStruct)member ).arrayAdded )
         {
             //we need to remove it's max count values also.
-            listOfMaxCounts.removeAll ( ( (JIStruct)member ).getArrayMaxCounts () );
+            this.listOfMaxCounts.removeAll ( ( (JIStruct)member ).getArrayMaxCounts () );
         }
 
-        if ( listOfMaxCounts.size () == 0 )
+        if ( this.listOfMaxCounts.size () == 0 )
         {
-            arrayAdded = false;
+            this.arrayAdded = false;
         }
     }
 
@@ -215,7 +216,7 @@ public final class JIStruct implements Serializable
      */
     public List getMembers ()
     {
-        return listOfMembers;
+        return this.listOfMembers;
     }
 
     /**
@@ -225,9 +226,9 @@ public final class JIStruct implements Serializable
      *            Zero based index.
      * @return
      */
-    public Object getMember ( int position )
+    public Object getMember ( final int position )
     {
-        return listOfMembers.get ( position );
+        return this.listOfMembers.get ( position );
     }
 
     /**
@@ -237,21 +238,21 @@ public final class JIStruct implements Serializable
      */
     public int getSize ()
     {
-        return listOfMembers.size ();
+        return this.listOfMembers.size ();
     }
 
-    void encode ( NetworkDataRepresentation ndr, List defferedPointers, int FLAG )
+    void encode ( final NetworkDataRepresentation ndr, final List defferedPointers, final int FLAG )
     {
         //first write all Max counts and then the rest of the structs
-        for ( int i = 0; i < listOfMaxCounts.size (); i++ )
+        for ( int i = 0; i < this.listOfMaxCounts.size (); i++ )
         {
-            JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, (Integer)listOfMaxCounts.get ( i ), null, FLAG );
+            JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, this.listOfMaxCounts.get ( i ), null, FLAG );
         }
 
         int i = 0;
-        while ( i < listOfMembers.size () )
+        while ( i < this.listOfMembers.size () )
         {
-            Object o = listOfMembers.get ( i );
+            final Object o = this.listOfMembers.get ( i );
             {
                 if ( o instanceof JIArray )
                 {
@@ -270,14 +271,14 @@ public final class JIStruct implements Serializable
         }
     }
 
-    JIStruct decode ( NetworkDataRepresentation ndr, List defferedPointers, int FLAG, Map additionalData )
+    JIStruct decode ( final NetworkDataRepresentation ndr, final List defferedPointers, final int FLAG, final Map additionalData )
     {
-        JIStruct retVal = new JIStruct ();
-        ArrayList listOfMaxCounts2 = new ArrayList ();
+        final JIStruct retVal = new JIStruct ();
+        final ArrayList listOfMaxCounts2 = new ArrayList ();
         //first read all Max counts and then the rest of the structs
-        for ( int i = 0; i < listOfDimensions.size (); i++ )
+        for ( int i = 0; i < this.listOfDimensions.size (); i++ )
         {
-            for ( int j = 0; j < ( (Integer)listOfDimensions.get ( i ) ).intValue (); j++ )
+            for ( int j = 0; j < ( (Integer)this.listOfDimensions.get ( i ) ).intValue (); j++ )
             {
                 listOfMaxCounts2.add ( JIMarshalUnMarshalHelper.deSerialize ( ndr, Integer.class, null, FLAG, additionalData ) );
             }
@@ -285,9 +286,9 @@ public final class JIStruct implements Serializable
 
         int i = 0;
         int j = 0; //index only for the conformant \ varying arrays
-        while ( i < listOfMembers.size () )
+        while ( i < this.listOfMembers.size () )
         {
-            Object o = listOfMembers.get ( i );
+            final Object o = this.listOfMembers.get ( i );
             List maxCountTemp = null;
             if ( o instanceof JIArray )
             {
@@ -297,11 +298,11 @@ public final class JIStruct implements Serializable
                     //read before.
                     ( (JIArray)o ).setConformant ( false );
                     maxCountTemp = ( (JIArray)o ).getConformantMaxCounts ();
-                    ( (JIArray)o ).setMaxCountAndUpperBounds ( listOfMaxCounts2.subList ( j, ( (Integer)listOfDimensions.get ( j ) ).intValue () ) );
+                    ( (JIArray)o ).setMaxCountAndUpperBounds ( listOfMaxCounts2.subList ( j, ( (Integer)this.listOfDimensions.get ( j ) ).intValue () ) );
                     j++;
                 }
             }
-            Object o1 = JIMarshalUnMarshalHelper.deSerialize ( ndr, o, defferedPointers, FLAG, additionalData );
+            final Object o1 = JIMarshalUnMarshalHelper.deSerialize ( ndr, o, defferedPointers, FLAG, additionalData );
             if ( o instanceof JIArray )
             {
                 if ( ( (JIArray)o ).isConformant () || ( (JIArray)o ).isVarying () )
@@ -315,7 +316,7 @@ public final class JIStruct implements Serializable
             {
                 retVal.addMember ( o1 );//listOfMembers.add(o);
             }
-            catch ( JIException e )
+            catch ( final JIException e )
             {
                 throw new JIRuntimeException ( e.getErrorCode () );
             }
@@ -330,9 +331,9 @@ public final class JIStruct implements Serializable
     {
         int length = 0;
         int i = 0;
-        while ( i < listOfMembers.size () )
+        while ( i < this.listOfMembers.size () )
         {
-            Object o = listOfMembers.get ( i );
+            final Object o = this.listOfMembers.get ( i );
             if ( o instanceof Class )
             {
                 length += JIMarshalUnMarshalHelper.getLengthInBytes ( (Class)o, o, JIFlags.FLAG_NULL );
@@ -348,21 +349,21 @@ public final class JIStruct implements Serializable
 
     List getArrayMaxCounts ()
     {
-        return listOfMaxCounts;
+        return this.listOfMaxCounts;
     }
 
     int getAlignment ()
     {
         int alignment = 0;
 
-        for ( int i = 0; i < listOfMembers.size (); i++ )
+        for ( int i = 0; i < this.listOfMembers.size (); i++ )
         {
-            Class c = listOfMembers.get ( i ).getClass ();
+            Class c = this.listOfMembers.get ( i ).getClass ();
             boolean isClass = false;
             if ( c.equals ( Class.class ) )
             {
                 isClass = true;
-                c = (Class)listOfMembers.get ( i );
+                c = (Class)this.listOfMembers.get ( i );
             }
 
             if ( c.equals ( Integer.class ) || c.equals ( Float.class ) || c.equals ( String.class ) || c.equals ( JIString.class ) || c.equals ( JIPointer.class ) || c.equals ( JIUnsignedInteger.class ) || c.equals ( JIVariant.class ) )
@@ -384,7 +385,7 @@ public final class JIStruct implements Serializable
             {
                 if ( !isClass )
                 {
-                    int align = ( (JIStruct)listOfMembers.get ( i ) ).getAlignment ();
+                    final int align = ( (JIStruct)this.listOfMembers.get ( i ) ).getAlignment ();
                     alignment = alignment <= align ? align : alignment;
                 }
                 else
@@ -396,7 +397,7 @@ public final class JIStruct implements Serializable
             {
                 if ( !isClass )
                 {
-                    int align = ( (JIUnion)listOfMembers.get ( i ) ).getAlignment ();
+                    final int align = ( (JIUnion)this.listOfMembers.get ( i ) ).getAlignment ();
                     alignment = alignment <= align ? align : alignment;
                 }
                 else
@@ -405,7 +406,9 @@ public final class JIStruct implements Serializable
                 }
             }
             if ( alignment == 8 )
+            {
                 break;
+            }
         }
 
         return alignment;

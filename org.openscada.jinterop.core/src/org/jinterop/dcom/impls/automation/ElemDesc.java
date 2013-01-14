@@ -45,19 +45,19 @@ public final class ElemDesc implements Serializable
      */
     public final ParamDesc paramDesc;
 
-    public ElemDesc ( JIStruct values )
+    public ElemDesc ( final JIStruct values )
     {
         if ( values == null )
         {
-            typeDesc = null;
-            paramDesc = null;
+            this.typeDesc = null;
+            this.paramDesc = null;
             return;
         }
-        typeDesc = new TypeDesc ( (JIStruct)values.getMember ( 0 ) );
-        paramDesc = new ParamDesc ( (JIStruct)values.getMember ( 1 ) );
+        this.typeDesc = new TypeDesc ( (JIStruct)values.getMember ( 0 ) );
+        this.paramDesc = new ParamDesc ( (JIStruct)values.getMember ( 1 ) );
     }
 
-    ElemDesc ( JIPointer ptrValues )
+    ElemDesc ( final JIPointer ptrValues )
     {
         this ( ptrValues.isNull () ? null : (JIStruct)ptrValues.getReferent () );
     }

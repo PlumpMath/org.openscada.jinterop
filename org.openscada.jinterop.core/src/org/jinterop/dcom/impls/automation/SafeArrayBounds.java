@@ -35,15 +35,15 @@ public final class SafeArrayBounds implements Serializable
 
     public final int lLbound;
 
-    SafeArrayBounds ( JIStruct values )
+    SafeArrayBounds ( final JIStruct values )
     {
         if ( values == null )
         {
-            cElements = -1;
-            lLbound = -1;
+            this.cElements = -1;
+            this.lLbound = -1;
             return;
         }
-        cElements = ( (Integer)values.getMember ( 0 ) ).intValue ();
-        lLbound = ( (Integer)values.getMember ( 0 ) ).intValue ();
+        this.cElements = ( (Integer)values.getMember ( 0 ) ).intValue ();
+        this.lLbound = ( (Integer)values.getMember ( 0 ) ).intValue ();
     }
 }

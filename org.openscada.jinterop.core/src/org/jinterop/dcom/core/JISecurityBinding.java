@@ -42,27 +42,27 @@ final class JISecurityBinding implements Serializable
 
     public int getLength ()
     {
-        return length;
+        return this.length;
     }
 
-    JISecurityBinding ( int authnSvc, int authzSvc, String princName )
+    JISecurityBinding ( final int authnSvc, final int authzSvc, final String princName )
     {
         this.authnSvc = authnSvc;
         this.authzSvc = authzSvc;
         this.princName = princName;
         if ( princName.equals ( "" ) )
         {
-            length = 2 + 2 + 2;
+            this.length = 2 + 2 + 2;
         }
         else
         {
-            length = 2 + 2 + princName.length () * 2 + 2;
+            this.length = 2 + 2 + princName.length () * 2 + 2;
         }
     }
 
-    static JISecurityBinding decode ( NetworkDataRepresentation ndr )
+    static JISecurityBinding decode ( final NetworkDataRepresentation ndr )
     {
-        JISecurityBinding securityBinding = new JISecurityBinding ();
+        final JISecurityBinding securityBinding = new JISecurityBinding ();
 
         securityBinding.authnSvc = ndr.readUnsignedShort ();
 
@@ -77,7 +77,7 @@ final class JISecurityBinding implements Serializable
         //now to read the String till a null termination character.
         // a '0' will be represented as 30
         int retVal = -1;
-        StringBuffer buffer = new StringBuffer ();
+        final StringBuffer buffer = new StringBuffer ();
         while ( ( retVal = ndr.readUnsignedShort () ) != 0 )
         {
             //even though this is a unicode string , but will not have anything else
@@ -93,16 +93,16 @@ final class JISecurityBinding implements Serializable
         return securityBinding;
     }
 
-    public void encode ( NetworkDataRepresentation ndr )
+    public void encode ( final NetworkDataRepresentation ndr )
     {
-        ndr.writeUnsignedShort ( authnSvc );
-        ndr.writeUnsignedShort ( authzSvc );
+        ndr.writeUnsignedShort ( this.authnSvc );
+        ndr.writeUnsignedShort ( this.authzSvc );
 
         //now to write the network address.
         int i = 0;
-        while ( i < princName.length () )
+        while ( i < this.princName.length () )
         {
-            ndr.writeUnsignedShort ( princName.charAt ( i ) );
+            ndr.writeUnsignedShort ( this.princName.charAt ( i ) );
             i++;
         }
 

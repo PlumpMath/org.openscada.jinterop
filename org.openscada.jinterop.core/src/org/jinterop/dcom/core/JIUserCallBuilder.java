@@ -29,11 +29,16 @@ import ndr.NetworkDataRepresentation;
 public abstract class JIUserCallBuilder extends JICallBuilder
 {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     public abstract void writeObject ( NetworkDataRepresentation ndr );
 
     public abstract void readObject ( NetworkDataRepresentation ndr );
 
-    public JIUserCallBuilder ( boolean dispatchNotSupported )
+    public JIUserCallBuilder ( final boolean dispatchNotSupported )
     {
         super ( dispatchNotSupported );
     }
@@ -43,12 +48,14 @@ public abstract class JIUserCallBuilder extends JICallBuilder
         super ();
     }
 
-    public void write ( NetworkDataRepresentation ndr )
+    @Override
+    public void write ( final NetworkDataRepresentation ndr )
     {
         writeObject ( ndr );
     }
 
-    public void read ( NetworkDataRepresentation ndr )
+    @Override
+    public void read ( final NetworkDataRepresentation ndr )
     {
         readObject ( ndr );
     }

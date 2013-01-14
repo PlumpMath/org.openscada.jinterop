@@ -185,54 +185,54 @@ public final class TypeAttr implements Serializable
 
     public static final int TYPEFLAG_FREVERSEBIND = 0x2000;
 
-    TypeAttr ( JIPointer values )
+    TypeAttr ( final JIPointer values )
     {
         this ( values.isNull () ? null : (JIStruct)values.getReferent () );
     }
 
-    TypeAttr ( JIStruct filledStruct )
+    TypeAttr ( final JIStruct filledStruct )
     {
         if ( filledStruct == null )
         {
-            guid = null;
-            lcid = -1;
-            dwReserved = -1;
-            memidConstructor = -1;
-            memidDestructor = -1;
-            lpstrSchema = null;
-            cbSizeInstance = -1;
-            typekind = -1;
-            cFuncs = -1;
-            cVars = -1;
-            cImplTypes = -1;
-            cbSizeVft = -1;
-            cbAlignment = -1;
-            wTypeFlags = -1;
-            wMajorVerNum = -1;
-            wMinorVerNum = -1;
-            tdescAlias = null;
-            idldescType = null;
+            this.guid = null;
+            this.lcid = -1;
+            this.dwReserved = -1;
+            this.memidConstructor = -1;
+            this.memidDestructor = -1;
+            this.lpstrSchema = null;
+            this.cbSizeInstance = -1;
+            this.typekind = -1;
+            this.cFuncs = -1;
+            this.cVars = -1;
+            this.cImplTypes = -1;
+            this.cbSizeVft = -1;
+            this.cbAlignment = -1;
+            this.wTypeFlags = -1;
+            this.wMajorVerNum = -1;
+            this.wMinorVerNum = -1;
+            this.tdescAlias = null;
+            this.idldescType = null;
             return;
         }
 
-        guid = ( ( (rpc.core.UUID)filledStruct.getMember ( 0 ) ).toString () );
-        lcid = ( (Integer)filledStruct.getMember ( 1 ) ).intValue ();
-        dwReserved = ( (Integer)filledStruct.getMember ( 2 ) ).intValue ();
-        memidConstructor = ( (Integer)filledStruct.getMember ( 3 ) ).intValue ();
-        memidDestructor = ( (Integer)filledStruct.getMember ( 4 ) ).intValue ();
-        lpstrSchema = ( (JIPointer)filledStruct.getMember ( 5 ) );
-        cbSizeInstance = ( (Integer)filledStruct.getMember ( 6 ) ).intValue ();
-        typekind = ( (Integer)filledStruct.getMember ( 7 ) ).intValue ();
-        cFuncs = ( (Short)filledStruct.getMember ( 8 ) ).shortValue ();
-        cVars = ( (Short)filledStruct.getMember ( 9 ) ).shortValue ();
-        cImplTypes = ( (Short)filledStruct.getMember ( 10 ) ).shortValue ();
-        cbSizeVft = ( (Short)filledStruct.getMember ( 11 ) ).shortValue ();
-        cbAlignment = ( (Short)filledStruct.getMember ( 12 ) ).shortValue ();
-        wTypeFlags = ( (Short)filledStruct.getMember ( 13 ) ).shortValue ();
-        wMajorVerNum = ( (Short)filledStruct.getMember ( 14 ) ).shortValue ();
-        wMinorVerNum = ( (Short)filledStruct.getMember ( 15 ) ).shortValue ();
-        tdescAlias = new TypeDesc ( (JIStruct)filledStruct.getMember ( 16 ) );
-        idldescType = new IdlDesc ( (JIStruct)filledStruct.getMember ( 17 ) );
+        this.guid = ( (rpc.core.UUID)filledStruct.getMember ( 0 ) ).toString ();
+        this.lcid = ( (Integer)filledStruct.getMember ( 1 ) ).intValue ();
+        this.dwReserved = ( (Integer)filledStruct.getMember ( 2 ) ).intValue ();
+        this.memidConstructor = ( (Integer)filledStruct.getMember ( 3 ) ).intValue ();
+        this.memidDestructor = ( (Integer)filledStruct.getMember ( 4 ) ).intValue ();
+        this.lpstrSchema = (JIPointer)filledStruct.getMember ( 5 );
+        this.cbSizeInstance = ( (Integer)filledStruct.getMember ( 6 ) ).intValue ();
+        this.typekind = ( (Integer)filledStruct.getMember ( 7 ) ).intValue ();
+        this.cFuncs = ( (Short)filledStruct.getMember ( 8 ) ).shortValue ();
+        this.cVars = ( (Short)filledStruct.getMember ( 9 ) ).shortValue ();
+        this.cImplTypes = ( (Short)filledStruct.getMember ( 10 ) ).shortValue ();
+        this.cbSizeVft = ( (Short)filledStruct.getMember ( 11 ) ).shortValue ();
+        this.cbAlignment = ( (Short)filledStruct.getMember ( 12 ) ).shortValue ();
+        this.wTypeFlags = ( (Short)filledStruct.getMember ( 13 ) ).shortValue ();
+        this.wMajorVerNum = ( (Short)filledStruct.getMember ( 14 ) ).shortValue ();
+        this.wMinorVerNum = ( (Short)filledStruct.getMember ( 15 ) ).shortValue ();
+        this.tdescAlias = new TypeDesc ( (JIStruct)filledStruct.getMember ( 16 ) );
+        this.idldescType = new IdlDesc ( (JIStruct)filledStruct.getMember ( 17 ) );
 
     }
 

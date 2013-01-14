@@ -41,11 +41,11 @@ public final class JILocalInterfaceDefinition implements Serializable
 
     private String interfaceIdentifier = null;
 
-    private Map opnumVsMethodInfo = new HashMap ();
+    private final Map opnumVsMethodInfo = new HashMap ();
 
-    private Map dispIdVsMethodInfo = new HashMap ();
+    private final Map dispIdVsMethodInfo = new HashMap ();
 
-    private Map nameVsMethodInfo = new HashMap ();
+    private final Map nameVsMethodInfo = new HashMap ();
 
     private int nextNum = 0;
 
@@ -62,7 +62,7 @@ public final class JILocalInterfaceDefinition implements Serializable
      * @param interfaceIdentifier
      *            <code>IID</code> of the COM interface being implemented.
      */
-    public JILocalInterfaceDefinition ( String interfaceIdentifier )
+    public JILocalInterfaceDefinition ( final String interfaceIdentifier )
     {
         this.interfaceIdentifier = interfaceIdentifier;
     }
@@ -79,7 +79,7 @@ public final class JILocalInterfaceDefinition implements Serializable
      *            <code>dispinterface</code>")
      *            is supported , <code>false</code> otherwise.
      */
-    public JILocalInterfaceDefinition ( String interfaceIdentifier, boolean isDispInterface )
+    public JILocalInterfaceDefinition ( final String interfaceIdentifier, final boolean isDispInterface )
     {
         this.interfaceIdentifier = interfaceIdentifier;
         this.dispInterface = isDispInterface;
@@ -95,27 +95,27 @@ public final class JILocalInterfaceDefinition implements Serializable
      * @throws IllegalArgumentException
      *             if a method by the same name already exists.
      */
-    public void addMethodDescriptor ( JILocalMethodDescriptor methodDescriptor )
+    public void addMethodDescriptor ( final JILocalMethodDescriptor methodDescriptor )
     {
-        if ( nameVsMethodInfo.containsKey ( methodDescriptor.getMethodName () ) )
+        if ( this.nameVsMethodInfo.containsKey ( methodDescriptor.getMethodName () ) )
         {
             throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_CALLBACK_OVERLOADS_NOTALLOWED ) );
         }
 
-        methodDescriptor.setMethodNum ( nextNum );
-        nextNum++;
+        methodDescriptor.setMethodNum ( this.nextNum );
+        this.nextNum++;
 
-        opnumVsMethodInfo.put ( new Integer ( methodDescriptor.getMethodNum () ), methodDescriptor );
-        if ( dispInterface )
+        this.opnumVsMethodInfo.put ( new Integer ( methodDescriptor.getMethodNum () ), methodDescriptor );
+        if ( this.dispInterface )
         {
             if ( methodDescriptor.getMethodDispID () == -1 )
             {
                 throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_METHODDESC_DISPID_MISSING ) );
             }
-            dispIdVsMethodInfo.put ( new Integer ( methodDescriptor.getMethodDispID () ), methodDescriptor );
+            this.dispIdVsMethodInfo.put ( new Integer ( methodDescriptor.getMethodDispID () ), methodDescriptor );
         }
 
-        nameVsMethodInfo.put ( methodDescriptor.getMethodName (), methodDescriptor );
+        this.nameVsMethodInfo.put ( methodDescriptor.getMethodName (), methodDescriptor );
 
     }
 
@@ -126,9 +126,9 @@ public final class JILocalInterfaceDefinition implements Serializable
      * @return <code>null</code> if no method by this <code>opnum</code> was
      *         found.
      */
-    public JILocalMethodDescriptor getMethodDescriptor ( int opnum )
+    public JILocalMethodDescriptor getMethodDescriptor ( final int opnum )
     {
-        return (JILocalMethodDescriptor)opnumVsMethodInfo.get ( new Integer ( opnum ) );
+        return (JILocalMethodDescriptor)this.opnumVsMethodInfo.get ( new Integer ( opnum ) );
     }
 
     /**
@@ -138,9 +138,9 @@ public final class JILocalInterfaceDefinition implements Serializable
      * @return <code>null</code> if no method by this <code>dispId</code> was
      *         found.
      */
-    public JILocalMethodDescriptor getMethodDescriptorForDispId ( int dispId )
+    public JILocalMethodDescriptor getMethodDescriptorForDispId ( final int dispId )
     {
-        return (JILocalMethodDescriptor)dispIdVsMethodInfo.get ( new Integer ( dispId ) );
+        return (JILocalMethodDescriptor)this.dispIdVsMethodInfo.get ( new Integer ( dispId ) );
     }
 
     /**
@@ -150,9 +150,9 @@ public final class JILocalInterfaceDefinition implements Serializable
      * @return <code>null</code> if no method by this <code>name</code> was
      *         found.
      */
-    public JILocalMethodDescriptor getMethodDescriptor ( String name )
+    public JILocalMethodDescriptor getMethodDescriptor ( final String name )
     {
-        return (JILocalMethodDescriptor)nameVsMethodInfo.get ( name );
+        return (JILocalMethodDescriptor)this.nameVsMethodInfo.get ( name );
     }
 
     /**
@@ -162,7 +162,7 @@ public final class JILocalInterfaceDefinition implements Serializable
      */
     public JILocalMethodDescriptor[] getMethodDescriptors ()
     {
-        return (JILocalMethodDescriptor[])opnumVsMethodInfo.values ().toArray ( new JILocalMethodDescriptor[opnumVsMethodInfo.values ().size ()] );
+        return (JILocalMethodDescriptor[])this.opnumVsMethodInfo.values ().toArray ( new JILocalMethodDescriptor[this.opnumVsMethodInfo.values ().size ()] );
     }
 
     /**
@@ -172,7 +172,7 @@ public final class JILocalInterfaceDefinition implements Serializable
      */
     public String getInterfaceIdentifier ()
     {
-        return interfaceIdentifier;
+        return this.interfaceIdentifier;
     }
 
     /**
@@ -184,12 +184,12 @@ public final class JILocalInterfaceDefinition implements Serializable
      * @param opnum
      * @see #addMethodDescriptor(JILocalMethodDescriptor)
      */
-    public void removeMethodDescriptor ( int opnum )
+    public void removeMethodDescriptor ( final int opnum )
     {
-        JILocalMethodDescriptor methodDescriptor = (JILocalMethodDescriptor)opnumVsMethodInfo.remove ( new Integer ( opnum ) );
+        final JILocalMethodDescriptor methodDescriptor = (JILocalMethodDescriptor)this.opnumVsMethodInfo.remove ( new Integer ( opnum ) );
         if ( methodDescriptor != null )
         {
-            nameVsMethodInfo.remove ( methodDescriptor.getMethodName () );
+            this.nameVsMethodInfo.remove ( methodDescriptor.getMethodName () );
         }
     }
 
@@ -203,12 +203,12 @@ public final class JILocalInterfaceDefinition implements Serializable
      * @param methodName
      * @see #addMethodDescriptor(JILocalMethodDescriptor)
      */
-    public void removeMethodDescriptor ( String methodName )
+    public void removeMethodDescriptor ( final String methodName )
     {
-        JILocalMethodDescriptor methodDescriptor = (JILocalMethodDescriptor)nameVsMethodInfo.remove ( methodName );
+        final JILocalMethodDescriptor methodDescriptor = (JILocalMethodDescriptor)this.nameVsMethodInfo.remove ( methodName );
         if ( methodDescriptor != null )
         {
-            nameVsMethodInfo.remove ( new Integer ( methodDescriptor.getMethodNum () ) );
+            this.nameVsMethodInfo.remove ( new Integer ( methodDescriptor.getMethodNum () ) );
         }
     }
 
@@ -220,6 +220,6 @@ public final class JILocalInterfaceDefinition implements Serializable
      */
     public boolean isDispInterface ()
     {
-        return dispInterface;
+        return this.dispInterface;
     }
 }

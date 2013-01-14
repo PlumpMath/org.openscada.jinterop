@@ -1,7 +1,6 @@
 package org.jinterop.dcom.test;
 
 import java.net.UnknownHostException;
-import java.util.logging.Level;
 
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
@@ -23,24 +22,24 @@ public class MSWord
 
     private IJIComObject unknown = null;
 
-    public MSWord ( String address, String[] args ) throws JIException, UnknownHostException
+    public MSWord ( final String address, final String[] args ) throws JIException, UnknownHostException
     {
-        JISession session = JISession.createSession ( args[1], args[2], args[3] );
+        final JISession session = JISession.createSession ( args[1], args[2], args[3] );
         session.useSessionSecurity ( true );
-        comStub = new JIComServer ( JIProgId.valueOf ( "Word.Application" ), address, session );
+        this.comStub = new JIComServer ( JIProgId.valueOf ( "Word.Application" ), address, session );
     }
 
     public void startWord () throws JIException
     {
-        unknown = comStub.createInstance ();
-        dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( unknown.queryInterface ( IJIDispatch.IID ) );
+        this.unknown = this.comStub.createInstance ();
+        this.dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( this.unknown.queryInterface ( IJIDispatch.IID ) );
     }
 
     public void showWord () throws JIException
     {
-        int dispId = dispatch.getIDsOfNames ( "Visible" );
-        JIVariant variant = new JIVariant ( true );
-        dispatch.put ( dispId, variant );
+        final int dispId = this.dispatch.getIDsOfNames ( "Visible" );
+        final JIVariant variant = new JIVariant ( true );
+        this.dispatch.put ( dispId, variant );
     }
 
     public void performOp () throws JIException, InterruptedException
@@ -51,36 +50,36 @@ public class MSWord
          */
         JISystem.setJavaCoClassAutoCollection ( true );
 
-        System.out.println ( ( (JIVariant)dispatch.get ( "Version" ) ).getObjectAsString ().getString () );
-        System.out.println ( ( (JIVariant)dispatch.get ( "Path" ) ).getObjectAsString ().getString () );
-        JIVariant variant = dispatch.get ( "Documents" );
+        System.out.println ( this.dispatch.get ( "Version" ).getObjectAsString ().getString () );
+        System.out.println ( this.dispatch.get ( "Path" ).getObjectAsString ().getString () );
+        JIVariant variant = this.dispatch.get ( "Documents" );
 
         System.out.println ( "Open document..." );
-        IJIDispatch documents = (IJIDispatch)JIObjectFactory.narrowObject ( variant.getObjectAsComObject () );
-        JIString filePath = new JIString ( "c:\\temp\\test.doc" );
-        JIVariant variant2[] = documents.callMethodA ( "open", new Object[] { filePath, JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM () } );
+        final IJIDispatch documents = (IJIDispatch)JIObjectFactory.narrowObject ( variant.getObjectAsComObject () );
+        final JIString filePath = new JIString ( "c:\\temp\\test.doc" );
+        final JIVariant variant2[] = documents.callMethodA ( "open", new Object[] { filePath, JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM () } );
 
         System.out.println ( "doc opened" );
         //10
         sleep ( 10 );
 
         System.out.println ( "Get content..." );
-        IJIDispatch document = (IJIDispatch)JIObjectFactory.narrowObject ( variant2[0].getObjectAsComObject () );
+        final IJIDispatch document = (IJIDispatch)JIObjectFactory.narrowObject ( variant2[0].getObjectAsComObject () );
         variant = document.get ( "Content" );
-        IJIDispatch range = (IJIDispatch)JIObjectFactory.narrowObject ( variant.getObjectAsComObject () );
+        final IJIDispatch range = (IJIDispatch)JIObjectFactory.narrowObject ( variant.getObjectAsComObject () );
 
         //10
         sleep ( 10 );
         System.out.println ( "Running find..." );
         variant = range.get ( "Find" );
-        IJIDispatch find = (IJIDispatch)JIObjectFactory.narrowObject ( variant.getObjectAsComObject () );
+        final IJIDispatch find = (IJIDispatch)JIObjectFactory.narrowObject ( variant.getObjectAsComObject () );
 
         //2
         sleep ( 5 );
 
         System.out.println ( "Running execute..." );
-        JIString findString = new JIString ( "ow" );
-        JIString replaceString = new JIString ( "igh" );
+        final JIString findString = new JIString ( "ow" );
+        final JIString replaceString = new JIString ( "igh" );
         find.callMethodA ( "Execute", new Object[] { findString.VariantByRef, JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), replaceString.VariantByRef, JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM () } );
 
         //1
@@ -91,10 +90,10 @@ public class MSWord
 
     }
 
-    private void sleep ( int minutes ) throws InterruptedException
+    private void sleep ( final int minutes ) throws InterruptedException
     {
         System.out.println ( "Sleeping " + minutes + " minute(s)..." );
-        Thread.sleep ( (int) ( minutes * 60 * 1000 ) );
+        Thread.sleep ( minutes * 60 * 1000 );
     }
 
     /**
@@ -103,11 +102,11 @@ public class MSWord
     private void quitAndDestroy () throws JIException
     {
         System.out.println ( "Quit..." );
-        dispatch.callMethod ( "Quit", new Object[] { new JIVariant ( -1, true ), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM () } );
-        JISession.destroySession ( dispatch.getAssociatedSession () );
+        this.dispatch.callMethod ( "Quit", new Object[] { new JIVariant ( -1, true ), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM () } );
+        JISession.destroySession ( this.dispatch.getAssociatedSession () );
     }
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
 
         try
@@ -118,9 +117,10 @@ public class MSWord
                 return;
             }
 
-            JISystem.getLogger ().setLevel ( Level.INFO );
+            // JR: JISystem.getLogger ().setLevel ( Level.INFO );
+            // JR: configure using slf4j now
             JISystem.setInBuiltLogHandler ( false );
-            MSWord test = new MSWord ( args[0], args );
+            final MSWord test = new MSWord ( args[0], args );
             test.startWord ();
             test.showWord ();
 
@@ -131,7 +131,7 @@ public class MSWord
             test.quitAndDestroy ();
 
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();

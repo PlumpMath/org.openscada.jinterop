@@ -19,12 +19,13 @@ package org.jinterop.dcom.core;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.jinterop.dcom.common.IJIUnreferenced;
 import org.jinterop.dcom.common.JIErrorCodes;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.iwombat.foundation.IdentifierFactory;
 import com.iwombat.util.GUIDUtil;
@@ -38,10 +39,8 @@ import com.iwombat.util.GUIDUtil;
  */
 final class JIComObjectImpl implements IJIComObject
 {
+    private final static Logger logger = LoggerFactory.getLogger ( JIComObjectImpl.class );
 
-    /**
-	 * 
-	 */
     private static final long serialVersionUID = -1661750453596032089L;
 
     private boolean isDual = false;
@@ -58,19 +57,19 @@ final class JIComObjectImpl implements IJIComObject
 
     private final boolean isLocal;
 
-    JIComObjectImpl ( JISession session, JIInterfacePointer ptr )
+    JIComObjectImpl ( final JISession session, final JIInterfacePointer ptr )
     {
         this ( session, ptr, false );
     }
 
-    JIComObjectImpl ( JISession session, JIInterfacePointer ptr, boolean isLocal )
+    JIComObjectImpl ( final JISession session, final JIInterfacePointer ptr, final boolean isLocal )
     {
         this.session = session;
         this.ptr = ptr;
         this.isLocal = isLocal;
     }
 
-    void replaceMembers ( IJIComObject comObject )
+    void replaceMembers ( final IJIComObject comObject )
     {
         this.session = comObject.getAssociatedSession ();
         this.ptr = comObject.internal_getInterfacePointer ();
@@ -78,7 +77,7 @@ final class JIComObjectImpl implements IJIComObject
 
     private void checkLocal ()
     {
-        if ( session == null )
+        if ( this.session == null )
         {
             throw new IllegalStateException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_SESSION_NOT_ATTACHED ) );
         }
@@ -89,23 +88,25 @@ final class JIComObjectImpl implements IJIComObject
         }
     }
 
-    public IJIComObject queryInterface ( String iid ) throws JIException
+    @Override
+    public IJIComObject queryInterface ( final String iid ) throws JIException
     {
         checkLocal ();
-        return session.getStub ().getInterface ( iid, ptr.getIPID () );
+        return this.session.getStub ().getInterface ( iid, this.ptr.getIPID () );
     }
 
+    @Override
     public void addRef () throws JIException
     {
         checkLocal ();
-        JICallBuilder obj = new JICallBuilder ( true );
-        obj.setParentIpid ( ptr.getIPID () );
+        final JICallBuilder obj = new JICallBuilder ( true );
+        obj.setParentIpid ( this.ptr.getIPID () );
         obj.setOpnum ( 1 );//addRef
 
         //length
         obj.addInParamAsShort ( (short)1, JIFlags.FLAG_NULL );
         //ipid to addfref on
-        JIArray array = new JIArray ( new rpc.core.UUID[] { new rpc.core.UUID ( ptr.getIPID () ) }, true );
+        final JIArray array = new JIArray ( new rpc.core.UUID[] { new rpc.core.UUID ( this.ptr.getIPID () ) }, true );
         obj.addInParamAsArray ( array, JIFlags.FLAG_NULL );
         //TODO requesting 5 for now, will later build caching mechnaism to exhaust 5 refs first before asking for more
         // same with release.
@@ -114,14 +115,14 @@ final class JIComObjectImpl implements IJIComObject
 
         obj.addOutParamAsType ( Short.class, JIFlags.FLAG_NULL );//size
         obj.addOutParamAsType ( Integer.class, JIFlags.FLAG_NULL );//Hresult for size
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
+        if ( logger.isInfoEnabled () )
         {
-            JISystem.getLogger ().warning ( "addRef: Adding 5 references for " + ptr.getIPID () + " session: " + session.getSessionIdentifier () );
+            logger.info ( "addRef: Adding 5 references for " + this.ptr.getIPID () + " session: " + this.session.getSessionIdentifier () );
         }
 
-        JISession.debug_addIpids ( ptr.getIPID (), 5 );
+        JISession.debug_addIpids ( this.ptr.getIPID (), 5 );
 
-        session.getStub2 ().addRef_ReleaseRef ( obj );
+        this.session.getStub2 ().addRef_ReleaseRef ( obj );
 
         if ( obj.getResultAsIntAt ( 1 ) != 0 )
         {
@@ -129,46 +130,51 @@ final class JIComObjectImpl implements IJIComObject
         }
     }
 
+    @Override
     public void release () throws JIException
     {
         checkLocal ();
-        JICallBuilder obj = new JICallBuilder ( true );
-        obj.setParentIpid ( ptr.getIPID () );
+        final JICallBuilder obj = new JICallBuilder ( true );
+        obj.setParentIpid ( this.ptr.getIPID () );
         obj.setOpnum ( 2 );//release
         //length
         obj.addInParamAsShort ( (short)1, JIFlags.FLAG_NULL );
         //ipid to addfref on
-        JIArray array = new JIArray ( new rpc.core.UUID[] { new rpc.core.UUID ( ptr.getIPID () ) }, true );
+        final JIArray array = new JIArray ( new rpc.core.UUID[] { new rpc.core.UUID ( this.ptr.getIPID () ) }, true );
         obj.addInParamAsArray ( array, JIFlags.FLAG_NULL );
         //TODO requesting 5 for now, will later build caching mechnaism to exhaust 5 refs first before asking for more
         // same with release.
         obj.addInParamAsInt ( 5, JIFlags.FLAG_NULL );
         obj.addInParamAsInt ( 0, JIFlags.FLAG_NULL );//private refs = 0
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
+        if ( logger.isInfoEnabled () )
         {
-            JISystem.getLogger ().warning ( "RELEASE called directly ! removing 5 references for " + ptr.getIPID () + " session: " + session.getSessionIdentifier () );
-            JISession.debug_delIpids ( ptr.getIPID (), 5 );
+            logger.info ( "RELEASE called directly ! removing 5 references for " + this.ptr.getIPID () + " session: " + this.session.getSessionIdentifier () );
+            JISession.debug_delIpids ( this.ptr.getIPID (), 5 );
         }
-        session.getStub2 ().addRef_ReleaseRef ( obj );
+        this.session.getStub2 ().addRef_ReleaseRef ( obj );
     }
 
-    public Object[] call ( JICallBuilder obj ) throws JIException
+    @Override
+    public Object[] call ( final JICallBuilder obj ) throws JIException
     {
         checkLocal ();
-        return call ( obj, timeout );
+        return call ( obj, this.timeout );
     }
 
+    @Override
     public JIInterfacePointer internal_getInterfacePointer ()
     {
-        return ptr == null ? session.getStub ().getServerInterfacePointer () : ptr;
+        return this.ptr == null ? this.session.getStub ().getServerInterfacePointer () : this.ptr;
     }
 
+    @Override
     public String getIpid ()
     {
-        return ptr.getIPID ();
+        return this.ptr.getIPID ();
     }
 
-    public boolean equals ( Object obj )
+    @Override
+    public boolean equals ( final Object obj )
     {
 
         if ( ! ( obj instanceof JIComObjectImpl ) )
@@ -176,22 +182,25 @@ final class JIComObjectImpl implements IJIComObject
             return false;
         }
 
-        return ( this.ptr.getIPID ().equalsIgnoreCase ( ( (IJIComObject)obj ).getIpid () ) );
+        return this.ptr.getIPID ().equalsIgnoreCase ( ( (IJIComObject)obj ).getIpid () );
     }
 
+    @Override
     public int hashCode ()
     {
-        return ptr.getIPID ().hashCode ();
+        return this.ptr.getIPID ().hashCode ();
     }
 
+    @Override
     public JISession getAssociatedSession ()
     {
-        return session;
+        return this.session;
     }
 
+    @Override
     public String getInterfaceIdentifier ()
     {
-        return ptr.getIID ();
+        return this.ptr.getIID ();
     }
 
     //	public JIComServer getAssociatedComServer()
@@ -200,113 +209,126 @@ final class JIComObjectImpl implements IJIComObject
     //		return session.getStub();
     //	}
 
+    @Override
     public synchronized boolean isDispatchSupported ()
     {
         checkLocal ();
-        if ( !dualInfo )
+        if ( !this.dualInfo )
         {
             //query interface for it and then release it.
             try
             {
-                IJIComObject comObject = queryInterface ( "00020400-0000-0000-c000-000000000046" );
+                final IJIComObject comObject = queryInterface ( "00020400-0000-0000-c000-000000000046" );
                 comObject.release ();
                 setIsDual ( true );
             }
-            catch ( JIException e )
+            catch ( final JIException e )
             {
                 setIsDual ( false );
             }
         }
-        return isDual;
+        return this.isDual;
     }
 
-    public synchronized String internal_setConnectionInfo ( IJIComObject connectionPoint, Integer cookie )
+    @Override
+    public synchronized String internal_setConnectionInfo ( final IJIComObject connectionPoint, final Integer cookie )
     {
         checkLocal ();
-        if ( connectionPointInfo == null ) //lazy creation, since this is used by event callbacks only.
+        if ( this.connectionPointInfo == null ) //lazy creation, since this is used by event callbacks only.
         {
-            connectionPointInfo = new HashMap ();
+            this.connectionPointInfo = new HashMap ();
         }
-        String uniqueId = GUIDUtil.guidStringFromHexString ( IdentifierFactory.createUniqueIdentifier ().toHexString () );
-        connectionPointInfo.put ( uniqueId, new Object[] { connectionPoint, cookie } );
+        final String uniqueId = GUIDUtil.guidStringFromHexString ( IdentifierFactory.createUniqueIdentifier ().toHexString () );
+        this.connectionPointInfo.put ( uniqueId, new Object[] { connectionPoint, cookie } );
         return uniqueId;
     }
 
-    public synchronized Object[] internal_getConnectionInfo ( String identifier )
+    @Override
+    public synchronized Object[] internal_getConnectionInfo ( final String identifier )
     {
         checkLocal ();
-        return (Object[])connectionPointInfo.get ( identifier );
+        return (Object[])this.connectionPointInfo.get ( identifier );
     }
 
-    public synchronized Object[] internal_removeConnectionInfo ( String identifier )
+    @Override
+    public synchronized Object[] internal_removeConnectionInfo ( final String identifier )
     {
         checkLocal ();
-        return (Object[])connectionPointInfo.remove ( identifier );
+        return (Object[])this.connectionPointInfo.remove ( identifier );
     }
 
+    @Override
     public IJIUnreferenced getUnreferencedHandler ()
     {
         checkLocal ();
-        return session.getUnreferencedHandler ( getIpid () );
+        return this.session.getUnreferencedHandler ( getIpid () );
     }
 
-    public void registerUnreferencedHandler ( IJIUnreferenced unreferenced )
+    @Override
+    public void registerUnreferencedHandler ( final IJIUnreferenced unreferenced )
     {
         checkLocal ();
-        session.registerUnreferencedHandler ( getIpid (), unreferenced );
+        this.session.registerUnreferencedHandler ( getIpid (), unreferenced );
     }
 
+    @Override
     public void unregisterUnreferencedHandler ()
     {
         checkLocal ();
-        session.unregisterUnreferencedHandler ( getIpid () );
+        this.session.unregisterUnreferencedHandler ( getIpid () );
     }
 
-    public Object[] call ( JICallBuilder obj, int socketTimeout ) throws JIException
+    @Override
+    public Object[] call ( final JICallBuilder obj, final int socketTimeout ) throws JIException
     {
         checkLocal ();
-        obj.attachSession ( session );
-        obj.setParentIpid ( ptr.getIPID () );
+        obj.attachSession ( this.session );
+        obj.setParentIpid ( this.ptr.getIPID () );
         //Call is always made on your stub.
 
         if ( socketTimeout != 0 ) //using instance level timeout
         {
-            return session.getStub ().call ( obj, ptr.getIID (), socketTimeout );
+            return this.session.getStub ().call ( obj, this.ptr.getIID (), socketTimeout );
         }
         else
         {
-            return session.getStub ().call ( obj, ptr.getIID () );
+            return this.session.getStub ().call ( obj, this.ptr.getIID () );
         }
     }
 
+    @Override
     public int getInstanceLevelSocketTimeout ()
     {
         checkLocal ();
-        return timeout;
+        return this.timeout;
     }
 
-    public void setInstanceLevelSocketTimeout ( int timeout )
+    @Override
+    public void setInstanceLevelSocketTimeout ( final int timeout )
     {
         checkLocal ();
         this.timeout = timeout;
     }
 
-    public void internal_setDeffered ( boolean deffered )
+    @Override
+    public void internal_setDeffered ( final boolean deffered )
     {
-        ptr.setDeffered ( deffered );
+        this.ptr.setDeffered ( deffered );
     }
 
+    @Override
     public boolean isLocalReference ()
     {
-        return isLocal;
+        return this.isLocal;
     }
 
-    void setIsDual ( boolean isDual )
+    void setIsDual ( final boolean isDual )
     {
         this.dualInfo = true;
         this.isDual = isDual;
     }
 
+    @Override
     public String toString ()
     {
         return "IJIComObject[" + internal_getInterfacePointer () + " , session: " + getAssociatedSession ().getSessionIdentifier () + ", isLocal: " + isLocalReference () + "]";

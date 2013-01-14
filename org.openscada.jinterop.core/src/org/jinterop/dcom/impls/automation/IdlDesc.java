@@ -45,16 +45,16 @@ public final class IdlDesc implements Serializable
 
     public final short wIDLFlags;
 
-    IdlDesc ( JIStruct values )
+    IdlDesc ( final JIStruct values )
     {
         if ( values == null )
         {
-            dwReserved = null;
-            wIDLFlags = -1;
+            this.dwReserved = null;
+            this.wIDLFlags = -1;
             return;
         }
-        dwReserved = (JIPointer)values.getMember ( 0 );
-        wIDLFlags = ( (Short)values.getMember ( 1 ) ).shortValue ();
+        this.dwReserved = (JIPointer)values.getMember ( 0 );
+        this.wIDLFlags = ( (Short)values.getMember ( 1 ) ).shortValue ();
     }
 
 }

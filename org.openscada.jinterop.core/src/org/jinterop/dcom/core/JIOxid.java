@@ -27,36 +27,38 @@ final class JIOxid implements Serializable
 
     byte[] oxid = null;
 
-    JIOxid ( byte[] oxid )
+    JIOxid ( final byte[] oxid )
     {
         this.oxid = oxid;
     }
 
     byte[] getOXID ()
     {
-        return oxid;
+        return this.oxid;
     }
 
+    @Override
     public int hashCode ()
     {
         int result = 1;
         //from SUN
-        for ( int i = 0; i < oxid.length; i++ )
+        for ( int i = 0; i < this.oxid.length; i++ )
         {
-            result = 31 * result + oxid[i];
+            result = 31 * result + this.oxid[i];
         }
         return result;
         //return Arrays.hashCode(oxid);
     }
 
-    public boolean equals ( Object obj )
+    @Override
+    public boolean equals ( final Object obj )
     {
         if ( ! ( obj instanceof JIOxid ) )
         {
             return false;
         }
 
-        return Arrays.equals ( oxid, ( (JIOxid)obj ).getOXID () );
+        return Arrays.equals ( this.oxid, ( (JIOxid)obj ).getOXID () );
     }
 
 }

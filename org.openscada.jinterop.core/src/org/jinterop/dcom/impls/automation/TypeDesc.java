@@ -51,49 +51,49 @@ public final class TypeDesc implements Serializable
 
     public final short vt;
 
-    TypeDesc ( JIStruct values )
+    TypeDesc ( final JIStruct values )
     {
         if ( values == null )
         {
-            typeDesc = null;
-            arrayDesc = null;
-            hrefType = -1;
-            vt = -1;
+            this.typeDesc = null;
+            this.arrayDesc = null;
+            this.hrefType = -1;
+            this.vt = -1;
             return;
         }
 
-        vt = ( (Short)values.getMember ( 1 ) ).shortValue ();
-        JIUnion union = (JIUnion)values.getMember ( 0 );
+        this.vt = ( (Short)values.getMember ( 1 ) ).shortValue ();
+        final JIUnion union = (JIUnion)values.getMember ( 0 );
 
-        if ( new Short ( vt ).equals ( VT_PTR ) || new Short ( vt ).equals ( VT_SAFEARRAY ) )
+        if ( new Short ( this.vt ).equals ( VT_PTR ) || new Short ( this.vt ).equals ( VT_SAFEARRAY ) )
         {
             JIPointer pointer = ( pointer = (JIPointer)union.getMembers ().get ( VT_PTR ) ) == null ? (JIPointer)union.getMembers ().get ( VT_SAFEARRAY ) : pointer;
-            typeDesc = new JIPointer ( new TypeDesc ( pointer ), false );
-            arrayDesc = null;
-            hrefType = -1;
+            this.typeDesc = new JIPointer ( new TypeDesc ( pointer ), false );
+            this.arrayDesc = null;
+            this.hrefType = -1;
         }
-        else if ( new Short ( vt ).equals ( VT_CARRAY ) )
+        else if ( new Short ( this.vt ).equals ( VT_CARRAY ) )
         {
-            hrefType = -1;
-            typeDesc = null;
-            arrayDesc = new JIPointer ( new ArrayDesc ( (JIPointer)union.getMembers ().get ( VT_CARRAY ) ) );
+            this.hrefType = -1;
+            this.typeDesc = null;
+            this.arrayDesc = new JIPointer ( new ArrayDesc ( (JIPointer)union.getMembers ().get ( VT_CARRAY ) ) );
         }
-        else if ( new Short ( vt ).equals ( VT_USERDEFINED ) )
+        else if ( new Short ( this.vt ).equals ( VT_USERDEFINED ) )
         {
-            typeDesc = null;
-            arrayDesc = null;
-            hrefType = ( (Integer)union.getMembers ().get ( VT_USERDEFINED ) ).intValue ();
+            this.typeDesc = null;
+            this.arrayDesc = null;
+            this.hrefType = ( (Integer)union.getMembers ().get ( VT_USERDEFINED ) ).intValue ();
         }
         else
         {
-            typeDesc = null;
-            arrayDesc = null;
-            hrefType = -1;
+            this.typeDesc = null;
+            this.arrayDesc = null;
+            this.hrefType = -1;
         }
 
     }
 
-    TypeDesc ( JIPointer values )
+    TypeDesc ( final JIPointer values )
     {
         this ( values.isNull () ? null : (JIStruct)values.getReferent () );
     }

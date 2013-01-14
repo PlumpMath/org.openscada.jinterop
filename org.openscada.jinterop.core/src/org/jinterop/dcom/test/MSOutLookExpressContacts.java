@@ -21,16 +21,16 @@ public class MSOutLookExpressContacts
 
     JIComServer comServer = null;
 
-    MSOutLookExpressContacts ( String args[] ) throws UnknownHostException, JIException
+    MSOutLookExpressContacts ( final String args[] ) throws UnknownHostException, JIException
     {
-        session = JISession.createSession ( args[1], args[2], args[3] );
-        comServer = new JIComServer ( JIProgId.valueOf ( "Outlook.Application" ), args[0], session );
+        this.session = JISession.createSession ( args[1], args[2], args[3] );
+        this.comServer = new JIComServer ( JIProgId.valueOf ( "Outlook.Application" ), args[0], this.session );
     }
 
     void doStuff () throws JIException
     {
-        IJIComObject unknown = (IJIComObject)comServer.createInstance ();
-        IJIComObject application = (IJIComObject)unknown.queryInterface ( "00063001-0000-0000-C000-000000000046" );
+        final IJIComObject unknown = this.comServer.createInstance ();
+        final IJIComObject application = unknown.queryInterface ( "00063001-0000-0000-C000-000000000046" );
 
         JICallBuilder callObject = new JICallBuilder ( !application.isDispatchSupported () );
         callObject.setOpnum ( 12 );
@@ -38,7 +38,7 @@ public class MSOutLookExpressContacts
         callObject.addOutParamAsType ( IJIComObject.class, JIFlags.FLAG_NULL );
         Object[] res = application.call ( callObject );
 
-        IJIComObject namespace = JIObjectFactory.narrowObject ( (IJIComObject)res[0] );
+        final IJIComObject namespace = JIObjectFactory.narrowObject ( (IJIComObject)res[0] );
         callObject = new JICallBuilder ();
         callObject.setOpnum ( 16 );
         callObject.addOutParamAsType ( IJIComObject.class, JIFlags.FLAG_NULL );
@@ -50,7 +50,7 @@ public class MSOutLookExpressContacts
             return;
         }
 
-        IJIComObject folder = JIObjectFactory.narrowObject ( (IJIComObject)res[0] );
+        final IJIComObject folder = JIObjectFactory.narrowObject ( (IJIComObject)res[0] );
         callObject = new JICallBuilder ();
         callObject.setOpnum ( 4 );
         callObject.addOutParamAsType ( Integer.class, JIFlags.FLAG_NULL );
@@ -72,7 +72,7 @@ public class MSOutLookExpressContacts
             return;
         }
 
-        IJIComObject items = JIObjectFactory.narrowObject ( (IJIComObject)res[0] );
+        final IJIComObject items = JIObjectFactory.narrowObject ( (IJIComObject)res[0] );
         callObject = new JICallBuilder ();
         callObject.setOpnum ( 12 );
         callObject.addOutParamAsType ( IJIComObject.class, JIFlags.FLAG_NULL );
@@ -86,7 +86,7 @@ public class MSOutLookExpressContacts
             }
 
             String details = null;
-            IJIDispatch contactItem = (IJIDispatch)JIObjectFactory.narrowObject ( (IJIComObject)res[0] );
+            final IJIDispatch contactItem = (IJIDispatch)JIObjectFactory.narrowObject ( (IJIComObject)res[0] );
             JIVariant res2 = contactItem.get ( "FullName" );
             //			callObject = new JICallBuilder(contactItem.getIpid());
             //			callObject.setOpnum(124);
@@ -111,7 +111,7 @@ public class MSOutLookExpressContacts
 
     }
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
         if ( args.length < 4 )
         {
@@ -121,16 +121,16 @@ public class MSOutLookExpressContacts
         JISystem.setAutoRegisteration ( true );
         try
         {
-            MSOutLookExpressContacts outlookMessages = new MSOutLookExpressContacts ( args );
+            final MSOutLookExpressContacts outlookMessages = new MSOutLookExpressContacts ( args );
             outlookMessages.doStuff ();
             JISession.destroySession ( outlookMessages.session );
         }
-        catch ( UnknownHostException e )
+        catch ( final UnknownHostException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();
         }
-        catch ( JIException e )
+        catch ( final JIException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();

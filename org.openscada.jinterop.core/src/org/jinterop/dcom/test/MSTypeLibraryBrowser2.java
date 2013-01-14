@@ -1,7 +1,6 @@
 package org.jinterop.dcom.test;
 
 import java.net.UnknownHostException;
-import java.util.logging.Level;
 
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
@@ -33,30 +32,30 @@ public class MSTypeLibraryBrowser2
 
     private IJIComObject unknown = null;
 
-    public MSTypeLibraryBrowser2 ( String address, String args[] ) throws JIException, UnknownHostException
+    public MSTypeLibraryBrowser2 ( final String address, final String args[] ) throws JIException, UnknownHostException
     {
-        JISession session = JISession.createSession ( args[1], args[2], args[3] );
+        final JISession session = JISession.createSession ( args[1], args[2], args[3] );
         session.useSessionSecurity ( true );
-        comServer = new JIComServer ( JIProgId.valueOf ( args[4] ), address, session );
+        this.comServer = new JIComServer ( JIProgId.valueOf ( args[4] ), address, session );
     }
 
     public void start () throws JIException
     {
-        unknown = comServer.createInstance ();
-        dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( unknown.queryInterface ( IJIDispatch.IID ) );
-        IJITypeLib typeLib = (IJITypeLib) ( (Object[])dispatch.getTypeInfo ( 0 ).getContainingTypeLib () )[0];
+        this.unknown = this.comServer.createInstance ();
+        this.dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( this.unknown.queryInterface ( IJIDispatch.IID ) );
+        final IJITypeLib typeLib = (IJITypeLib)this.dispatch.getTypeInfo ( 0 ).getContainingTypeLib ()[0];
         Object[] result = typeLib.getDocumentation ( -1 );
         System.out.println ( "Name: " + ( (JIString)result[0] ).getString () );
         System.out.println ( "Library Name: " + ( (JIString)result[1] ).getString () );
         System.out.println ( "Full path to help file: " + ( (JIString)result[3] ).getString () );
         System.out.println ( "\n------------------------Library Members---------------------" );
-        int typeInfoCount = typeLib.getTypeInfoCount ();
-        String g_arrClassification[] = { "Enum", "Struct", "Module", "Interface", "Dispinterface", "Coclass", "Typedef", "Union" };
+        final int typeInfoCount = typeLib.getTypeInfoCount ();
+        final String g_arrClassification[] = { "Enum", "Struct", "Module", "Interface", "Dispinterface", "Coclass", "Typedef", "Union" };
         for ( int l = 0; l < typeInfoCount; l++ )
         {
             System.out.println ( "\n\n-----------------------Member Description--------------------------" );
             result = typeLib.getDocumentation ( l );
-            int k = typeLib.getTypeInfoType ( l );
+            final int k = typeLib.getTypeInfoType ( l );
 
             System.out.println ( "Name: " + ( (JIString)result[0] ).getString () );
             System.out.println ( "Type: " + g_arrClassification[k] );
@@ -81,7 +80,7 @@ public class MSTypeLibraryBrowser2
                     {
                         nFlags = typeInfo.getImplTypeFlags ( i );
                     }
-                    catch ( JIException e )
+                    catch ( final JIException e )
                     {
                         continue;
                     }
@@ -93,7 +92,7 @@ public class MSTypeLibraryBrowser2
                         {
                             hRefType = typeInfo.getRefTypeOfImplType ( i );
                         }
-                        catch ( JIException e )
+                        catch ( final JIException e )
                         {
                             break;
                         }
@@ -102,7 +101,7 @@ public class MSTypeLibraryBrowser2
                         {
                             ptempInfo = typeInfo.getRefTypeInfo ( hRefType );
                         }
-                        catch ( JIException e )
+                        catch ( final JIException e )
                         {
                             break;
                         }
@@ -111,7 +110,7 @@ public class MSTypeLibraryBrowser2
                         {
                             pTempAttr = ptempInfo.getTypeAttr ();
                         }
-                        catch ( JIException e )
+                        catch ( final JIException e )
                         {
                             System.out.println ( "Failed to get reference type info." );
                             return;
@@ -127,9 +126,9 @@ public class MSTypeLibraryBrowser2
                 typeAttr = pTempAttr;
             }
 
-            int m_nMethodCount = typeAttr.cFuncs;
-            int m_nVarCount = typeAttr.cVars;
-            int m_nDispInfoCount = m_nMethodCount + 2 * m_nVarCount;
+            final int m_nMethodCount = typeAttr.cFuncs;
+            final int m_nVarCount = typeAttr.cVars;
+            final int m_nDispInfoCount = m_nMethodCount + 2 * m_nVarCount;
             System.out.println ( "Method and variable count = " + m_nMethodCount + m_nVarCount + "\n\n" );
 
             for ( int i = 0; i < m_nMethodCount; i++ )
@@ -141,7 +140,7 @@ public class MSTypeLibraryBrowser2
                 {
                     pFuncDesc = typeInfo.getFuncDesc ( i );
                 }
-                catch ( JIException e )
+                catch ( final JIException e )
                 {
                     e.printStackTrace ();
                     return;
@@ -152,11 +151,11 @@ public class MSTypeLibraryBrowser2
                 int nCount;
                 try
                 {
-                    Object[] ret = typeInfo.getNames ( pFuncDesc.memberId, 1 );
+                    final Object[] ret = typeInfo.getNames ( pFuncDesc.memberId, 1 );
                     System.out.println ( "MethodName = " + ( (JIString) ( (Object[]) ( (JIArray)ret[0] ).getArrayInstance () )[0] ).getString () );
                     nCount = ( (Integer)ret[1] ).intValue ();
                 }
-                catch ( JIException e )
+                catch ( final JIException e )
                 {
                     System.out.println ( "GetNames failed." );
                     return;
@@ -186,11 +185,11 @@ public class MSTypeLibraryBrowser2
                 //TODO need to return a string representation of this.
                 System.out.println ( "Return type = " + pFuncDesc.elemdescFunc.typeDesc.vt );
                 System.out.println ( "ParamCount = " + pFuncDesc.cParams );
-                JIArray array = (JIArray)pFuncDesc.lprgelemdescParam.getReferent ();
+                final JIArray array = (JIArray)pFuncDesc.lprgelemdescParam.getReferent ();
                 ElemDesc[] types = null;
                 if ( array != null )
                 {
-                    Object[] temp = (Object[])array.getArrayInstance ();
+                    final Object[] temp = (Object[])array.getArrayInstance ();
                     types = new ElemDesc[temp.length];
                     for ( int k1 = 0; k1 < temp.length; k1++ )
                     {
@@ -201,11 +200,11 @@ public class MSTypeLibraryBrowser2
                 for ( int j = 0; j < pFuncDesc.cParams; j++ )
                 {
 
-                    if ( ( (ElemDesc)types[j] ).typeDesc.vt == TypeDesc.VT_SAFEARRAY.shortValue () )
+                    if ( types[j].typeDesc.vt == TypeDesc.VT_SAFEARRAY.shortValue () )
                     {
                         System.out.println ( "Param(" + j + ") type = SafeArray" );
                     }
-                    else if ( ( (ElemDesc)types[j] ).typeDesc.vt == TypeDesc.VT_PTR.shortValue () )
+                    else if ( types[j].typeDesc.vt == TypeDesc.VT_PTR.shortValue () )
                     {
                         System.out.println ( "Param(" + j + ") type = Pointer" );
                     }
@@ -224,7 +223,7 @@ public class MSTypeLibraryBrowser2
                 {
                     pVarDesc = typeInfo.getVarDesc ( i - m_nMethodCount );
                 }
-                catch ( JIException e )
+                catch ( final JIException e )
                 {
                     System.out.println ( "GetVarDesc failed." );
                     return;
@@ -235,11 +234,11 @@ public class MSTypeLibraryBrowser2
                 int nCount;
                 try
                 {
-                    Object[] ret = typeInfo.getNames ( pVarDesc.memberId, 1 );
+                    final Object[] ret = typeInfo.getNames ( pVarDesc.memberId, 1 );
                     System.out.println ( "VarName = " + ( (JIString) ( (Object[]) ( (JIArray)ret[0] ).getArrayInstance () )[0] ).getString () );
                     nCount = ( (Integer)ret[1] ).intValue ();
                 }
-                catch ( JIException e )
+                catch ( final JIException e )
                 {
                     System.out.println ( "GetNames failed." );
                     return;
@@ -260,10 +259,10 @@ public class MSTypeLibraryBrowser2
         }
 
         System.out.println ( "########################Execution complete#########################" );
-        JISession.destroySession ( dispatch.getAssociatedSession () );
+        JISession.destroySession ( this.dispatch.getAssociatedSession () );
     }
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
         try
         {
@@ -272,12 +271,13 @@ public class MSTypeLibraryBrowser2
                 System.out.println ( "Please provide address domain username password progIdOfApplication" );
                 return;
             }
-            JISystem.getLogger ().setLevel ( Level.OFF );
+            // JR: JISystem.getLogger ().setLevel ( Level.OFF );
+            // JR: configure using slf4j now
             JISystem.setInBuiltLogHandler ( false );
-            MSTypeLibraryBrowser2 typeLibraryBrowser = new MSTypeLibraryBrowser2 ( args[0], args );
+            final MSTypeLibraryBrowser2 typeLibraryBrowser = new MSTypeLibraryBrowser2 ( args[0], args );
             typeLibraryBrowser.start ();
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();

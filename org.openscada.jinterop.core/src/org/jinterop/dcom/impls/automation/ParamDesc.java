@@ -57,18 +57,18 @@ public final class ParamDesc implements Serializable
      */
     public final short wPARAMFlags;
 
-    ParamDesc ( JIStruct values )
+    ParamDesc ( final JIStruct values )
     {
         if ( values == null )
         {
-            lpVarValue = null;
-            wPARAMFlags = -1;
+            this.lpVarValue = null;
+            this.wPARAMFlags = -1;
             return;
         }
 
-        lpVarValue = (JIPointer)values.getMember ( 0 );
+        this.lpVarValue = (JIPointer)values.getMember ( 0 );
         //lpVarValue = (JIVariant)values.getMember(0);
-        wPARAMFlags = ( (Short)values.getMember ( 1 ) ).shortValue ();
+        this.wPARAMFlags = ( (Short)values.getMember ( 1 ) ).shortValue ();
     }
 
 }

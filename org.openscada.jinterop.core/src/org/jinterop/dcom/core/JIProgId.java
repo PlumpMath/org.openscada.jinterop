@@ -72,7 +72,7 @@ public class JIProgId
      *            <code>true</code> if auto registration should be done by the
      *            framework.
      */
-    public void setAutoRegistration ( boolean autoRegister )
+    public void setAutoRegistration ( final boolean autoRegister )
     {
         this.autoRegister = autoRegister;
     }
@@ -85,16 +85,16 @@ public class JIProgId
      */
     public boolean isAutoRegistrationSet ()
     {
-        return autoRegister;
+        return this.autoRegister;
     }
 
-    private JIProgId ( String progId )
+    private JIProgId ( final String progId )
     {
         this.progId = progId;
-        clsid = JIClsid.valueOf ( JISystem.getClsidFromProgId ( progId ) );
+        this.clsid = JIClsid.valueOf ( JISystem.getClsidFromProgId ( progId ) );
     }
 
-    void setServer ( String server )
+    void setServer ( final String server )
     {
         this.server = server;
     }
@@ -121,37 +121,37 @@ public class JIProgId
         //			throw new JIException(JIErrorCodes.JI_WINREG_EXCEPTION3);
         //		}
 
-        if ( server == null )
+        if ( this.server == null )
         {
-            server = session.getTargetServer ();
+            this.server = this.session.getTargetServer ();
         }
 
         try
         {
-            if ( session.isSSOEnabled () )
+            if ( this.session.isSSOEnabled () )
             {
-                winreg = JIWinRegFactory.getSingleTon ().getWinreg ( server, true );
+                winreg = JIWinRegFactory.getSingleTon ().getWinreg ( this.server, true );
             }
             else
             {
-                winreg = JIWinRegFactory.getSingleTon ().getWinreg ( new JIDefaultAuthInfoImpl ( session.getDomain (), session.getUserName (), session.getPassword () ), server, true );
+                winreg = JIWinRegFactory.getSingleTon ().getWinreg ( new JIDefaultAuthInfoImpl ( this.session.getDomain (), this.session.getUserName (), this.session.getPassword () ), this.server, true );
             }
 
         }
-        catch ( UnknownHostException e )
+        catch ( final UnknownHostException e )
         {
             throw new JIException ( JIErrorCodes.JI_WINREG_EXCEPTION3 );
         }
-        JIPolicyHandle handle = winreg.winreg_OpenHKLM ();
-        JIPolicyHandle handle2 = winreg.winreg_OpenKey ( handle, "SOFTWARE\\Classes\\" + progId + "\\CLSID", IJIWinReg.KEY_READ );
-        String key = new String ( winreg.winreg_QueryValue ( handle2, 255 ) );
+        final JIPolicyHandle handle = winreg.winreg_OpenHKLM ();
+        final JIPolicyHandle handle2 = winreg.winreg_OpenKey ( handle, "SOFTWARE\\Classes\\" + this.progId + "\\CLSID", IJIWinReg.KEY_READ );
+        final String key = new String ( winreg.winreg_QueryValue ( handle2, 255 ) );
         winreg.winreg_CloseKey ( handle2 );
         winreg.winreg_CloseKey ( handle );
         winreg.closeConnection ();
         //seperate the {}
-        clsid = JIClsid.valueOf ( key.substring ( key.indexOf ( "{" ) + 1, key.indexOf ( "}" ) ) );
-        clsid.setAutoRegistration ( autoRegister );
-        JISystem.internal_setClsidtoProgId ( progId, clsid.getCLSID () );
+        this.clsid = JIClsid.valueOf ( key.substring ( key.indexOf ( "{" ) + 1, key.indexOf ( "}" ) ) );
+        this.clsid.setAutoRegistration ( this.autoRegister );
+        JISystem.internal_setClsidtoProgId ( this.progId, this.clsid.getCLSID () );
 
     }
 
@@ -163,7 +163,7 @@ public class JIProgId
      *            "Excel.Application"
      * @return
      */
-    public static JIProgId valueOf ( String progId )
+    public static JIProgId valueOf ( final String progId )
     {
         return new JIProgId ( progId );
     }
@@ -176,14 +176,14 @@ public class JIProgId
      */
     public JIClsid getCorrespondingCLSID () throws JIException
     {
-        if ( clsid == null )
+        if ( this.clsid == null )
         {
             getIdFromWinReg ();
         }
-        return clsid;
+        return this.clsid;
     }
 
-    void setSession ( JISession session )
+    void setSession ( final JISession session )
     {
         this.session = session;
     }

@@ -38,7 +38,7 @@ public class JIPolicyHandle
      * @exclude
      * @param newlyCreated
      */
-    public JIPolicyHandle ( boolean newlyCreated )
+    public JIPolicyHandle ( final boolean newlyCreated )
     {
         this.newlyCreated = newlyCreated;
     }

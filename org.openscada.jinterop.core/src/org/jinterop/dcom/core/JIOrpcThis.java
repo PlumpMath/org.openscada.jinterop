@@ -29,6 +29,8 @@ import ndr.NetworkDataRepresentation;
 import org.jinterop.dcom.common.JIComVersion;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import rpc.core.UUID;
 
@@ -37,6 +39,7 @@ import com.iwombat.util.GUIDUtil;
 
 final class JIOrpcThis implements Serializable
 {
+    private final static Logger logger = LoggerFactory.getLogger ( JIOrpcThis.class );
 
     private static final long serialVersionUID = 9148006530957254901L;
 
@@ -52,75 +55,75 @@ final class JIOrpcThis implements Serializable
 
     public JIOrpcThis ()
     {
-        cid = GUIDUtil.guidStringFromHexString ( IdentifierFactory.createUniqueIdentifier ().toHexString () );
+        this.cid = GUIDUtil.guidStringFromHexString ( IdentifierFactory.createUniqueIdentifier ().toHexString () );
     }
 
-    public JIOrpcThis ( UUID casualityIdentifier )
+    public JIOrpcThis ( final UUID casualityIdentifier )
     {
-        cid = casualityIdentifier.toString ();
+        this.cid = casualityIdentifier.toString ();
     }
 
-    public void setORPCFlags ( int flags )
+    public void setORPCFlags ( final int flags )
     {
         this.flags = flags;
     }
 
     public int getORPCFlags ()
     {
-        return flags;
+        return this.flags;
     }
 
-    public void setExtentArray ( JIOrpcExtentArray[] arry )
+    public void setExtentArray ( final JIOrpcExtentArray[] arry )
     {
         this.arry = arry;
     }
 
     public JIOrpcExtentArray[] getExtentArray ()
     {
-        return arry;
+        return this.arry;
     }
 
     public String getCasualityIdentifier ()
     {
-        return cid;
+        return this.cid;
     }
 
-    public void encode ( NetworkDataRepresentation ndr )
+    public void encode ( final NetworkDataRepresentation ndr )
     {
-        ndr.writeUnsignedShort ( version.getMajorVersion () ); //COM Major version
-        ndr.writeUnsignedShort ( version.getMinorVersion () ); //COM minor version
-        ndr.writeUnsignedLong ( flags ); // No Flags
+        ndr.writeUnsignedShort ( this.version.getMajorVersion () ); //COM Major version
+        ndr.writeUnsignedShort ( this.version.getMinorVersion () ); //COM minor version
+        ndr.writeUnsignedLong ( this.flags ); // No Flags
         ndr.writeUnsignedLong ( 0 ); // Reserved ...always 0.
 
         //the order here is important since the cid is always filled from the ctor hence will never be null.
-        String cid2 = cidForCallback.get () == null ? cid : (String)cidForCallback.get ();
+        final String cid2 = cidForCallback.get () == null ? this.cid : (String)cidForCallback.get ();
         //		System.out.println(cid2);
         rpc.core.UUID uuid = new rpc.core.UUID ( cid2 );
         try
         {
             uuid.encode ( ndr, ndr.getBuffer () );
         }
-        catch ( NdrException e )
+        catch ( final NdrException e )
         {
-            JISystem.getLogger ().throwing ( "JIOrpcThis", "encode", e );
+            logger.warn ( "JIOrpcThis", e );
         }
 
         int i = 0;
-        if ( arry != null && arry.length != 0 )
+        if ( this.arry != null && this.arry.length != 0 )
         {
-            ndr.writeUnsignedLong ( arry.length );
+            ndr.writeUnsignedLong ( this.arry.length );
             ndr.writeUnsignedLong ( 0 );
-            while ( i < arry.length )
+            while ( i < this.arry.length )
             {
-                JIOrpcExtentArray arryy = arry[i];
+                final JIOrpcExtentArray arryy = this.arry[i];
                 uuid = new rpc.core.UUID ( arryy.getGUID () );
                 try
                 {
                     uuid.encode ( ndr, ndr.getBuffer () );
                 }
-                catch ( NdrException e )
+                catch ( final NdrException e )
                 {
-                    JISystem.getLogger ().throwing ( "JIOrpcThis", "encode", e );
+                    logger.warn ( "encode", e );
                 }
 
                 ndr.writeUnsignedLong ( arryy.getSizeOfData () );
@@ -134,30 +137,30 @@ final class JIOrpcThis implements Serializable
         }
     }
 
-    static JIOrpcThis decode ( NetworkDataRepresentation ndr )
+    static JIOrpcThis decode ( final NetworkDataRepresentation ndr )
     {
-        JIOrpcThis retval = new JIOrpcThis ();
-        Map map = new HashMap ();
-        int majorVersion = ( (Short) ( JIMarshalUnMarshalHelper.deSerialize ( ndr, Short.class, null, JIFlags.FLAG_NULL, map ) ) ).intValue ();
-        int minorVersion = ( (Short) ( JIMarshalUnMarshalHelper.deSerialize ( ndr, Short.class, null, JIFlags.FLAG_NULL, map ) ) ).intValue ();
+        final JIOrpcThis retval = new JIOrpcThis ();
+        final Map map = new HashMap ();
+        final int majorVersion = ( (Short)JIMarshalUnMarshalHelper.deSerialize ( ndr, Short.class, null, JIFlags.FLAG_NULL, map ) ).intValue ();
+        final int minorVersion = ( (Short)JIMarshalUnMarshalHelper.deSerialize ( ndr, Short.class, null, JIFlags.FLAG_NULL, map ) ).intValue ();
 
         retval.version = new JIComVersion ( majorVersion, minorVersion );
-        retval.flags = ( (Integer) ( JIMarshalUnMarshalHelper.deSerialize ( ndr, Integer.class, null, JIFlags.FLAG_NULL, map ) ) ).intValue ();
+        retval.flags = ( (Integer)JIMarshalUnMarshalHelper.deSerialize ( ndr, Integer.class, null, JIFlags.FLAG_NULL, map ) ).intValue ();
 
         JIMarshalUnMarshalHelper.deSerialize ( ndr, Integer.class, null, JIFlags.FLAG_NULL, map );//reserved.
 
-        rpc.core.UUID uuid = new rpc.core.UUID ();
+        final rpc.core.UUID uuid = new rpc.core.UUID ();
         try
         {
             uuid.decode ( ndr, ndr.getBuffer () );
             retval.cid = uuid.toString ();
         }
-        catch ( NdrException e )
+        catch ( final NdrException e )
         {
-            JISystem.getLogger ().throwing ( "JIOrpcThis", "decode", e );
+            logger.warn ( "decode", e );
         }
 
-        JIStruct orpcextentarray = new JIStruct ();
+        final JIStruct orpcextentarray = new JIStruct ();
         try
         {
             //create the orpcextent struct
@@ -171,7 +174,7 @@ final class JIOrpcThis implements Serializable
 
              */
 
-            JIStruct orpcextent = new JIStruct ();
+            final JIStruct orpcextent = new JIStruct ();
             orpcextent.addMember ( UUID.class );
             orpcextent.addMember ( Integer.class ); //length
             orpcextent.addMember ( new JIArray ( Byte.class, null, 1, true ) );
@@ -191,36 +194,38 @@ final class JIOrpcThis implements Serializable
             //this is since the pointer is [unique]
             orpcextentarray.addMember ( new JIPointer ( new JIArray ( new JIPointer ( orpcextent ), null, 1, true ) ) );
         }
-        catch ( JIException e1 )
+        catch ( final JIException e1 )
         {
             //this won't fail...i am certain :)...
         }
 
-        List listOfDefferedPointers = new ArrayList ();
-        JIPointer orpcextentarrayptr = (JIPointer)JIMarshalUnMarshalHelper.deSerialize ( ndr, new JIPointer ( orpcextentarray ), listOfDefferedPointers, JIFlags.FLAG_NULL, map );
+        final List listOfDefferedPointers = new ArrayList ();
+        final JIPointer orpcextentarrayptr = (JIPointer)JIMarshalUnMarshalHelper.deSerialize ( ndr, new JIPointer ( orpcextentarray ), listOfDefferedPointers, JIFlags.FLAG_NULL, map );
         int x = 0;
 
         while ( x < listOfDefferedPointers.size () )
         {
-            ArrayList newList = new ArrayList ();
-            JIPointer replacement = (JIPointer)JIMarshalUnMarshalHelper.deSerialize ( ndr, (JIPointer)listOfDefferedPointers.get ( x ), newList, JIFlags.FLAG_NULL, map );
+            final ArrayList newList = new ArrayList ();
+            final JIPointer replacement = (JIPointer)JIMarshalUnMarshalHelper.deSerialize ( ndr, listOfDefferedPointers.get ( x ), newList, JIFlags.FLAG_NULL, map );
             ( (JIPointer)listOfDefferedPointers.get ( x ) ).replaceSelfWithNewPointer ( replacement ); //this should replace the value in the original place.
             x++;
             listOfDefferedPointers.addAll ( x, newList );
         }
 
-        ArrayList extentArrays = new ArrayList ();
+        final ArrayList extentArrays = new ArrayList ();
         //now read whether extend array exists or not
         if ( !orpcextentarrayptr.isNull () )
         {
-            JIPointer[] pointers = (JIPointer[]) ( (JIArray) ( (JIPointer) ( (JIStruct)orpcextentarrayptr.getReferent () ).getMember ( 2 ) ).getReferent () ).getArrayInstance ();
+            final JIPointer[] pointers = (JIPointer[]) ( (JIArray) ( (JIPointer) ( (JIStruct)orpcextentarrayptr.getReferent () ).getMember ( 2 ) ).getReferent () ).getArrayInstance ();
             for ( int i = 0; i < pointers.length; i++ )
             {
                 if ( pointers[i].isNull () )
+                {
                     continue;
+                }
 
-                JIStruct orpcextent2 = (JIStruct)pointers[i].getReferent ();
-                Byte[] byteArray = (Byte[]) ( (JIArray)orpcextent2.getMember ( 2 ) ).getArrayInstance ();
+                final JIStruct orpcextent2 = (JIStruct)pointers[i].getReferent ();
+                final Byte[] byteArray = (Byte[]) ( (JIArray)orpcextent2.getMember ( 2 ) ).getArrayInstance ();
 
                 extentArrays.add ( new JIOrpcExtentArray ( ( (UUID)orpcextent2.getMember ( 0 ) ).toString (), byteArray.length, byteArray ) );
             }

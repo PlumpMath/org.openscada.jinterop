@@ -30,7 +30,7 @@ public final class JIUnsignedInteger implements IJIUnsigned
 
     private final Long intValue;
 
-    JIUnsignedInteger ( Long intValue )
+    JIUnsignedInteger ( final Long intValue )
     {
         if ( intValue == null || intValue.longValue () < 0 )
         {
@@ -39,14 +39,16 @@ public final class JIUnsignedInteger implements IJIUnsigned
         this.intValue = intValue;
     }
 
+    @Override
     public int getType ()
     {
         return JIFlags.FLAG_REPRESENTATION_UNSIGNED_INT;
     }
 
+    @Override
     public Number getValue ()
     {
-        return intValue;
+        return this.intValue;
     }
 
 }

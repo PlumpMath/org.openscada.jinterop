@@ -19,7 +19,6 @@ package org.jinterop.dcom.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
 
 import ndr.NdrBuffer;
 import ndr.NetworkDataRepresentation;
@@ -27,6 +26,8 @@ import ndr.NetworkDataRepresentation;
 import org.jinterop.dcom.common.JIErrorCodes;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Internal Framework Helper class. Do not use outside of framework.
@@ -36,12 +37,14 @@ import org.jinterop.dcom.common.JISystem;
 public final class JIFrameworkHelper
 {
 
+    private final static Logger logger = LoggerFactory.getLogger ( JIFrameworkHelper.class );
+
     /**
      * @exclude
      * @param src
      * @param target
      */
-    static void link2Sessions ( JISession src, JISession target )
+    static void link2Sessions ( final JISession src, final JISession target )
     {
         if ( src == null || target == null )
         {
@@ -56,7 +59,7 @@ public final class JIFrameworkHelper
      * @param src
      * @param target
      */
-    static void unLinkSession ( JISession src, JISession unlinkedSession )
+    static void unLinkSession ( final JISession src, final JISession unlinkedSession )
     {
         if ( src == null || unlinkedSession == null )
         {
@@ -71,7 +74,7 @@ public final class JIFrameworkHelper
      * @param src
      * @param target
      */
-    static JISession resolveSessionForOXID ( byte[] oxid )
+    static JISession resolveSessionForOXID ( final byte[] oxid )
     {
         return JISession.resolveSessionForOxid ( new JIOxid ( oxid ) );
     }
@@ -81,7 +84,7 @@ public final class JIFrameworkHelper
      * @param src
      * @param target
      */
-    static JIInterfacePointer getInterfacePointerOfStub ( JISession session )
+    static JIInterfacePointer getInterfacePointerOfStub ( final JISession session )
     {
         return session.getStub ().getServerInterfacePointer ();
     }
@@ -96,9 +99,9 @@ public final class JIFrameworkHelper
      * @return
      * @throws JIException
      */
-    static IJIComObject instantiateComObject ( JISession session, final JIInterfacePointer ptr ) throws JIException
+    static IJIComObject instantiateComObject ( final JISession session, final JIInterfacePointer ptr ) throws JIException
     {
-        IJIComObject retval = instantiateComObject2 ( session, ptr );
+        final IJIComObject retval = instantiateComObject2 ( session, ptr );
         addComObjectToSession ( retval.getAssociatedSession (), retval );
         return retval;
     }
@@ -111,13 +114,10 @@ public final class JIFrameworkHelper
         }
 
         IJIComObject retval = null;
-        JIInterfacePointer stubPtr = JIFrameworkHelper.getInterfacePointerOfStub ( session );
+        final JIInterfacePointer stubPtr = JIFrameworkHelper.getInterfacePointerOfStub ( session );
         if ( !JIInterfacePointer.isOxidEqual ( stubPtr, ptr ) )
         {
-            if ( JISystem.getLogger ().isLoggable ( Level.WARNING ) )
-            {
-                JISystem.getLogger ().warning ( "NEW SESSION IDENTIFIED ! for ptr " + ptr );
-            }
+            logger.warn ( "NEW SESSION IDENTIFIED ! for ptr {}", ptr );
             //first check if a session for this OXID does not already exist and thus its stub
             JISession newsession = JIFrameworkHelper.resolveSessionForOXID ( ptr.getOXID () );
             if ( newsession == null )
@@ -127,7 +127,7 @@ public final class JIFrameworkHelper
                 newsession.setGlobalSocketTimeout ( session.getGlobalSocketTimeout () );
                 newsession.useSessionSecurity ( session.isSessionSecurityEnabled () );
                 newsession.useNTLMv2 ( session.isNTLMv2Enabled () );
-                JIComServer comServer = new JIComServer ( newsession, ptr, null );
+                final JIComServer comServer = new JIComServer ( newsession, ptr, null );
                 retval = comServer.getInstance ();
                 JIFrameworkHelper.link2Sessions ( session, newsession );
             }
@@ -148,7 +148,7 @@ public final class JIFrameworkHelper
         return retval;
     }
 
-    static void addComObjectToSession ( JISession session, IJIComObject comObject )
+    static void addComObjectToSession ( final JISession session, final IJIComObject comObject )
     {
         session.addToSession ( comObject, comObject.internal_getInterfacePointer ().getOID () );
     }
@@ -160,7 +160,7 @@ public final class JIFrameworkHelper
      * @param javaComponent
      * @return
      */
-    public static IJIComObject instantiateLocalComObject ( JISession session, JILocalCoClass javaComponent ) throws JIException
+    public static IJIComObject instantiateLocalComObject ( final JISession session, final JILocalCoClass javaComponent ) throws JIException
     {
         return new JIComObjectImpl ( session, JIComOxidRuntime.getInterfacePointer ( session, javaComponent ), true );
     }
@@ -174,22 +174,22 @@ public final class JIFrameworkHelper
      * @return
      * @throws JIException
      */
-    public static IJIComObject instantiateComObject ( JISession session, byte[] rawBytes, String ipAddress ) throws JIException
+    public static IJIComObject instantiateComObject ( final JISession session, final byte[] rawBytes, final String ipAddress ) throws JIException
     {
-        NetworkDataRepresentation ndr = new NetworkDataRepresentation ();
-        NdrBuffer ndrBuffer = new NdrBuffer ( rawBytes, 0 );
+        final NetworkDataRepresentation ndr = new NetworkDataRepresentation ();
+        final NdrBuffer ndrBuffer = new NdrBuffer ( rawBytes, 0 );
         ndr.setBuffer ( ndrBuffer );
         ndrBuffer.length = rawBytes.length;
 
         //this is a brand new session.
         if ( session.getStub () == null )
         {
-            JIComServer comServer = new JIComServer ( session, JIInterfacePointer.decode ( ndr, new ArrayList (), JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2, new HashMap () ), ipAddress );
+            final JIComServer comServer = new JIComServer ( session, JIInterfacePointer.decode ( ndr, new ArrayList (), JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2, new HashMap () ), ipAddress );
             return comServer.getInstance ();
         }
         else
         {
-            IJIComObject retval = instantiateComObject ( session, JIInterfacePointer.decode ( ndr, new ArrayList (), JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2, new HashMap () ) );
+            final IJIComObject retval = instantiateComObject ( session, JIInterfacePointer.decode ( ndr, new ArrayList (), JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2, new HashMap () ) );
             //increasing the reference count.
             retval.addRef ();
             return retval;
@@ -208,7 +208,7 @@ public final class JIFrameworkHelper
      * @return
      * @throws JIException
      */
-    public static IJIComObject instantiateComObject ( JISession session, IJIComObject comObject ) throws JIException
+    public static IJIComObject instantiateComObject ( final JISession session, final IJIComObject comObject ) throws JIException
     {
         if ( comObject.getAssociatedSession () != null )
         {
@@ -229,23 +229,20 @@ public final class JIFrameworkHelper
      * @param identifier
      * @throws JIException
      */
-    public static void detachEventHandler ( IJIComObject comObject, String identifier ) throws JIException
+    public static void detachEventHandler ( final IJIComObject comObject, final String identifier ) throws JIException
     {
-        Object[] connectionInfo = comObject.internal_getConnectionInfo ( identifier );
+        final Object[] connectionInfo = comObject.internal_getConnectionInfo ( identifier );
         if ( connectionInfo == null )
         {
             throw new JIException ( JIErrorCodes.JI_CALLBACK_INVALID_ID );
         }
 
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-        {
-            JISystem.getLogger ().info ( "Detaching event handler for  comObject: " + comObject.getInterfaceIdentifier () + " , identifier: " + identifier );
-        }
+        logger.info ( "Detaching event handler for  comObject: {} , identifier: {}", comObject.getInterfaceIdentifier (), identifier );
 
-        IJIComObject connectionPointer = (IJIComObject)connectionInfo[0];
+        final IJIComObject connectionPointer = (IJIComObject)connectionInfo[0];
 
         //first use the cookie to detach.
-        JICallBuilder object = new JICallBuilder ( true );
+        final JICallBuilder object = new JICallBuilder ( true );
         object.setOpnum ( 3 );
         object.addInParamAsInt ( ( (Integer)connectionInfo[1] ).intValue (), JIFlags.FLAG_NULL );
         connectionPointer.call ( object );
@@ -261,46 +258,43 @@ public final class JIFrameworkHelper
      * @return
      * @throws JIException
      */
-    public static String attachEventHandler ( IJIComObject comObject, String sourceUUID, IJIComObject eventListener ) throws JIException
+    public static String attachEventHandler ( final IJIComObject comObject, final String sourceUUID, final IJIComObject eventListener ) throws JIException
     {
         if ( eventListener == null || comObject == null || sourceUUID == null || sourceUUID.equalsIgnoreCase ( "" ) )
         {
             throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_CALLBACK_INVALID_PARAMS ) );
         }
 
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
+        if ( logger.isInfoEnabled () )
         {
-            JISystem.getLogger ().info ( "Attaching event handler for  comObject: " + comObject.getInterfaceIdentifier () + " , sourceUUID: " + sourceUUID + " , eventListener: " + eventListener.getInterfaceIdentifier () + " and eventListner IPID: " + eventListener.getIpid () );
+            logger.info ( "Attaching event handler for  comObject: " + comObject.getInterfaceIdentifier () + " , sourceUUID: " + sourceUUID + " , eventListener: " + eventListener.getInterfaceIdentifier () + " and eventListner IPID: " + eventListener.getIpid () );
         }
         //IID of IConnectionPointContainer :- B196B284-BAB4-101A-B69C-00AA00341D07
-        IJIComObject connectionPointContainer = (IJIComObject)comObject.queryInterface ( "B196B284-BAB4-101A-B69C-00AA00341D07" );
-        JICallBuilder object = new JICallBuilder ( true );
+        final IJIComObject connectionPointContainer = comObject.queryInterface ( "B196B284-BAB4-101A-B69C-00AA00341D07" );
+        final JICallBuilder object = new JICallBuilder ( true );
         object.setOpnum ( 1 );
         object.addInParamAsUUID ( sourceUUID, JIFlags.FLAG_NULL );
         object.addOutParamAsObject ( IJIComObject.class, JIFlags.FLAG_NULL );
-        Object[] objects = (Object[])connectionPointContainer.call ( object ); //find connection point
-        IJIComObject connectionPointer = (IJIComObject)objects[0];
+        final Object[] objects = connectionPointContainer.call ( object ); //find connection point
+        final IJIComObject connectionPointer = (IJIComObject)objects[0];
 
         object.reInit ();
         object.setOpnum ( 2 );
         object.addInParamAsComObject ( eventListener, JIFlags.FLAG_NULL );
         object.addOutParamAsType ( Integer.class, JIFlags.FLAG_NULL );
-        Object[] obj = connectionPointer.call ( object );
+        final Object[] obj = connectionPointer.call ( object );
 
         //used to unadvise from the connectionpoint
-        Integer dwcookie = ( (Integer)obj[0] );
+        final Integer dwcookie = (Integer)obj[0];
 
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-        {
-            JISystem.getLogger ().info ( "Event handler returned cookie " + dwcookie );
-        }
+        logger.info ( "Event handler returned cookie {}", dwcookie );
         connectionPointContainer.release ();
 
         return comObject.internal_setConnectionInfo ( connectionPointer, dwcookie );
 
     }
 
-    public static int reverseArrayForDispatch ( JIArray arrayToReverse )
+    public static int reverseArrayForDispatch ( final JIArray arrayToReverse )
     {
         return arrayToReverse.reverseArrayForDispatch ();
     }

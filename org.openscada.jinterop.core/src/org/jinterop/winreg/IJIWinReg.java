@@ -93,20 +93,23 @@ public interface IJIWinReg
     {
         public JIPolicyHandle key = null;
 
+        @Override
         public int getOpnum ()
         {
             return 5;
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
             ndr.writeOctetArray ( key.handle, 0, 20 );
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
             ndr.readOctetArray ( policyhandle, 0, 20 );
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );
@@ -118,12 +121,14 @@ public interface IJIWinReg
 
     class openHKLM extends NdrObject
     {
+        @Override
         public int getOpnum ()
         {
             return 2;
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
             //it's a pointer
 
@@ -139,10 +144,11 @@ public interface IJIWinReg
             ndr.writeUnsignedLong ( 0x2000000 );
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
             ndr.readOctetArray ( policyhandle, 0, 20 );
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );
@@ -154,12 +160,14 @@ public interface IJIWinReg
 
     class openHKCU extends NdrObject
     {
+        @Override
         public int getOpnum ()
         {
             return 1;
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
             //it's a pointer
 
@@ -175,10 +183,11 @@ public interface IJIWinReg
             ndr.writeUnsignedLong ( 0x2000000 );
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
             ndr.readOctetArray ( policyhandle, 0, 20 );
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );
@@ -190,12 +199,14 @@ public interface IJIWinReg
 
     class openHKU extends NdrObject
     {
+        @Override
         public int getOpnum ()
         {
             return 4;
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
             //it's a pointer
 
@@ -211,10 +222,11 @@ public interface IJIWinReg
             ndr.writeUnsignedLong ( 0x2000000 );
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
             ndr.readOctetArray ( policyhandle, 0, 20 );
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );
@@ -226,12 +238,14 @@ public interface IJIWinReg
 
     class openHKCR extends NdrObject
     {
+        @Override
         public int getOpnum ()
         {
             return 0;
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
             //it's a pointer
 
@@ -247,10 +261,11 @@ public interface IJIWinReg
             ndr.writeUnsignedLong ( 0x2000000 );
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
             ndr.readOctetArray ( policyhandle, 0, 20 );
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );
@@ -268,6 +283,7 @@ public interface IJIWinReg
 
         public boolean isKey = false;
 
+        @Override
         public int getOpnum ()
         {
             if ( isKey )
@@ -280,7 +296,8 @@ public interface IJIWinReg
             }
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
             //write parent handle
             ndr.writeOctetArray ( parentKey.handle, 0, 20 );
@@ -311,9 +328,10 @@ public interface IJIWinReg
             ndr.writeUnsignedShort ( 0 );
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );
@@ -328,12 +346,14 @@ public interface IJIWinReg
 
         public String fileName = null;
 
+        @Override
         public int getOpnum ()
         {
             return 20;
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
             //write parent handle
             ndr.writeOctetArray ( parentKey.handle, 0, 20 );
@@ -363,16 +383,17 @@ public interface IJIWinReg
             //null termination
             ndr.writeUnsignedShort ( 0 );
             //now align for int
-            double index = new Integer ( ndr.getBuffer ().getIndex () ).doubleValue ();
+            final double index = new Integer ( ndr.getBuffer ().getIndex () ).doubleValue ();
             long k = ( k = Math.round ( index % 4.0 ) ) == 0 ? 0 : 4 - k;
             ndr.writeOctetArray ( new byte[(int)k], 0, (int)k );
 
             ndr.writeUnsignedLong ( 0 );
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );
@@ -393,12 +414,14 @@ public interface IJIWinReg
 
         public int actiontaken = -1;
 
+        @Override
         public int getOpnum ()
         {
             return 6;
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
 
             //write parent handle
@@ -435,7 +458,7 @@ public interface IJIWinReg
             ndr.writeOctetArray ( new byte[(int)k], 0, (int)k );
 
             //write the class
-            String clazz = "REG_SZ";
+            final String clazz = "REG_SZ";
             //clazz len , since it is uint16
             ndr.writeUnsignedShort ( ( clazz.length () + 1 ) * 2 );
             //clazz size, since it is uint16
@@ -478,13 +501,14 @@ public interface IJIWinReg
             ndr.writeUnsignedLong ( 0 );
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
             ndr.readOctetArray ( policyhandle, 0, 20 );
             //pointer to action taken
             ndr.readUnsignedLong ();
             actiontaken = ndr.readUnsignedLong ();
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );
@@ -510,12 +534,14 @@ public interface IJIWinReg
 
         public int dword;
 
+        @Override
         public int getOpnum ()
         {
             return 22;
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
 
             //write parent handle
@@ -641,9 +667,10 @@ public interface IJIWinReg
 
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );
@@ -660,12 +687,14 @@ public interface IJIWinReg
 
         public String[] retval = new String[2];
 
+        @Override
         public int getOpnum ()
         {
             return 9;
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
 
             //write parent handle
@@ -711,7 +740,8 @@ public interface IJIWinReg
             ndr.writeUnsignedLong ( 0 );
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
             //buffer len , since it is uint16
             ndr.readUnsignedShort ();
@@ -736,7 +766,7 @@ public interface IJIWinReg
             //last 2 bytes , null termination will be eaten outside the loop
             while ( i < actuallength - 1 )
             {
-                int retVal = ndr.readUnsignedShort ();
+                final int retVal = ndr.readUnsignedShort ();
                 bytes[i] = (byte)retVal;
                 i++;
             }
@@ -777,7 +807,7 @@ public interface IJIWinReg
             //last 2 bytes , null termination will be eaten outside the loop
             while ( i < actuallength - 1 )
             {
-                int retVal = ndr.readUnsignedShort ();
+                final int retVal = ndr.readUnsignedShort ();
                 bytes[i] = (byte)retVal;
                 i++;
             }
@@ -796,7 +826,7 @@ public interface IJIWinReg
             ndr.readUnsignedLong ();
             ndr.readUnsignedLong ();
 
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );
@@ -813,12 +843,14 @@ public interface IJIWinReg
 
         public Object[] retval = new Object[2];
 
+        @Override
         public int getOpnum ()
         {
             return 10;
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
 
             //write parent handle
@@ -855,7 +887,8 @@ public interface IJIWinReg
 
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
             //buffer len , since it is uint16
             ndr.readUnsignedShort ();
@@ -870,7 +903,7 @@ public interface IJIWinReg
             //offset
             ndr.readUnsignedLong ();
 
-            int actuallength = ndr.readUnsignedLong ();//actuallength
+            final int actuallength = ndr.readUnsignedLong ();//actuallength
             byte[] bytes = new byte[0];
             if ( actuallength != 0 )
             {
@@ -880,7 +913,7 @@ public interface IJIWinReg
             //last 2 bytes , null termination will be eaten outside the loop
             while ( i < actuallength - 1 )
             {
-                int retVal = ndr.readUnsignedShort ();
+                final int retVal = ndr.readUnsignedShort ();
                 bytes[i] = (byte)retVal;
                 i++;
             }
@@ -898,7 +931,7 @@ public interface IJIWinReg
             //referent
             ndr.readUnsignedLong ();
 
-            int type = ndr.readUnsignedLong ();
+            final int type = ndr.readUnsignedLong ();
             retval[1] = new Integer ( type );
 
             ndr.readUnsignedLong ();
@@ -909,7 +942,7 @@ public interface IJIWinReg
             ndr.readUnsignedLong ();
             ndr.readUnsignedLong ();
 
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );
@@ -926,12 +959,14 @@ public interface IJIWinReg
 
         public int accessMask = KEY_READ;
 
+        @Override
         public int getOpnum ()
         {
             return 15;
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
 
             //write parent handle
@@ -963,7 +998,7 @@ public interface IJIWinReg
             ndr.writeUnsignedShort ( 0 );
 
             //now align for int
-            double index = new Integer ( ndr.getBuffer ().getIndex () ).doubleValue ();
+            final double index = new Integer ( ndr.getBuffer ().getIndex () ).doubleValue ();
             long k = ( k = Math.round ( index % 4.0 ) ) == 0 ? 0 : 4 - k;
             ndr.writeOctetArray ( new byte[(int)k], 0, (int)k );
 
@@ -973,10 +1008,11 @@ public interface IJIWinReg
             ndr.writeUnsignedLong ( accessMask );
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
             ndr.readOctetArray ( policyhandle, 0, 20 );
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );
@@ -1000,12 +1036,14 @@ public interface IJIWinReg
 
         public byte[][] buffer2 = new byte[2048][];
 
+        @Override
         public int getOpnum ()
         {
             return 17;
         }
 
-        public void write ( NetworkDataRepresentation ndr )
+        @Override
+        public void write ( final NetworkDataRepresentation ndr )
         {
 
             //write parent handle
@@ -1037,7 +1075,7 @@ public interface IJIWinReg
             ndr.writeUnsignedShort ( 0 );
 
             //now align for int
-            double index = new Integer ( ndr.getBuffer ().getIndex () ).doubleValue ();
+            final double index = new Integer ( ndr.getBuffer ().getIndex () ).doubleValue ();
             long k = ( k = Math.round ( index % 4.0 ) ) == 0 ? 0 : 4 - k;
             ndr.writeOctetArray ( new byte[(int)k], 0, (int)k );
 
@@ -1061,7 +1099,8 @@ public interface IJIWinReg
             ndr.writeUnsignedLong ( 0 );
         }
 
-        public void read ( NetworkDataRepresentation ndr )
+        @Override
+        public void read ( final NetworkDataRepresentation ndr )
         {
             int i = 0;
             //pointer
@@ -1071,8 +1110,8 @@ public interface IJIWinReg
             //StringBuffer buffer = new StringBuffer();
             //pointer to data
             ndr.readUnsignedLong ();
-            int maxcount = ndr.readUnsignedLong (); //maxcount
-            int offset = ndr.readUnsignedLong ();//offset
+            final int maxcount = ndr.readUnsignedLong (); //maxcount
+            final int offset = ndr.readUnsignedLong ();//offset
             switch ( type )
             {
                 case REG_EXPAND_SZ: //for environment variable strings
@@ -1083,7 +1122,7 @@ public interface IJIWinReg
                     //last 2 bytes , null termination will be eaten outside the loop
                     while ( i < actuallength - 1 )
                     {
-                        int retVal = ndr.readUnsignedShort ();
+                        final int retVal = ndr.readUnsignedShort ();
                         //even though this is a unicode string , but will not have anything else
                         //other than ascii charset, which is supported by all encodings.
                         //buffer.append(new String(new byte[]{(byte)retVal}));
@@ -1098,7 +1137,7 @@ public interface IJIWinReg
                     break;
                 case REG_DWORD:
                     i = ndr.readUnsignedLong ();
-                    int value = ndr.readUnsignedLong ();
+                    final int value = ndr.readUnsignedLong ();
                     Encdec.enc_uint32le ( value, retval, 0 );
                     break;
                 case REG_NONE:
@@ -1115,7 +1154,7 @@ public interface IJIWinReg
                     //last 2 bytes , null termination will be eaten outside the loop
                     while ( i < actuallength - 1 )
                     {
-                        int retVal = ndr.readUnsignedShort ();
+                        final int retVal = ndr.readUnsignedShort ();
                         if ( retVal == 0 )
                         {
                             //reached end of one string
@@ -1154,7 +1193,7 @@ public interface IJIWinReg
             ndr.readUnsignedLong ();
             ndr.readUnsignedLong ();
 
-            int hresult = ndr.readUnsignedLong ();
+            final int hresult = ndr.readUnsignedLong ();
             if ( hresult != 0 )
             {
                 throw new JIRuntimeException ( hresult );

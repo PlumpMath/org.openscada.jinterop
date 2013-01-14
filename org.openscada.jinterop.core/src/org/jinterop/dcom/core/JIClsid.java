@@ -39,7 +39,7 @@ import rpc.core.UUID;
 public class JIClsid
 {
 
-    private UUID nestedUUID = new UUID ();
+    private final UUID nestedUUID = new UUID ();
 
     private boolean autoRegister = false;
 
@@ -54,7 +54,7 @@ public class JIClsid
      *            <code>true</code> if auto registration should be done by the
      *            framework.
      */
-    public void setAutoRegistration ( boolean autoRegister )
+    public void setAutoRegistration ( final boolean autoRegister )
     {
         this.autoRegister = autoRegister;
     }
@@ -67,7 +67,7 @@ public class JIClsid
      */
     public boolean isAutoRegistrationSet ()
     {
-        return autoRegister;
+        return this.autoRegister;
     }
 
     /**
@@ -77,7 +77,7 @@ public class JIClsid
      *            - clsid of the form "00000000-0000-0000-0000-000000000000"
      * @return - instance of JIClsid
      */
-    public static JIClsid valueOf ( String uuid )
+    public static JIClsid valueOf ( final String uuid )
     {
         if ( uuid == null )
         {
@@ -86,7 +86,7 @@ public class JIClsid
         return new JIClsid ( uuid );
     }
 
-    private JIClsid ( String uuid )
+    private JIClsid ( final String uuid )
     {
         this.nestedUUID.parse ( uuid );
     }
@@ -98,7 +98,7 @@ public class JIClsid
      */
     public String getCLSID ()
     {
-        return nestedUUID.toString ();
+        return this.nestedUUID.toString ();
     }
 
 }

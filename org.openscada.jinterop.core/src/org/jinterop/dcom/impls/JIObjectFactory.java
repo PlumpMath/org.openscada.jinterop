@@ -67,7 +67,7 @@ public class JIObjectFactory
      *             if any parameter is <code>null</code> or
      *             <code>sourceUUID</code> is empty.
      */
-    public static String attachEventHandler ( IJIComObject comObject, String sourceUUID, IJIComObject eventListener ) throws JIException
+    public static String attachEventHandler ( final IJIComObject comObject, final String sourceUUID, final IJIComObject eventListener ) throws JIException
     {
         return JIFrameworkHelper.attachEventHandler ( comObject, sourceUUID, eventListener );
 
@@ -82,7 +82,7 @@ public class JIObjectFactory
      * @param identifier
      * @throws JIException
      */
-    public static void detachEventHandler ( IJIComObject comObject, String identifier ) throws JIException
+    public static void detachEventHandler ( final IJIComObject comObject, final String identifier ) throws JIException
     {
         JIFrameworkHelper.detachEventHandler ( comObject, identifier );
     }
@@ -109,7 +109,7 @@ public class JIObjectFactory
         }
 
         //Will later on add another way to dynamically moving to factories.
-        IJIComObject retval = Internal_JIAutomationFactory.narrowObject ( comObject );
+        final IJIComObject retval = Internal_JIAutomationFactory.narrowObject ( comObject );
 
         return retval;
     }
@@ -129,7 +129,7 @@ public class JIObjectFactory
      * @return
      * @throws JIException
      */
-    public static IJIComObject buildObject ( JISession session, JILocalCoClass javaComponent ) throws JIException
+    public static IJIComObject buildObject ( final JISession session, final JILocalCoClass javaComponent ) throws JIException
     {
         return JIFrameworkHelper.instantiateLocalComObject ( session, javaComponent );
     }
@@ -151,7 +151,7 @@ public class JIObjectFactory
      * @throws IllegalArgumentException
      *             if <code>rawBytes</code> is an invalid representation.
      */
-    public static IJIComObject buildObject ( JISession session, byte[] rawBytes ) throws JIException
+    public static IJIComObject buildObject ( final JISession session, final byte[] rawBytes ) throws JIException
     {
         return narrowObject ( JIFrameworkHelper.instantiateComObject ( session, rawBytes, null ) );
     }
@@ -187,7 +187,7 @@ public class JIObjectFactory
      * @throws IllegalArgumentException
      *             if <code>rawBytes</code> is an invalid representation.
      */
-    public static IJIComObject buildObject ( JISession session, byte[] rawBytes, String ipAddress ) throws JIException
+    public static IJIComObject buildObject ( final JISession session, final byte[] rawBytes, final String ipAddress ) throws JIException
     {
         return narrowObject ( JIFrameworkHelper.instantiateComObject ( session, rawBytes, ipAddress ) );
     }
@@ -217,7 +217,7 @@ public class JIObjectFactory
      *             reference.
      * @see IJIComObject#isLocalReference()
      */
-    public static IJIComObject narrowObject ( JISession session, IJIComObject comObject ) throws JIException
+    public static IJIComObject narrowObject ( final JISession session, final IJIComObject comObject ) throws JIException
     {
         return narrowObject ( JIFrameworkHelper.instantiateComObject ( session, comObject ) );
     }

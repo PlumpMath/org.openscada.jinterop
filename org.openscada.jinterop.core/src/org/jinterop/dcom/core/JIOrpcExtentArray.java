@@ -33,29 +33,29 @@ final class JIOrpcExtentArray implements Serializable
 
     private Byte[] data = null;
 
-    JIOrpcExtentArray ( String guid, int size, Byte[] data )
+    JIOrpcExtentArray ( final String guid, final int size, final Byte[] data )
     {
-        uuid = guid;
+        this.uuid = guid;
         this.size = size;
         this.data = data;
     }
 
     public String getGUID ()
     {
-        return uuid;
+        return this.uuid;
     }
 
     public int getSizeOfData ()
     {
-        return size;
+        return this.size;
     }
 
     public byte[] getData ()
     {
-        byte[] newData = new byte[data.length];
-        for ( int i = 0; i < data.length; i++ )
+        final byte[] newData = new byte[this.data.length];
+        for ( int i = 0; i < this.data.length; i++ )
         {
-            newData[i] = data[i].byteValue ();
+            newData[i] = this.data[i].byteValue ();
         }
         return newData;
     }

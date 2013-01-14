@@ -25,11 +25,11 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.channels.SocketChannel;
 import java.util.Properties;
-import java.util.logging.Level;
 
 import ndr.NdrBuffer;
 
-import org.jinterop.dcom.common.JISystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import rpc.Endpoint;
 import rpc.ProviderException;
@@ -47,11 +47,13 @@ import rpc.core.PresentationSyntax;
 final class JIComTransport implements Transport
 {
 
+    private final static Logger logger = LoggerFactory.getLogger ( JIComTransport.class );
+
     public static final String PROTOCOL = "ncacn_ip_tcp";
 
     private static final String LOCALHOST;
 
-    private Properties properties;
+    private final Properties properties;
 
     private String host;
 
@@ -76,107 +78,121 @@ final class JIComTransport implements Transport
         {
             localhost = InetAddress.getLocalHost ().getHostName ();
         }
-        catch ( UnknownHostException ex )
+        catch ( final UnknownHostException ex )
         {
         }
         LOCALHOST = localhost;
     }
 
-    public JIComTransport ( String address, Properties properties ) throws ProviderException
+    public JIComTransport ( final String address, final Properties properties ) throws ProviderException
     {
         this.properties = properties;
         parse ( address );
     }
 
+    @Override
     public String getProtocol ()
     {
         return PROTOCOL;
     }
 
+    @Override
     public Properties getProperties ()
     {
-        return properties;
+        return this.properties;
     }
 
-    public Endpoint attach ( PresentationSyntax syntax ) throws IOException
+    @Override
+    public Endpoint attach ( final PresentationSyntax syntax ) throws IOException
     {
-        if ( attached )
+        if ( this.attached )
+        {
             throw new RpcException ( "Transport already attached." );
+        }
         try
         {
-            if ( JISystem.getLogger ().isLoggable ( Level.FINEST ) )
+            if ( logger.isDebugEnabled () )
             {
-                JISystem.getLogger ().finest ( "Opening socket on " + new InetSocketAddress ( InetAddress.getByName ( host ), port ) );
+                logger.debug ( "Opening socket on " + new InetSocketAddress ( InetAddress.getByName ( this.host ), this.port ) );
             }
 
-            channel = SocketChannel.open ( new InetSocketAddress ( InetAddress.getByName ( host ), port ) );
-            socket = channel.socket ();//new Socket(host, port);
-            output = null;
-            input = null;
-            attached = true;
-            socket.setKeepAlive ( true );//backup for not providing a timeout.
+            this.channel = SocketChannel.open ( new InetSocketAddress ( InetAddress.getByName ( this.host ), this.port ) );
+            this.socket = this.channel.socket ();//new Socket(host, port);
+            this.output = null;
+            this.input = null;
+            this.attached = true;
+            this.socket.setKeepAlive ( true );//backup for not providing a timeout.
             return new JIComEndpoint ( this, syntax );
         }
-        catch ( IOException ex )
+        catch ( final IOException ex )
         {
             try
             {
                 close ();
             }
-            catch ( Exception ignore )
+            catch ( final Exception ignore )
             {
             }
             throw ex;
         }
     }
 
+    @Override
     public void close () throws IOException
     {
         try
         {
-            if ( socket != null )
+            if ( this.socket != null )
             {
                 //            	input.close();
                 //            	output.close();
-                socket.shutdownInput ();
-                socket.shutdownOutput ();
-                socket.close ();
-                channel.close ();
-                if ( JISystem.getLogger ().isLoggable ( Level.FINEST ) )
-                {
-                    JISystem.getLogger ().finest ( "Socket closed... " + socket + " host " + host + " , port " + port );
-                }
+                this.socket.shutdownInput ();
+                this.socket.shutdownOutput ();
+                this.socket.close ();
+                this.channel.close ();
+
+                logger.debug ( "Socket closed... {} host {}, port {}", new Object[] { this.socket, this.host, this.port } );
             }
         }
         finally
         {
-            attached = false;
-            socket = null;
-            output = null;
-            input = null;
-            channel = null;
+            this.attached = false;
+            this.socket = null;
+            this.output = null;
+            this.input = null;
+            this.channel = null;
         }
     }
 
-    public void send ( NdrBuffer buffer ) throws IOException
+    @Override
+    public void send ( final NdrBuffer buffer ) throws IOException
     {
-        if ( !attached )
+        if ( !this.attached )
+        {
             throw new RpcException ( "Transport not attached." );
-        if ( output == null )
-            output = socket.getOutputStream ();
-        channel.configureBlocking ( true );
-        output.write ( buffer.getBuffer (), 0, buffer.getLength () );
-        output.flush ();
+        }
+        if ( this.output == null )
+        {
+            this.output = this.socket.getOutputStream ();
+        }
+        this.channel.configureBlocking ( true );
+        this.output.write ( buffer.getBuffer (), 0, buffer.getLength () );
+        this.output.flush ();
     }
 
-    public void receive ( NdrBuffer buffer ) throws IOException
+    @Override
+    public void receive ( final NdrBuffer buffer ) throws IOException
     {
-        if ( !attached )
+        if ( !this.attached )
+        {
             throw new RpcException ( "Transport not attached." );
+        }
         applySocketTimeout ();
-        if ( input == null )
-            input = socket.getInputStream ();
-        buffer.length = ( input.read ( buffer.getBuffer (), 0, buffer.getCapacity () ) );
+        if ( this.input == null )
+        {
+            this.input = this.socket.getInputStream ();
+        }
+        buffer.length = this.input.read ( buffer.getBuffer (), 0, buffer.getCapacity () );
     }
 
     private void applySocketTimeout ()
@@ -187,19 +203,19 @@ final class JIComTransport implements Transport
             timeout = Integer.parseInt ( this.properties.getProperty ( "rpc.socketTimeout", "0" ) );
             if ( timeout != 0 )
             {
-                socket.setSoTimeout ( timeout );
-                timeoutModifiedfrom0 = true;
+                this.socket.setSoTimeout ( timeout );
+                this.timeoutModifiedfrom0 = true;
             }
             else
             {
-                if ( timeoutModifiedfrom0 )
+                if ( this.timeoutModifiedfrom0 )
                 {
-                    socket.setSoTimeout ( timeout );
-                    timeoutModifiedfrom0 = false;
+                    this.socket.setSoTimeout ( timeout );
+                    this.timeoutModifiedfrom0 = false;
                 }
             }
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
         }
     }
@@ -229,16 +245,18 @@ final class JIComTransport implements Transport
         }
         address = address.substring ( 0, index );
         if ( "".equals ( server ) )
+        {
             server = LOCALHOST;
+        }
         try
         {
-            port = Integer.parseInt ( address );
+            this.port = Integer.parseInt ( address );
         }
-        catch ( Exception ex )
+        catch ( final Exception ex )
         {
             throw new ProviderException ( "Invalid port specifier." );
         }
-        host = server;
+        this.host = server;
     }
 
 }

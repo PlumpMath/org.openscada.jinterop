@@ -67,17 +67,17 @@ public final class JICurrency
             value = value + "0";
         }
 
-        String[] str = value.split ( "\\." );
+        final String[] str = value.split ( "\\." );
 
-        units = Integer.parseInt ( str[0] );
+        this.units = Integer.parseInt ( str[0] );
         if ( str.length > 1 )
         {
-            fractionalUnits = Integer.parseInt ( str[1] );
+            this.fractionalUnits = Integer.parseInt ( str[1] );
         }
 
     }
 
-    public JICurrency ( int units, int fractionalUnits )
+    public JICurrency ( final int units, final int fractionalUnits )
     {
         this.units = units;
         this.fractionalUnits = fractionalUnits;
@@ -90,7 +90,7 @@ public final class JICurrency
      */
     public int getUnits ()
     {
-        return units;
+        return this.units;
     }
 
     /**
@@ -100,7 +100,7 @@ public final class JICurrency
      */
     public int getFractionalUnits ()
     {
-        return fractionalUnits;
+        return this.fractionalUnits;
     }
 
     //	/**Returns the encapsulated value.

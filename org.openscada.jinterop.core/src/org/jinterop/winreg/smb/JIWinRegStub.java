@@ -45,7 +45,7 @@ public class JIWinRegStub extends Stub implements IJIWinReg
 {
 
     //"ncacn_np:" + servername + "[\\PIPE\\winreg]"
-    public JIWinRegStub ( IJIAuthInfo authInfo, String serverName ) throws UnknownHostException
+    public JIWinRegStub ( final IJIAuthInfo authInfo, String serverName ) throws UnknownHostException
     {
         super ();
         if ( authInfo == null )
@@ -61,23 +61,23 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         {
             password = URLEncoder.encode ( authInfo.getPassword (), "utf-8" );
         }
-        catch ( UnsupportedEncodingException e )
+        catch ( final UnsupportedEncodingException e )
         {
             try
             {
                 password = URLEncoder.encode ( authInfo.getPassword (), System.getProperty ( "file.encoding" ) );
             }
-            catch ( UnsupportedEncodingException e1 )
+            catch ( final UnsupportedEncodingException e1 )
             {
                 throw new JIRuntimeException ( JIErrorCodes.JI_WINREG_EXCEPTION2 );
             }
         }
         //some strange issue with the space character, it gets encoded to '+' (which is right) , but Windows refuses it.
         //Manually changing + to %20
-        StringBuffer password_ = new StringBuffer ();
+        final StringBuffer password_ = new StringBuffer ();
         for ( int i = 0; i < password.length (); i++ )
         {
-            char ch = password.charAt ( i );
+            final char ch = password.charAt ( i );
             if ( ch == '+' )
             {
                 password_.append ( "%20" );
@@ -107,23 +107,24 @@ public class JIWinRegStub extends Stub implements IJIWinReg
 
     }
 
+    @Override
     public JIPolicyHandle winreg_OpenHKLM () throws JIException
     {
-        openHKLM openhklm = new openHKLM ();
-        JIPolicyHandle handle = new JIPolicyHandle ( false );
+        final openHKLM openhklm = new openHKLM ();
+        final JIPolicyHandle handle = new JIPolicyHandle ( false );
         try
         {
             call ( Endpoint.IDEMPOTENT, openhklm );
         }
-        catch ( SmbException e )
+        catch ( final SmbException e )
         {
             throw new JIException ( e.getNtStatus (), e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.JI_WINREG_EXCEPTION, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
@@ -133,23 +134,24 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         return handle;
     }
 
+    @Override
     public JIPolicyHandle winreg_OpenHKCR () throws JIException
     {
-        openHKCR openhkcr = new openHKCR ();
-        JIPolicyHandle handle = new JIPolicyHandle ( false );
+        final openHKCR openhkcr = new openHKCR ();
+        final JIPolicyHandle handle = new JIPolicyHandle ( false );
         try
         {
             call ( Endpoint.IDEMPOTENT, openhkcr );
         }
-        catch ( SmbException e )
+        catch ( final SmbException e )
         {
             throw new JIException ( e.getNtStatus (), e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.JI_WINREG_EXCEPTION, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
@@ -159,23 +161,24 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         return handle;
     }
 
+    @Override
     public JIPolicyHandle winreg_OpenHKCU () throws JIException
     {
-        openHKCU openhkcu = new openHKCU ();
-        JIPolicyHandle handle = new JIPolicyHandle ( false );
+        final openHKCU openhkcu = new openHKCU ();
+        final JIPolicyHandle handle = new JIPolicyHandle ( false );
         try
         {
             call ( Endpoint.IDEMPOTENT, openhkcu );
         }
-        catch ( SmbException e )
+        catch ( final SmbException e )
         {
             throw new JIException ( e.getNtStatus (), e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.JI_WINREG_EXCEPTION, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
@@ -185,23 +188,24 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         return handle;
     }
 
+    @Override
     public JIPolicyHandle winreg_OpenHKU () throws JIException
     {
-        openHKU openhku = new openHKU ();
-        JIPolicyHandle handle = new JIPolicyHandle ( false );
+        final openHKU openhku = new openHKU ();
+        final JIPolicyHandle handle = new JIPolicyHandle ( false );
         try
         {
             call ( Endpoint.IDEMPOTENT, openhku );
         }
-        catch ( SmbException e )
+        catch ( final SmbException e )
         {
             throw new JIException ( e.getNtStatus (), e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.JI_WINREG_EXCEPTION, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
@@ -211,26 +215,27 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         return handle;
     }
 
-    public JIPolicyHandle winreg_OpenKey ( JIPolicyHandle handle, String key, int accessMask ) throws JIException
+    @Override
+    public JIPolicyHandle winreg_OpenKey ( final JIPolicyHandle handle, final String key, final int accessMask ) throws JIException
     {
-        openKey openkey = new openKey ();
+        final openKey openkey = new openKey ();
         openkey.accessMask = accessMask;
         openkey.key = key;
         openkey.parentKey = handle;
-        JIPolicyHandle newHandle = new JIPolicyHandle ( false );
+        final JIPolicyHandle newHandle = new JIPolicyHandle ( false );
         try
         {
             call ( Endpoint.IDEMPOTENT, openkey );
         }
-        catch ( SmbException e )
+        catch ( final SmbException e )
         {
             throw new JIException ( e.getNtStatus (), e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
@@ -240,31 +245,33 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         return newHandle;
     }
 
-    public void winreg_CloseKey ( JIPolicyHandle handle ) throws JIException
+    @Override
+    public void winreg_CloseKey ( final JIPolicyHandle handle ) throws JIException
     {
-        closeKey closekey = new closeKey ();
+        final closeKey closekey = new closeKey ();
         closekey.key = handle;
         try
         {
             call ( Endpoint.IDEMPOTENT, closekey );
         }
-        catch ( SmbException e )
+        catch ( final SmbException e )
         {
             throw new JIException ( e.getNtStatus (), e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
     }
 
-    public void winreg_DeleteKeyOrValue ( JIPolicyHandle handle, String valueName, boolean isKey ) throws JIException
+    @Override
+    public void winreg_DeleteKeyOrValue ( final JIPolicyHandle handle, final String valueName, final boolean isKey ) throws JIException
     {
-        deleteValueOrKey delete = new deleteValueOrKey ();
+        final deleteValueOrKey delete = new deleteValueOrKey ();
         delete.parentKey = handle;
         delete.valueName = valueName;
         delete.isKey = isKey;
@@ -272,38 +279,39 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         {
             call ( Endpoint.IDEMPOTENT, delete );
         }
-        catch ( SmbException e )
+        catch ( final SmbException e )
         {
             throw new JIException ( e.getNtStatus (), e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
     }
 
-    public byte[] winreg_QueryValue ( JIPolicyHandle handle, int bufferSize ) throws JIException
+    @Override
+    public byte[] winreg_QueryValue ( final JIPolicyHandle handle, final int bufferSize ) throws JIException
     {
-        queryValue queryvalue = new queryValue ();
+        final queryValue queryvalue = new queryValue ();
         queryvalue.parentKey = handle;
         queryvalue.bufferLength = bufferSize;
         try
         {
             call ( Endpoint.IDEMPOTENT, queryvalue );
         }
-        catch ( SmbException e )
+        catch ( final SmbException e )
         {
             throw new JIException ( e.getNtStatus (), e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
@@ -312,9 +320,10 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         return queryvalue.buffer;
     }
 
-    public Object[] winreg_QueryValue ( JIPolicyHandle handle, String valueName, int bufferSize ) throws JIException
+    @Override
+    public Object[] winreg_QueryValue ( final JIPolicyHandle handle, final String valueName, final int bufferSize ) throws JIException
     {
-        queryValue queryvalue = new queryValue ();
+        final queryValue queryvalue = new queryValue ();
         queryvalue.parentKey = handle;
         queryvalue.bufferLength = bufferSize;
         queryvalue.key = valueName;
@@ -323,25 +332,26 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         {
             call ( Endpoint.IDEMPOTENT, queryvalue );
         }
-        catch ( SmbException e )
+        catch ( final SmbException e )
         {
             throw new JIException ( e.getNtStatus (), e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
 
-        return new Object[] { new Integer ( queryvalue.type ), ( queryvalue.buffer != null ? (Object)queryvalue.buffer : (Object)queryvalue.buffer2 ) };
+        return new Object[] { new Integer ( queryvalue.type ), queryvalue.buffer != null ? (Object)queryvalue.buffer : (Object)queryvalue.buffer2 };
     }
 
-    public void winreg_SaveFile ( JIPolicyHandle handle, String fileName ) throws JIException
+    @Override
+    public void winreg_SaveFile ( final JIPolicyHandle handle, final String fileName ) throws JIException
     {
-        saveFile savefile = new saveFile ();
+        final saveFile savefile = new saveFile ();
         savefile.parentKey = handle;
         savefile.fileName = fileName;
 
@@ -349,24 +359,25 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         {
             call ( Endpoint.IDEMPOTENT, savefile );
         }
-        catch ( SmbException e )
+        catch ( final SmbException e )
         {
             throw new JIException ( e.getNtStatus (), e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
 
     }
 
-    public JIPolicyHandle winreg_CreateKey ( JIPolicyHandle handle, String subKey, int options, int accessMask ) throws JIException
+    @Override
+    public JIPolicyHandle winreg_CreateKey ( final JIPolicyHandle handle, final String subKey, final int options, final int accessMask ) throws JIException
     {
-        createKey createkey = new createKey ();
+        final createKey createkey = new createKey ();
         createkey.accessMask = accessMask;
         createkey.key = subKey;
         createkey.parentKey = handle;
@@ -376,26 +387,27 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         {
             call ( Endpoint.IDEMPOTENT, createkey );
         }
-        catch ( SmbException e )
+        catch ( final SmbException e )
         {
             throw new JIException ( e.getNtStatus (), e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
 
-        JIPolicyHandle newHandle = new JIPolicyHandle ( createkey.actiontaken == 1 ? true : false );
+        final JIPolicyHandle newHandle = new JIPolicyHandle ( createkey.actiontaken == 1 ? true : false );
         System.arraycopy ( createkey.policyhandle, 0, newHandle.handle, 0, 20 );
 
         return newHandle;
     }
 
-    public void winreg_SetValue ( JIPolicyHandle handle, String valueName, byte[][] data ) throws JIException
+    @Override
+    public void winreg_SetValue ( final JIPolicyHandle handle, final String valueName, final byte[][] data ) throws JIException
     {
         if ( data == null )
         {
@@ -403,17 +415,17 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         }
 
         //calculate length of all strings + extra null in the end
-        int totalStrings = data.length;
+        final int totalStrings = data.length;
         int length = 0;
         for ( int i = 0; i < totalStrings; i++ )
         {
-            int j = data[i].length;
+            final int j = data[i].length;
             length = length + ( j + 1 ) * 2; //including null termination
         }
 
         length = length + 2; //final termination
 
-        setValue setvalue = new setValue ();
+        final setValue setvalue = new setValue ();
         setvalue.clazzType = REG_MULTI_SZ;
         setvalue.data2 = data;
         setvalue.lengthInBytes = length;
@@ -422,18 +434,20 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         setValue ( setvalue );
     }
 
-    public void winreg_SetValue ( JIPolicyHandle handle, String valueName ) throws JIException
+    @Override
+    public void winreg_SetValue ( final JIPolicyHandle handle, final String valueName ) throws JIException
     {
-        setValue setvalue = new setValue ();
+        final setValue setvalue = new setValue ();
         setvalue.clazzType = REG_NONE;
         setvalue.parentKey = handle;
         setvalue.valueName = valueName;
         setValue ( setvalue );
     }
 
-    public void winreg_SetValue ( JIPolicyHandle handle, String valueName, byte[] data, boolean isBinary, boolean expand_sz ) throws JIException
+    @Override
+    public void winreg_SetValue ( final JIPolicyHandle handle, final String valueName, final byte[] data, final boolean isBinary, final boolean expand_sz ) throws JIException
     {
-        setValue setvalue = new setValue ();
+        final setValue setvalue = new setValue ();
         if ( isBinary )
         {
             setvalue.clazzType = REG_BINARY;
@@ -457,9 +471,10 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         setValue ( setvalue );
     }
 
-    public void winreg_SetValue ( JIPolicyHandle handle, String valueName, int data ) throws JIException
+    @Override
+    public void winreg_SetValue ( final JIPolicyHandle handle, final String valueName, final int data ) throws JIException
     {
-        setValue setvalue = new setValue ();
+        final setValue setvalue = new setValue ();
         setvalue.clazzType = REG_DWORD;
         setvalue.lengthInBytes = 4;
         setvalue.dword = data;
@@ -468,9 +483,10 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         setValue ( setvalue );
     }
 
-    public String[] winreg_EnumKey ( JIPolicyHandle handle, int index ) throws JIException
+    @Override
+    public String[] winreg_EnumKey ( final JIPolicyHandle handle, final int index ) throws JIException
     {
-        enumKey enumkey = new enumKey ();
+        final enumKey enumkey = new enumKey ();
         enumkey.parentKey = handle;
         enumkey.index = index;
 
@@ -478,11 +494,11 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         {
             call ( Endpoint.IDEMPOTENT, enumkey );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
@@ -490,9 +506,10 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         return enumkey.retval;
     }
 
-    public Object[] winreg_EnumValue ( JIPolicyHandle handle, int index ) throws JIException
+    @Override
+    public Object[] winreg_EnumValue ( final JIPolicyHandle handle, final int index ) throws JIException
     {
-        enumValue enumvalue = new enumValue ();
+        final enumValue enumvalue = new enumValue ();
         enumvalue.parentKey = handle;
         enumvalue.index = index;
 
@@ -500,11 +517,11 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         {
             call ( Endpoint.IDEMPOTENT, enumvalue );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
@@ -512,35 +529,37 @@ public class JIWinRegStub extends Stub implements IJIWinReg
         return enumvalue.retval;
     }
 
-    private void setValue ( setValue setvalue ) throws JIException
+    private void setValue ( final setValue setvalue ) throws JIException
     {
         try
         {
             call ( Endpoint.IDEMPOTENT, setvalue );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
         }
-        catch ( JIRuntimeException e )
+        catch ( final JIRuntimeException e )
         {
             throw new JIException ( e );
         }
     }
 
+    @Override
     protected String getSyntax ()
     {
         // WinReg Service
         return "338cd001-2244-31f1-aaaa-900038001003:1.0";
     }
 
+    @Override
     public void closeConnection () throws JIException
     {
         try
         {
             super.detach ();
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
         }

@@ -38,7 +38,7 @@ public class JIException extends Exception
     /**
      * @exclude
      */
-    public JIException ( int errorCode, String message )
+    public JIException ( final int errorCode, final String message )
     {
         this ( errorCode, message, null );
     }
@@ -46,7 +46,7 @@ public class JIException extends Exception
     /**
      * @exclude
      */
-    public JIException ( int errorCode )
+    public JIException ( final int errorCode )
     {
         this ( errorCode, (Throwable)null );
     }
@@ -54,7 +54,7 @@ public class JIException extends Exception
     /**
      * @exclude
      */
-    public JIException ( int errorCode, Throwable cause )
+    public JIException ( final int errorCode, final Throwable cause )
     {
         this ( errorCode, null, cause );
     }
@@ -62,7 +62,7 @@ public class JIException extends Exception
     /**
      * @exclude
      */
-    public JIException ( JIRuntimeException exception )
+    public JIException ( final JIRuntimeException exception )
     {
         this ( exception.getHResult (), null, exception );
     }
@@ -70,7 +70,7 @@ public class JIException extends Exception
     /**
      * @exclude
      */
-    public JIException ( int errorCode, String message, Throwable cause )
+    public JIException ( final int errorCode, final String message, final Throwable cause )
     {
         super.initCause ( cause );
         this.errorCode = errorCode;
@@ -82,14 +82,15 @@ public class JIException extends Exception
      * 
      * @return
      */
+    @Override
     public String getMessage ()
     {
-        return message == null ? message = initMessageFromBundle () : message;
+        return this.message == null ? this.message = initMessageFromBundle () : this.message;
     }
 
     private String initMessageFromBundle ()
     {
-        return ( message = JISystem.getLocalizedMessage ( errorCode ) );
+        return this.message = JISystem.getLocalizedMessage ( this.errorCode );
     }
 
     /**
@@ -100,6 +101,6 @@ public class JIException extends Exception
      */
     public int getErrorCode ()
     {
-        return errorCode;
+        return this.errorCode;
     }
 }

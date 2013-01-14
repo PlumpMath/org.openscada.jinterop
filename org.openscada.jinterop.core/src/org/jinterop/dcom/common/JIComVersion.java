@@ -41,30 +41,30 @@ public final class JIComVersion implements Serializable
     {
     }
 
-    public JIComVersion ( int majorVersion, int minorVersion )
+    public JIComVersion ( final int majorVersion, final int minorVersion )
     {
         this.majorVersion = majorVersion;
         this.minorVersion = minorVersion;
     }
 
-    public void setMajorVersion ( int majorVersion )
+    public void setMajorVersion ( final int majorVersion )
     {
         this.majorVersion = majorVersion;
     }
 
     public int getMajorVersion ()
     {
-        return majorVersion;
+        return this.majorVersion;
     }
 
-    public void setMinorVersion ( int minorVersion )
+    public void setMinorVersion ( final int minorVersion )
     {
         this.minorVersion = minorVersion;
     }
 
     public int getMinorVersion ()
     {
-        return minorVersion;
+        return this.minorVersion;
     }
 
 }

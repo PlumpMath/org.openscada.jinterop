@@ -108,7 +108,7 @@ public final class JIArray implements Serializable
      *             if <code>upperBounds</code> is supplied and its length
      *             is not equal to the <code>dimension</code> parameter.
      */
-    public JIArray ( Class clazz, int[] upperBounds, int dimension, boolean isConformant )
+    public JIArray ( final Class clazz, final int[] upperBounds, final int dimension, final boolean isConformant )
     {
         this.clazz = clazz;
         init2 ( upperBounds, dimension, isConformant, false );
@@ -133,7 +133,7 @@ public final class JIArray implements Serializable
      *             if <code>upperBounds</code> is supplied and its length
      *             is not equal to the <code>dimension</code> parameter.
      */
-    public JIArray ( Class clazz, int[] upperBounds, int dimension, boolean isConformant, boolean isVarying )
+    public JIArray ( final Class clazz, final int[] upperBounds, final int dimension, final boolean isConformant, final boolean isVarying )
     {
         this.clazz = clazz;
         init2 ( upperBounds, dimension, isConformant, isVarying );
@@ -183,7 +183,7 @@ public final class JIArray implements Serializable
      *             specified types.
      */
     //for structs, pointers , unions.
-    public JIArray ( Object template, int[] upperBounds, int dimension, boolean isConformant )
+    public JIArray ( final Object template, final int[] upperBounds, final int dimension, final boolean isConformant )
     {
         if ( template == null )
         {
@@ -225,7 +225,7 @@ public final class JIArray implements Serializable
      *             specified types.
      */
     //for structs, pointers , unions.
-    public JIArray ( Object template, int[] upperBounds, int dimension, boolean isConformant, boolean isVarying )
+    public JIArray ( final Object template, final int[] upperBounds, final int dimension, final boolean isConformant, final boolean isVarying )
     {
         if ( template == null )
         {
@@ -243,7 +243,7 @@ public final class JIArray implements Serializable
         init2 ( upperBounds, dimension, isConformant, isVarying );
     }
 
-    private void init2 ( int[] upperBounds, int dimension, boolean isConformant, boolean isVarying )
+    private void init2 ( final int[] upperBounds, final int dimension, final boolean isConformant, final boolean isVarying )
     {
         this.upperBounds = upperBounds;
         this.dimension = dimension;
@@ -263,10 +263,10 @@ public final class JIArray implements Serializable
 
         for ( int i = 0; upperBounds != null && i < upperBounds.length; i++ )
         {
-            numElementsInAllDimensions = numElementsInAllDimensions + upperBounds[i];
+            this.numElementsInAllDimensions = this.numElementsInAllDimensions + upperBounds[i];
             if ( isConformant )
             {
-                conformantMaxCounts.add ( new Integer ( upperBounds[i] ) );
+                this.conformantMaxCounts.add ( new Integer ( upperBounds[i] ) );
             }
         }
 
@@ -293,7 +293,7 @@ public final class JIArray implements Serializable
      *             is of primitive type or is an array of
      *             <code>java.lang.Object</code>.
      */
-    public JIArray ( Object array, boolean isConformant )
+    public JIArray ( final Object array, final boolean isConformant )
     {
         this.isConformant = isConformant;
         this.isConformantProxy = isConformant;
@@ -314,7 +314,7 @@ public final class JIArray implements Serializable
      *             is of primitive type or is an array of
      *             <code>java.lang.Object</code>.
      */
-    public JIArray ( Object array, boolean isConformant, boolean isVarying )
+    public JIArray ( final Object array, final boolean isConformant, final boolean isVarying )
     {
         this.isConformant = isConformant;
         this.isConformantProxy = isConformant;
@@ -341,12 +341,12 @@ public final class JIArray implements Serializable
      *             is of primitive type or is an array of
      *             <code>java.lang.Object</code>.
      */
-    public JIArray ( Object array )
+    public JIArray ( final Object array )
     {
         init ( array );
     }
 
-    private void init ( Object array )
+    private void init ( final Object array )
     {
         if ( !array.getClass ().isArray () )
         {
@@ -366,54 +366,54 @@ public final class JIArray implements Serializable
 
         this.memberArray = array;
 
-        ArrayList upperBounds2 = new ArrayList ();
+        final ArrayList upperBounds2 = new ArrayList ();
         String name = array.getClass ().getName ();
         Object subArray = array;
-        numElementsInAllDimensions = 1;
+        this.numElementsInAllDimensions = 1;
         while ( name.startsWith ( "[" ) )
         {
             name = name.substring ( 1 );
-            int x = ( (Object[])subArray ).length;
+            final int x = ( (Object[])subArray ).length;
             upperBounds2.add ( new Integer ( x ) );
-            numElementsInAllDimensions = numElementsInAllDimensions * x;
-            if ( isConformant )
+            this.numElementsInAllDimensions = this.numElementsInAllDimensions * x;
+            if ( this.isConformant )
             {
-                conformantMaxCounts.add ( new Integer ( x ) );
+                this.conformantMaxCounts.add ( new Integer ( x ) );
             }
-            clazz = subArray.getClass ().getComponentType ();
+            this.clazz = subArray.getClass ().getComponentType ();
             if ( x == 0 ) //In which ever index the length is 0 , the array stops there, example Byte[0],Byte[0][10],Byte[10][0]
             {
                 break;
             }
             subArray = Array.get ( subArray, 0 );
-            dimension++;
+            this.dimension++;
         }
 
-        if ( dimension == -1 )
+        if ( this.dimension == -1 )
         {
-            numElementsInAllDimensions = 0;
-            dimension++;
+            this.numElementsInAllDimensions = 0;
+            this.dimension++;
         }
 
-        upperBounds = new int[upperBounds2.size ()];
+        this.upperBounds = new int[upperBounds2.size ()];
         for ( int i = 0; i < upperBounds2.size (); i++ )
         {
-            upperBounds[i] = ( (Integer)upperBounds2.get ( i ) ).intValue ();
+            this.upperBounds[i] = ( (Integer)upperBounds2.get ( i ) ).intValue ();
         }
-        dimension++; //since it starts from -1.
-        sizeOfNestedArrayInBytes = computeLengthArray ( array );
+        this.dimension++; //since it starts from -1.
+        this.sizeOfNestedArrayInBytes = computeLengthArray ( array );
     }
 
-    private int computeLengthArray ( Object array )
+    private int computeLengthArray ( final Object array )
     {
         int length = 0;
-        String name = array.getClass ().getName ();
-        Object o[] = (Object[])array;
+        final String name = array.getClass ().getName ();
+        final Object o[] = (Object[])array;
         for ( int i = 0; i < o.length; i++ )
         {
             if ( name.charAt ( 1 ) != '[' )
             {
-                Object o1[] = (Object[])array;
+                final Object o1[] = (Object[])array;
                 for ( int j = 0; j < o1.length; j++ )
                 {
                     length = length + JIMarshalUnMarshalHelper.getLengthInBytes ( o1.getClass ().getComponentType (), o1[j], JIFlags.FLAG_NULL );
@@ -434,7 +434,7 @@ public final class JIArray implements Serializable
      */
     public Object getArrayInstance ()
     {
-        return memberArray;
+        return this.memberArray;
     }
 
     /**
@@ -444,7 +444,7 @@ public final class JIArray implements Serializable
      */
     public Class getArrayClass ()
     {
-        return clazz;
+        return this.clazz;
     }
 
     /**
@@ -454,7 +454,7 @@ public final class JIArray implements Serializable
      */
     public int[] getUpperBounds ()
     {
-        return upperBounds;
+        return this.upperBounds;
     }
 
     /**
@@ -464,7 +464,7 @@ public final class JIArray implements Serializable
      */
     public int getDimensions ()
     {
-        return dimension;
+        return this.dimension;
     }
 
     int getSizeOfAllElementsInBytes ()
@@ -472,55 +472,55 @@ public final class JIArray implements Serializable
         //		int length = numElementsInAllDimensions * JIMarshalUnMarshalHelper.getLengthInBytes(clazz,((Object[])memberArray)[0],JIFlags.FLAG_NULL);
 
         //this means that decode has created this array, and we need to compute the size to stay consistent.
-        if ( sizeOfNestedArrayInBytes == -1 )
+        if ( this.sizeOfNestedArrayInBytes == -1 )
         {
-            sizeOfNestedArrayInBytes = computeLengthArray ( memberArray );
+            this.sizeOfNestedArrayInBytes = computeLengthArray ( this.memberArray );
         }
 
-        return sizeOfNestedArrayInBytes;
+        return this.sizeOfNestedArrayInBytes;
     }
 
-    void encode ( NetworkDataRepresentation ndr, Object array, List defferedPointers, int FLAG )
+    void encode ( final NetworkDataRepresentation ndr, final Object array, final List defferedPointers, final int FLAG )
     {
         //	ArrayList listofDefferedPointers = new ArrayList();
 
-        if ( isConformantProxy )
+        if ( this.isConformantProxy )
         {
             //first write the max counts ...First to last dimension.
             int i = 0;
-            while ( i < conformantMaxCounts.size () )
+            while ( i < this.conformantMaxCounts.size () )
             {
-                JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, conformantMaxCounts.get ( i ), defferedPointers, FLAG );
+                JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, this.conformantMaxCounts.get ( i ), defferedPointers, FLAG );
                 i++;
             }
 
-            isConformantProxy = false; //this is since encode is recursive.
+            this.isConformantProxy = false; //this is since encode is recursive.
         }
 
-        if ( isVaryingProxy )
+        if ( this.isVaryingProxy )
         {
             //write the offset and the actual count
             int i = 0;
-            while ( i < conformantMaxCounts.size () )
+            while ( i < this.conformantMaxCounts.size () )
             {
                 JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, new Integer ( 0 ), defferedPointers, FLAG );//offset
-                JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, conformantMaxCounts.get ( i ), defferedPointers, FLAG );//actual count
+                JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, this.conformantMaxCounts.get ( i ), defferedPointers, FLAG );//actual count
                 i++;
             }
 
-            isVaryingProxy = false; //this is since encode is recursive.
+            this.isVaryingProxy = false; //this is since encode is recursive.
         }
 
-        String name = array.getClass ().getName ();
-        Object o[] = (Object[])array;
+        final String name = array.getClass ().getName ();
+        final Object o[] = (Object[])array;
         for ( int i = 0; i < o.length; i++ )
         {
             if ( name.charAt ( 1 ) != '[' )
             {
-                Object o1[] = (Object[])array;
+                final Object o1[] = (Object[])array;
                 for ( int j = 0; j < o1.length; j++ )
                 {
-                    JIMarshalUnMarshalHelper.serialize ( ndr, clazz, o1[j], defferedPointers, FLAG | JIFlags.FLAG_REPRESENTATION_ARRAY );
+                    JIMarshalUnMarshalHelper.serialize ( ndr, this.clazz, o1[j], defferedPointers, FLAG | JIFlags.FLAG_REPRESENTATION_ARRAY );
                 }
                 return;
             }
@@ -536,7 +536,7 @@ public final class JIArray implements Serializable
      */
     public boolean isConformant ()
     {
-        return isConformant;
+        return this.isConformant;
     }
 
     /**
@@ -546,15 +546,15 @@ public final class JIArray implements Serializable
      */
     public boolean isVarying ()
     {
-        return isVarying;
+        return this.isVarying;
     }
 
-    Object decode ( NetworkDataRepresentation ndr, Class arrayType, int dimension, List defferedPointers, int FLAG, Map additionalData )
+    Object decode ( final NetworkDataRepresentation ndr, final Class arrayType, final int dimension, final List defferedPointers, final int FLAG, final Map additionalData )
     {
-        JIArray retVal = new JIArray ();
-        retVal.isConformantProxy = isConformantProxy;
-        retVal.isVaryingProxy = isVaryingProxy;
-        if ( isConformantProxy )
+        final JIArray retVal = new JIArray ();
+        retVal.isConformantProxy = this.isConformantProxy;
+        retVal.isVaryingProxy = this.isVaryingProxy;
+        if ( this.isConformantProxy )
         {
 
             //first read the max counts ...First to last dimension.
@@ -567,7 +567,7 @@ public final class JIArray implements Serializable
 
             //isConformantProxy = false; //this is since decode is recursive.
 
-            if ( upperBounds == null )
+            if ( this.upperBounds == null )
             {
                 //max elements will come now.
                 retVal.numElementsInAllDimensions = 0;
@@ -581,19 +581,19 @@ public final class JIArray implements Serializable
                 }
                 if ( i == 0 )
                 {
-                    numElementsInAllDimensions = 0;
+                    this.numElementsInAllDimensions = 0;
                 }
                 //retVal.numElementsInAllDimensions = retVal.numElementsInAllDimensions * dimension;
             }
         }
         else
         {//this is the case when it is non conformant or coming from struct.
-            retVal.upperBounds = upperBounds;
-            retVal.conformantMaxCounts = conformantMaxCounts;
-            retVal.numElementsInAllDimensions = numElementsInAllDimensions;
+            retVal.upperBounds = this.upperBounds;
+            retVal.conformantMaxCounts = this.conformantMaxCounts;
+            retVal.numElementsInAllDimensions = this.numElementsInAllDimensions;
         }
 
-        if ( isVaryingProxy )
+        if ( this.isVaryingProxy )
         {
             //first read the max counts ...First to last dimension.
             int i = 0;
@@ -610,7 +610,7 @@ public final class JIArray implements Serializable
 
             //isConformantProxy = false; //this is since decode is recursive.
 
-            if ( upperBounds == null )
+            if ( this.upperBounds == null )
             {
                 //max elements will come now.
                 retVal.numElementsInAllDimensions = 1;
@@ -624,24 +624,24 @@ public final class JIArray implements Serializable
                 }
                 if ( i == 0 )
                 {
-                    numElementsInAllDimensions = 0;
+                    this.numElementsInAllDimensions = 0;
                 }
                 //retVal.numElementsInAllDimensions = retVal.numElementsInAllDimensions * dimension;
             }
 
         }
 
-        retVal.isConformant = isConformant;
-        retVal.isVarying = isVarying;
-        retVal.template = template;
+        retVal.isConformant = this.isConformant;
+        retVal.isVarying = this.isVarying;
+        retVal.template = this.template;
         retVal.memberArray = recurseDecode ( retVal, ndr, arrayType, dimension, defferedPointers, FLAG, additionalData );
-        retVal.clazz = clazz;
+        retVal.clazz = this.clazz;
         retVal.dimension = this.dimension;
         retVal.sizeOfNestedArrayInBytes = -1; // setting here so that when a call actually comes for it's lenght , the getLength will compute. This is required since while decoding many pointers are still not complete and their length cannot be decided.
         return retVal;
     }
 
-    private Object recurseDecode ( JIArray retVal, NetworkDataRepresentation ndr, Class arrayType, int dimension, List defferedPointers, int FLAG, Map additionalData )
+    private Object recurseDecode ( final JIArray retVal, final NetworkDataRepresentation ndr, final Class arrayType, final int dimension, final List defferedPointers, final int FLAG, final Map additionalData )
     {
         Object array = null;
         Class c = arrayType;
@@ -657,13 +657,13 @@ public final class JIArray implements Serializable
             {
                 //fill value here
                 //Array.set(array,i,new Float(i));
-                if ( template == null )
+                if ( this.template == null )
                 {
                     Array.set ( array, i, JIMarshalUnMarshalHelper.deSerialize ( ndr, c.getComponentType () == null ? c : c.getComponentType (), defferedPointers, FLAG | JIFlags.FLAG_REPRESENTATION_ARRAY, additionalData ) );
                 }
                 else
                 {
-                    Array.set ( array, i, JIMarshalUnMarshalHelper.deSerialize ( ndr, template, defferedPointers, FLAG | JIFlags.FLAG_REPRESENTATION_ARRAY, additionalData ) );
+                    Array.set ( array, i, JIMarshalUnMarshalHelper.deSerialize ( ndr, this.template, defferedPointers, FLAG | JIFlags.FLAG_REPRESENTATION_ARRAY, additionalData ) );
                 }
             }
             else
@@ -682,20 +682,22 @@ public final class JIArray implements Serializable
      */
     int reverseArrayForDispatch ()
     {
-        if ( memberArray == null )
+        if ( this.memberArray == null )
+        {
             return 0;
+        }
 
         int i = 0;
-        Stack stack = new Stack ();
-        for ( i = 0; i < ( (Object[])memberArray ).length; i++ )
+        final Stack stack = new Stack ();
+        for ( i = 0; i < ( (Object[])this.memberArray ).length; i++ )
         {
-            stack.push ( ( (Object[])memberArray )[i] );
+            stack.push ( ( (Object[])this.memberArray )[i] );
         }
 
         i = 0;
         while ( stack.size () > 0 )
         {
-            ( (Object[])memberArray )[i++] = stack.pop ();
+            ( (Object[])this.memberArray )[i++] = stack.pop ();
         }
 
         return i;
@@ -703,51 +705,51 @@ public final class JIArray implements Serializable
 
     List getConformantMaxCounts ()
     {
-        return conformantMaxCounts;
+        return this.conformantMaxCounts;
     }
 
-    void setConformant ( boolean isConformant )
+    void setConformant ( final boolean isConformant )
     {
-        isConformantProxy = isConformant;
+        this.isConformantProxy = isConformant;
     }
 
-    void setVarying ( boolean isVarying )
+    void setVarying ( final boolean isVarying )
     {
-        isVaryingProxy = isVarying;
+        this.isVaryingProxy = isVarying;
     }
 
-    void setMaxCountAndUpperBounds ( List maxCount )
+    void setMaxCountAndUpperBounds ( final List maxCount )
     {
-        conformantMaxCounts = maxCount;
+        this.conformantMaxCounts = maxCount;
         //	if (upperBounds == null) this will always be null since this api will get called from a decode and 
         //in that the upperBounds is always null, since one does not know the dim expected.
-        if ( conformantMaxCounts.size () > 0 )
+        if ( this.conformantMaxCounts.size () > 0 )
         {
             //max elements will come now.
-            numElementsInAllDimensions = 1;
-            upperBounds = new int[conformantMaxCounts.size ()];
+            this.numElementsInAllDimensions = 1;
+            this.upperBounds = new int[this.conformantMaxCounts.size ()];
             int i = 0;
-            while ( i < conformantMaxCounts.size () )
+            while ( i < this.conformantMaxCounts.size () )
             {
-                upperBounds[i] = ( (Integer)conformantMaxCounts.get ( i ) ).intValue ();
-                numElementsInAllDimensions = numElementsInAllDimensions * upperBounds[i];
+                this.upperBounds[i] = ( (Integer)this.conformantMaxCounts.get ( i ) ).intValue ();
+                this.numElementsInAllDimensions = this.numElementsInAllDimensions * this.upperBounds[i];
                 i++;
             }
             if ( i == 0 )
             {
-                numElementsInAllDimensions = 0;
+                this.numElementsInAllDimensions = 0;
             }
         }
         else
         {
-            upperBounds = null;
-            numElementsInAllDimensions = 0;
+            this.upperBounds = null;
+            this.numElementsInAllDimensions = 0;
         }
     }
 
     int getNumElementsInAllDimensions ()
     {
-        return numElementsInAllDimensions;
+        return this.numElementsInAllDimensions;
     }
 
     /**
@@ -770,28 +772,29 @@ public final class JIArray implements Serializable
      * @exclude
      * @param c
      */
-    void updateClazz ( Class c )
+    void updateClazz ( final Class c )
     {
-        clazz = c;
+        this.clazz = c;
     }
 
+    @Override
     public String toString ()
     {
-        String retVal = "[Type: " + clazz + " , ";
-        if ( memberArray == null )
+        String retVal = "[Type: " + this.clazz + " , ";
+        if ( this.memberArray == null )
         {
             retVal += "memberArray is null , ";
         }
         else
         {
-            retVal += memberArray + " , ";
+            retVal += this.memberArray + " , ";
         }
 
-        if ( isConformant )
+        if ( this.isConformant )
         {
             retVal += " conformant , ";
         }
-        if ( isVarying )
+        if ( this.isVarying )
         {
             retVal += " varying , ";
         }

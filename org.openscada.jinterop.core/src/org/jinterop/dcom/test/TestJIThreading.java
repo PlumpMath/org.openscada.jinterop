@@ -1,7 +1,6 @@
 package org.jinterop.dcom.test;
 
 import java.io.IOException;
-import java.util.logging.Level;
 
 import org.jinterop.dcom.common.JISystem;
 import org.jinterop.dcom.core.IJIComObject;
@@ -12,9 +11,13 @@ import org.jinterop.dcom.core.JIString;
 import org.jinterop.dcom.core.JIVariant;
 import org.jinterop.dcom.impls.JIObjectFactory;
 import org.jinterop.dcom.impls.automation.IJIDispatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestJIThreading
 {
+
+    private final static Logger logger = LoggerFactory.getLogger ( TestJIThreading.class );
 
     static final String domain = "fdgnt";
 
@@ -48,24 +51,25 @@ public class TestJIThreading
         {
             JISystem.setInBuiltLogHandler ( false );
         }
-        catch ( SecurityException e )
+        catch ( final SecurityException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();
         }
         JISystem.setAutoRegisteration ( true );
-        JISystem.getLogger ().setLevel ( Level.ALL );
+        // JR: JISystem.getLogger ().setLevel ( Level.ALL );
+        // JR: configure using slf4j now
     }
 
     public void testThreading ()
     {
-        ThreadGroup group = new ThreadGroup ( "JIThreading Group" );
-        Thread[] threads = new Thread[numThreads];
+        final ThreadGroup group = new ThreadGroup ( "JIThreading Group" );
+        final Thread[] threads = new Thread[numThreads];
         for ( int i = 0; i < numThreads; i++ )
         {
             threads[i] = new TestThread ( group, "TestThread: " + i );
@@ -78,20 +82,20 @@ public class TestJIThreading
             //group.list();
         }
 
-        boolean keepSleeping = true;
+        final boolean keepSleeping = true;
         while ( keepSleeping )
         {
             try
             {
                 for ( int i = 0; i < threads.length; i++ )
                 {
-                    Thread thread = threads[i];
+                    final Thread thread = threads[i];
                     thread.join ();
                 }
             }
-            catch ( InterruptedException e )
+            catch ( final InterruptedException e )
             {
-                JISystem.getLogger ().log ( Level.SEVERE, "InterruptedException caught", e );
+                logger.error ( "InterruptedException caught", e );
             }
 
             break;
@@ -117,11 +121,12 @@ public class TestJIThreading
 
     public static class TestThread extends Thread
     {
-        public TestThread ( ThreadGroup group, String name )
+        public TestThread ( final ThreadGroup group, final String name )
         {
             super ( group, name );
         }
 
+        @Override
         public void run ()
         {
             for ( int i = 0; i < loopsPerThread; i++ )
@@ -135,14 +140,14 @@ public class TestJIThreading
 
             try
             {
-                JISession session = JISession.createSession ( domain, user, password );
+                final JISession session = JISession.createSession ( domain, user, password );
 
                 //this.session.setGlobalSocketTimeout( 60000 );
 
                 // by name, requires local access (for registry search), or a populated progIdVsClsidDB.properties
-                JIProgId progId = JIProgId.valueOf ( comServerName );
+                final JIProgId progId = JIProgId.valueOf ( comServerName );
 
-                JIComServer baseComServer = new JIComServer ( progId, host, session );
+                final JIComServer baseComServer = new JIComServer ( progId, host, session );
 
                 // Do it by clsid
                 //JIClsid clsid = JIClsid.valueOf( "76A6415B-CB41-11d1-8B02-00600806D9B6" );
@@ -151,27 +156,27 @@ public class TestJIThreading
 
                 // I'm not really sure what the deal is with this
                 // Create an intermediary instance?
-                IJIComObject unknown = baseComServer.createInstance ();
+                final IJIComObject unknown = baseComServer.createInstance ();
 
-                IJIComObject baseComObject = (IJIComObject)unknown.queryInterface ( comObjectId );
+                final IJIComObject baseComObject = unknown.queryInterface ( comObjectId );
 
-                IJIDispatch baseDispatch = (IJIDispatch)JIObjectFactory.narrowObject ( baseComObject.queryInterface ( IJIDispatch.IID ) );
+                final IJIDispatch baseDispatch = (IJIDispatch)JIObjectFactory.narrowObject ( baseComObject.queryInterface ( IJIDispatch.IID ) );
 
-                JIVariant connectServer = (JIVariant)baseDispatch.callMethodA ( "ConnectServer", new Object[] { new JIString ( host ), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), new Integer ( 0 ), JIVariant.OPTIONAL_PARAM () } )[0];
+                final JIVariant connectServer = baseDispatch.callMethodA ( "ConnectServer", new Object[] { new JIString ( host ), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), new Integer ( 0 ), JIVariant.OPTIONAL_PARAM () } )[0];
 
                 JISession.destroySession ( session );
                 System.out.println ( "doStuff() run complete" );
             }
-            catch ( Exception e )
+            catch ( final Exception e )
             {
-                JISystem.getLogger ().log ( Level.SEVERE, "Caught exception: ", e );
+                logger.error ( "Caught exception: ", e );
             }
         }
     }
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
-        TestJIThreading testJIThreading = new TestJIThreading ();
+        final TestJIThreading testJIThreading = new TestJIThreading ();
         testJIThreading.setUp ();
         testJIThreading.testThreading ();
     }

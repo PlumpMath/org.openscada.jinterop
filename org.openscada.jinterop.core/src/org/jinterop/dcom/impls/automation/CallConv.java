@@ -38,7 +38,7 @@ public interface CallConv
     /**
      * Indicates that the Mscpascal calling convention is used for a method.
      */
-    public static final Integer CC_MSCPASCAL = new Integer ( CC_CDECL.intValue () + ( 1 ) );
+    public static final Integer CC_MSCPASCAL = new Integer ( CC_CDECL.intValue () + 1 );
 
     /**
      * Indicates that the Pascal calling convention is used for a method.

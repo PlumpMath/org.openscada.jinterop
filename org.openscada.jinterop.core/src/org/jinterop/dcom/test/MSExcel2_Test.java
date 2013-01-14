@@ -1,10 +1,8 @@
 package org.jinterop.dcom.test;
 
 import java.net.UnknownHostException;
-import java.util.logging.Level;
 
 import org.jinterop.dcom.common.JIException;
-import org.jinterop.dcom.common.JISystem;
 import org.jinterop.dcom.core.IJIComObject;
 import org.jinterop.dcom.core.JIArray;
 import org.jinterop.dcom.core.JIComServer;
@@ -32,52 +30,52 @@ public class MSExcel2_Test
 
     private JISession session = null;
 
-    public MSExcel2_Test ( String address, String[] args ) throws JIException, UnknownHostException
+    public MSExcel2_Test ( final String address, final String[] args ) throws JIException, UnknownHostException
     {
-        session = JISession.createSession ( args[1], args[2], args[3] );
-        session.useSessionSecurity ( true );
-        comServer = new JIComServer ( JIProgId.valueOf ( "Excel.Application" ), address, session );
+        this.session = JISession.createSession ( args[1], args[2], args[3] );
+        this.session.useSessionSecurity ( true );
+        this.comServer = new JIComServer ( JIProgId.valueOf ( "Excel.Application" ), address, this.session );
     }
 
     public void startExcel () throws JIException
     {
-        unknown = comServer.createInstance ();
-        dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( unknown.queryInterface ( IJIDispatch.IID ) );
+        this.unknown = this.comServer.createInstance ();
+        this.dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( this.unknown.queryInterface ( IJIDispatch.IID ) );
     }
 
     public void showExcel () throws JIException
     {
-        int dispId = dispatch.getIDsOfNames ( "Visible" );
-        JIVariant variant = new JIVariant ( true );
-        dispatch.put ( dispId, variant );
+        final int dispId = this.dispatch.getIDsOfNames ( "Visible" );
+        final JIVariant variant = new JIVariant ( true );
+        this.dispatch.put ( dispId, variant );
     }
 
     public void createWorkSheet () throws JIException
     {
-        int dispId = dispatch.getIDsOfNames ( "Workbooks" );
+        final int dispId = this.dispatch.getIDsOfNames ( "Workbooks" );
 
-        JIVariant outVal = dispatch.get ( dispId );
+        JIVariant outVal = this.dispatch.get ( dispId );
 
-        IJIDispatch dispatchOfWorkBooks = (IJIDispatch)JIObjectFactory.narrowObject ( outVal.getObjectAsComObject () );
+        final IJIDispatch dispatchOfWorkBooks = (IJIDispatch)JIObjectFactory.narrowObject ( outVal.getObjectAsComObject () );
 
         JIVariant[] outVal2 = dispatchOfWorkBooks.callMethodA ( "Add", new Object[] { JIVariant.OPTIONAL_PARAM () } );
-        dispatchOfWorkBook = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
+        this.dispatchOfWorkBook = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
 
-        outVal = dispatchOfWorkBook.get ( "Worksheets" );
+        outVal = this.dispatchOfWorkBook.get ( "Worksheets" );
 
-        dispatchOfWorkSheets = (IJIDispatch)JIObjectFactory.narrowObject ( outVal.getObjectAsComObject () );
+        this.dispatchOfWorkSheets = (IJIDispatch)JIObjectFactory.narrowObject ( outVal.getObjectAsComObject () );
 
-        outVal2 = dispatchOfWorkSheets.callMethodA ( "Add", new Object[] { JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM () } );
-        dispatchOfWorkSheet = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
+        outVal2 = this.dispatchOfWorkSheets.callMethodA ( "Add", new Object[] { JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM () } );
+        this.dispatchOfWorkSheet = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
     }
 
-    public void pasteArrayToWorkSheet ( int nRow ) throws JIException
+    public void pasteArrayToWorkSheet ( final int nRow ) throws JIException
     {
-        int dispId = dispatchOfWorkSheet.getIDsOfNames ( "Range" );
-        JIVariant variant = new JIVariant ( new JIString ( "A1:C" + nRow ) );
-        Object[] out = new Object[] { JIVariant.class };
-        JIVariant[] outVal2 = dispatchOfWorkSheet.get ( dispId, new Object[] { variant } );
-        IJIDispatch dispRange = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
+        final int dispId = this.dispatchOfWorkSheet.getIDsOfNames ( "Range" );
+        final JIVariant variant = new JIVariant ( new JIString ( "A1:C" + nRow ) );
+        final Object[] out = new Object[] { JIVariant.class };
+        final JIVariant[] outVal2 = this.dispatchOfWorkSheet.get ( dispId, new Object[] { variant } );
+        final IJIDispatch dispRange = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
 
         JIVariant[][] newValue = new JIVariant[nRow][3];
 
@@ -85,7 +83,7 @@ public class MSExcel2_Test
         {
             for ( int j = 0; j < newValue[i].length; j++ )
             {
-                newValue[i][j] = new JIVariant ( (double) ( 10.0 * Math.random () ) );
+                newValue[i][j] = new JIVariant ( 10.0 * Math.random () );
             }
         }
 
@@ -95,13 +93,13 @@ public class MSExcel2_Test
         {
             Thread.sleep ( 20000 );
         }
-        catch ( InterruptedException e )
+        catch ( final InterruptedException e )
         {
             e.printStackTrace ();
         }
 
-        JIVariant variant2 = dispRange.get ( "Value2" );
-        JIArray newValue2 = variant2.getObjectAsArray ();
+        final JIVariant variant2 = dispRange.get ( "Value2" );
+        final JIArray newValue2 = variant2.getObjectAsArray ();
         newValue = (JIVariant[][])newValue2.getArrayInstance ();
         for ( int i = 0; i < newValue.length; i++ )
         {
@@ -119,24 +117,25 @@ public class MSExcel2_Test
         {
             Thread.sleep ( 20000 );
         }
-        catch ( InterruptedException e )
+        catch ( final InterruptedException e )
         {
             e.printStackTrace ();
         }
 
-        dispatchOfWorkBook.callMethod ( "close", new Object[] { Boolean.FALSE, JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM () } );
-        dispatch.callMethod ( "Quit" );
-        JISession.destroySession ( session );
+        this.dispatchOfWorkBook.callMethod ( "close", new Object[] { Boolean.FALSE, JIVariant.OPTIONAL_PARAM (), JIVariant.OPTIONAL_PARAM () } );
+        this.dispatch.callMethod ( "Quit" );
+        JISession.destroySession ( this.session );
 
     }
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
 
         try
         {
 
-            JISystem.getLogger ().setLevel ( Level.FINEST );
+            // JR: JISystem.getLogger ().setLevel ( Level.FINEST );
+            // JR: configure using slf4j now
 
             if ( args.length < 4 )
             {
@@ -156,13 +155,13 @@ public class MSExcel2_Test
                 {
                     nRow = Integer.parseInt ( args[4] );
                 }
-                catch ( NumberFormatException e )
+                catch ( final NumberFormatException e )
                 {
 
                 }
             }
 
-            MSExcel2_Test test = new MSExcel2_Test ( args[0], args );
+            final MSExcel2_Test test = new MSExcel2_Test ( args[0], args );
 
             test.startExcel ();
             test.showExcel ();
@@ -171,7 +170,7 @@ public class MSExcel2_Test
             test.pasteArrayToWorkSheet ( nRow );
 
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             e.printStackTrace ();
         }

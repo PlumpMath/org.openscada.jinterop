@@ -134,39 +134,39 @@ public final class FuncDesc implements Serializable
      */
     public final short wFuncFlags;
 
-    FuncDesc ( JIPointer values )
+    FuncDesc ( final JIPointer values )
     {
         this ( values.isNull () ? null : (JIStruct)values.getReferent () );
     }
 
-    FuncDesc ( JIStruct filledStruct )
+    FuncDesc ( final JIStruct filledStruct )
     {
         if ( filledStruct == null )
         {
-            values = null;
-            memberId = -1;
-            lprgscode = null;
-            lprgelemdescParam = null;
-            funcKind = -1;
-            invokeKind = -1;
-            callConv = -1;
-            cParams = -1;
-            cParamsOpt = -1;
-            oVft = -1;
-            cScodes = -1;
-            elemdescFunc = null;
-            wFuncFlags = -1;
+            this.values = null;
+            this.memberId = -1;
+            this.lprgscode = null;
+            this.lprgelemdescParam = null;
+            this.funcKind = -1;
+            this.invokeKind = -1;
+            this.callConv = -1;
+            this.cParams = -1;
+            this.cParamsOpt = -1;
+            this.oVft = -1;
+            this.cScodes = -1;
+            this.elemdescFunc = null;
+            this.wFuncFlags = -1;
             return;
         }
-        values = filledStruct;
-        memberId = ( (Integer)values.getMember ( 0 ) ).intValue ();
-        lprgscode = (JIPointer)values.getMember ( 1 );
-        JIPointer ptr = (JIPointer)values.getMember ( 2 );
+        this.values = filledStruct;
+        this.memberId = ( (Integer)this.values.getMember ( 0 ) ).intValue ();
+        this.lprgscode = (JIPointer)this.values.getMember ( 1 );
+        final JIPointer ptr = (JIPointer)this.values.getMember ( 2 );
         JIArray arrayOfElemDesc = null;
         if ( !ptr.isNull () )
         {
-            JIArray arry = (JIArray)ptr.getReferent ();
-            Object[] obj = (Object[])arry.getArrayInstance ();
+            final JIArray arry = (JIArray)ptr.getReferent ();
+            final Object[] obj = (Object[])arry.getArrayInstance ();
             //			ElemDesc[] arry2 = new ElemDesc[obj.length];
             //			for (int i = 0; i < obj.length; i++)
             //			{
@@ -177,16 +177,16 @@ public final class FuncDesc implements Serializable
             arrayOfElemDesc = new JIArray ( obj );
         }
 
-        lprgelemdescParam = new JIPointer ( arrayOfElemDesc );
-        funcKind = ( (Integer)values.getMember ( 3 ) ).intValue ();
-        invokeKind = ( (Integer)values.getMember ( 4 ) ).intValue ();
-        callConv = ( (Integer)values.getMember ( 5 ) ).intValue ();
-        cParams = ( (Short)values.getMember ( 6 ) ).shortValue ();
-        cParamsOpt = ( (Short)values.getMember ( 7 ) ).shortValue ();
-        oVft = ( (Short)values.getMember ( 8 ) ).shortValue ();
-        cScodes = ( (Short)values.getMember ( 9 ) ).shortValue ();
-        elemdescFunc = new ElemDesc ( ( (JIStruct)values.getMember ( 10 ) ) );
-        wFuncFlags = ( (Short)values.getMember ( 11 ) ).shortValue ();
+        this.lprgelemdescParam = new JIPointer ( arrayOfElemDesc );
+        this.funcKind = ( (Integer)this.values.getMember ( 3 ) ).intValue ();
+        this.invokeKind = ( (Integer)this.values.getMember ( 4 ) ).intValue ();
+        this.callConv = ( (Integer)this.values.getMember ( 5 ) ).intValue ();
+        this.cParams = ( (Short)this.values.getMember ( 6 ) ).shortValue ();
+        this.cParamsOpt = ( (Short)this.values.getMember ( 7 ) ).shortValue ();
+        this.oVft = ( (Short)this.values.getMember ( 8 ) ).shortValue ();
+        this.cScodes = ( (Short)this.values.getMember ( 9 ) ).shortValue ();
+        this.elemdescFunc = new ElemDesc ( (JIStruct)this.values.getMember ( 10 ) );
+        this.wFuncFlags = ( (Short)this.values.getMember ( 11 ) ).shortValue ();
     }
 
 }

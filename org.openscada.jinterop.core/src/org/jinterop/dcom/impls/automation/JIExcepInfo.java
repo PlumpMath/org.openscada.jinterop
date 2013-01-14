@@ -40,10 +40,10 @@ public final class JIExcepInfo
 
     void clearAll ()
     {
-        errorCode = -1;
-        excepSource = null;
-        excepDesc = null;
-        excepHelpfile = null;
+        this.errorCode = -1;
+        this.excepSource = null;
+        this.excepDesc = null;
+        this.excepHelpfile = null;
     }
 
     /**
@@ -53,7 +53,7 @@ public final class JIExcepInfo
      */
     public int getErrorCode ()
     {
-        return errorCode;
+        return this.errorCode;
     }
 
     /**
@@ -65,7 +65,7 @@ public final class JIExcepInfo
      */
     public String getExcepSource ()
     {
-        return excepSource;
+        return this.excepSource;
     }
 
     /**
@@ -77,7 +77,7 @@ public final class JIExcepInfo
      */
     public String getExcepDesc ()
     {
-        return excepDesc;
+        return this.excepDesc;
     }
 
     /**
@@ -89,6 +89,6 @@ public final class JIExcepInfo
      */
     public String getHelpFilePath ()
     {
-        return excepHelpfile;
+        return this.excepHelpfile;
     }
 }

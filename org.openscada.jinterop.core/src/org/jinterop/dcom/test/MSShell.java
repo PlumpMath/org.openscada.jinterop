@@ -21,19 +21,19 @@ public class MSShell
 
     JIComServer comServer = null;
 
-    MSShell ( String args[] ) throws UnknownHostException, JIException
+    MSShell ( final String args[] ) throws UnknownHostException, JIException
     {
-        session = JISession.createSession ( args[1], args[2], args[3] );
-        comServer = new JIComServer ( JIProgId.valueOf ( "Shell.Application" ), args[0], session );
+        this.session = JISession.createSession ( args[1], args[2], args[3] );
+        this.comServer = new JIComServer ( JIProgId.valueOf ( "Shell.Application" ), args[0], this.session );
     }
 
     void doStuff () throws JIException
     {
         //this will return a reference to the IUnknown of the Shell coclass.
-        IJIComObject comUnknown = (IJIComObject)comServer.createInstance ();
+        final IJIComObject comUnknown = this.comServer.createInstance ();
 
         //now we query for the IShellDispatch interface
-        IJIComObject shellDispatch = (IJIComObject)comUnknown.queryInterface ( "D8F015C0-C278-11CE-A49E-444553540000" );
+        final IJIComObject shellDispatch = comUnknown.queryInterface ( "D8F015C0-C278-11CE-A49E-444553540000" );
 
         JICallBuilder callObject = new JICallBuilder ();
         //		callObject.setOpnum(5);
@@ -49,7 +49,7 @@ public class MSShell
         callObject.addInParamAsVariant ( new JIVariant ( 2 ), JIFlags.FLAG_NULL );
         callObject.addOutParamAsType ( IJIComObject.class, JIFlags.FLAG_NULL );
         Object[] result = shellDispatch.call ( callObject );
-        IJIComObject folder = JIObjectFactory.narrowObject ( (IJIComObject)result[0] );
+        final IJIComObject folder = JIObjectFactory.narrowObject ( (IJIComObject)result[0] );
 
         callObject = new JICallBuilder ();
         callObject.setOpnum ( 0 );
@@ -80,14 +80,14 @@ public class MSShell
         callObject.setOpnum ( 4 );
         callObject.addOutParamAsType ( IJIComObject.class, JIFlags.FLAG_NULL );
         result = folder.call ( callObject );
-        IJIComObject folderItems = JIObjectFactory.narrowObject ( (IJIComObject)result[0] );
+        final IJIComObject folderItems = JIObjectFactory.narrowObject ( (IJIComObject)result[0] );
 
         callObject = new JICallBuilder ();
         callObject.setOpnum ( 0 );
         callObject.addOutParamAsType ( Integer.class, JIFlags.FLAG_NULL );
         result = folderItems.call ( callObject );
 
-        int count = ( (Integer)result[0] ).intValue ();
+        final int count = ( (Integer)result[0] ).intValue ();
 
         for ( int i = 0; i < count; i++ )
         {
@@ -96,7 +96,7 @@ public class MSShell
             callObject.addInParamAsVariant ( new JIVariant ( i ), JIFlags.FLAG_NULL );
             callObject.addOutParamAsType ( IJIComObject.class, JIFlags.FLAG_NULL );
             result = folderItems.call ( callObject );
-            IJIComObject folderItem = JIObjectFactory.narrowObject ( (IJIComObject)result[0] );
+            final IJIComObject folderItem = JIObjectFactory.narrowObject ( (IJIComObject)result[0] );
 
             JICallBuilder callObject2 = new JICallBuilder ();
             callObject2.setOpnum ( 2 );
@@ -117,7 +117,7 @@ public class MSShell
             callObject2.addOutParamAsType ( Boolean.class, JIFlags.FLAG_NULL );
             result = folderItem.call ( callObject2 );
 
-            boolean isFileSystemObject = ( (Boolean)result[0] ).booleanValue ();
+            final boolean isFileSystemObject = ( (Boolean)result[0] ).booleanValue ();
 
             if ( isFileSystemObject )
             {
@@ -131,7 +131,7 @@ public class MSShell
             callObject2.reInit ();
             callObject2 = new JICallBuilder ();
             callObject2.setOpnum ( 13 );
-            callObject2.addOutParamAsObject ( ( Integer.class ), JIFlags.FLAG_NULL );
+            callObject2.addOutParamAsObject ( Integer.class, JIFlags.FLAG_NULL );
             result = folderItem.call ( callObject2 );
             System.out.print ( " and size(in bytes) is: " + ( (Integer)result[0] ).intValue () + "\n" );
 
@@ -139,7 +139,7 @@ public class MSShell
 
     }
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
 
         if ( args.length < 4 )
@@ -150,16 +150,16 @@ public class MSShell
         JISystem.setAutoRegisteration ( true );
         try
         {
-            MSShell shell = new MSShell ( args );
+            final MSShell shell = new MSShell ( args );
             shell.doStuff ();
             JISession.destroySession ( shell.session );
         }
-        catch ( UnknownHostException e )
+        catch ( final UnknownHostException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();
         }
-        catch ( JIException e )
+        catch ( final JIException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();

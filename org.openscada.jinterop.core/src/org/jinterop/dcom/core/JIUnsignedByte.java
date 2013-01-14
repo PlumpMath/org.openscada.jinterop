@@ -30,7 +30,7 @@ public final class JIUnsignedByte implements IJIUnsigned
 
     private final Short byteValue;
 
-    JIUnsignedByte ( Short byteValue )
+    JIUnsignedByte ( final Short byteValue )
     {
         if ( byteValue == null || byteValue.shortValue () < 0 )
         {
@@ -39,14 +39,16 @@ public final class JIUnsignedByte implements IJIUnsigned
         this.byteValue = byteValue;
     }
 
+    @Override
     public int getType ()
     {
         return JIFlags.FLAG_REPRESENTATION_UNSIGNED_BYTE;
     }
 
+    @Override
     public Number getValue ()
     {
-        return byteValue;
+        return this.byteValue;
     }
 
 }

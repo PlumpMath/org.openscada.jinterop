@@ -1,7 +1,6 @@
 package org.jinterop.dcom.test;
 
 import java.net.UnknownHostException;
-import java.util.logging.Level;
 
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
@@ -29,21 +28,21 @@ public class WshShell
 
     private IJIComObject unknown = null;
 
-    private IJIDispatch dispatchOfWorkSheet = null;
+    private final IJIDispatch dispatchOfWorkSheet = null;
 
-    private IJIDispatch dispatchOfWorkBook = null;
+    private final IJIDispatch dispatchOfWorkBook = null;
 
     private JISession session = null;
 
-    public WshShell ( String address, String domain, String username, String password ) throws JIException, UnknownHostException
-
+    public WshShell ( final String address, final String domain, final String username, final String password ) throws JIException, UnknownHostException
     {
 
-        JISystem.getLogger ().setLevel ( Level.SEVERE );
+        // JR: JISystem.getLogger ().setLevel ( Level.SEVERE );
+        // JR: configure using slf4j now
 
-        session = JISession.createSession ( domain, username, password );
+        this.session = JISession.createSession ( domain, username, password );
 
-        comServer = new JIComServer ( JIProgId.valueOf ( "WScript.Shell" ), address, session );
+        this.comServer = new JIComServer ( JIProgId.valueOf ( "WScript.Shell" ), address, this.session );
 
     }
 
@@ -51,25 +50,25 @@ public class WshShell
 
     {
 
-        System.out.println ( comServer.getProperties () );
+        System.out.println ( this.comServer.getProperties () );
 
-        unknown = comServer.createInstance ();
+        this.unknown = this.comServer.createInstance ();
 
-        dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( (IJIComObject)unknown.queryInterface ( IJIDispatch.IID ) );
+        this.dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( this.unknown.queryInterface ( IJIDispatch.IID ) );
 
-        JIVariant jv = (JIVariant)dispatch.get ( "CurrentDirectory" );
+        JIVariant jv = this.dispatch.get ( "CurrentDirectory" );
 
         System.out.println ( jv.getObjectAsString ().getString () );
 
-        int dispId = dispatch.getIDsOfNames ( "CurrentDirectory" );
+        final int dispId = this.dispatch.getIDsOfNames ( "CurrentDirectory" );
 
         System.out.println ( dispId );
 
-        JIVariant variant = new JIVariant ( "C://WINDOWS" );
+        final JIVariant variant = new JIVariant ( "C://WINDOWS" );
 
-        dispatch.put ( dispId, variant );
+        this.dispatch.put ( dispId, variant );
 
-        jv = (JIVariant)dispatch.get ( "CurrentDirectory" );
+        jv = this.dispatch.get ( "CurrentDirectory" );
 
         System.out.println ( jv.getObjectAsString ().getString () );
 
@@ -77,7 +76,7 @@ public class WshShell
         {
             Thread.sleep ( 60 * 1000 * 3 );
         }
-        catch ( InterruptedException e )
+        catch ( final InterruptedException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();
@@ -85,26 +84,26 @@ public class WshShell
 
         //WshShell.Exec
 
-        System.out.println ( dispatch.callMethodA ( "Exec", new Object[] { new JIString ( "calc" ) } )[0] );
+        System.out.println ( this.dispatch.callMethodA ( "Exec", new Object[] { new JIString ( "calc" ) } )[0] );
 
         try
         {
             Thread.sleep ( 60 * 1000 * 3 );
         }
-        catch ( InterruptedException e )
+        catch ( final InterruptedException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();
         }
         //WshShell.Run
 
-        System.out.println ( dispatch.callMethodA ( "Run", new Object[] { new JIString ( "notepad" ), new JIVariant ( 10 ), JIVariant.OPTIONAL_PARAM () } )[0] );
+        System.out.println ( this.dispatch.callMethodA ( "Run", new Object[] { new JIString ( "notepad" ), new JIVariant ( 10 ), JIVariant.OPTIONAL_PARAM () } )[0] );
 
         //JISession.destroySession(session);
 
     }
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
 
         try
@@ -112,12 +111,12 @@ public class WshShell
 
             JISystem.setAutoRegisteration ( true );
 
-            WshShell wScript = new WshShell ( "localhost", "domain", "username", "password" );
+            final WshShell wScript = new WshShell ( "localhost", "domain", "username", "password" );
 
             wScript.startWScript ();
 
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
 
             // TODO Auto-generated catch block

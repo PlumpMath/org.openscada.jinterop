@@ -52,36 +52,36 @@ public final class ArrayDesc implements Serializable
      */
     public final SafeArrayBounds safeArrayBounds[];
 
-    ArrayDesc ( JIStruct values )
+    ArrayDesc ( final JIStruct values )
     {
         if ( values == null )
         {
-            typeDesc = null;
-            cDims = -1;
-            safeArrayBounds = null;
+            this.typeDesc = null;
+            this.cDims = -1;
+            this.safeArrayBounds = null;
             return;
         }
 
-        typeDesc = new TypeDesc ( (JIStruct)values.getMember ( 0 ) );
-        cDims = ( (Short)values.getMember ( 1 ) ).shortValue ();
-        JIArray arry = (JIArray)values.getMember ( 2 );
-        Object[] arry2 = (Object[])arry.getArrayInstance ();
+        this.typeDesc = new TypeDesc ( (JIStruct)values.getMember ( 0 ) );
+        this.cDims = ( (Short)values.getMember ( 1 ) ).shortValue ();
+        final JIArray arry = (JIArray)values.getMember ( 2 );
+        final Object[] arry2 = (Object[])arry.getArrayInstance ();
 
         if ( arry2 != null )
         {
-            safeArrayBounds = new SafeArrayBounds[arry2.length];
+            this.safeArrayBounds = new SafeArrayBounds[arry2.length];
             for ( int i = 0; i < arry2.length; i++ )
             {
-                safeArrayBounds[i] = new SafeArrayBounds ( (JIStruct)arry2[i] );
+                this.safeArrayBounds[i] = new SafeArrayBounds ( (JIStruct)arry2[i] );
             }
         }
         else
         {
-            safeArrayBounds = null;
+            this.safeArrayBounds = null;
         }
     }
 
-    ArrayDesc ( JIPointer values )
+    ArrayDesc ( final JIPointer values )
     {
         this ( values.isNull () ? null : (JIStruct)values.getReferent () );
     }

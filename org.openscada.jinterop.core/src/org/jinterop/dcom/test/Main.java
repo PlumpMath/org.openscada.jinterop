@@ -11,7 +11,6 @@ package org.jinterop.dcom.test;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
 
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
@@ -26,7 +25,7 @@ import org.jinterop.dcom.impls.automation.IJIDispatch;
 public class Main
 {
 
-    public void Execute ( JIString str )
+    public void Execute ( final JIString str )
     {
         System.out.println ( str.getString () );
     }
@@ -34,7 +33,7 @@ public class Main
     /**
      * @param args
      */
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
 
         if ( args.length < 4 )
@@ -46,34 +45,35 @@ public class Main
         try
         {
 
-            String domain = args[1];
-            String username = args[2];
-            String password = args[3];
+            final String domain = args[1];
+            final String username = args[2];
+            final String password = args[3];
 
-            JISystem.getLogger ().setLevel ( Level.FINEST );
+            // JR: JISystem.getLogger ().setLevel ( Level.FINEST );
+            // JR: configure using slf4j now
             JISystem.setInBuiltLogHandler ( false );
             JISystem.setAutoRegisteration ( true );
-            JISession session3 = JISession.createSession ( domain, username, password );
+            final JISession session3 = JISession.createSession ( domain, username, password );
             session3.useSessionSecurity ( true );
-            JIComServer virtualServer = new JIComServer ( JIProgId.valueOf ( "VirtualServer.Application" ), args[0], session3 );
-            IJIComObject unkVirtualServer = virtualServer.createInstance ();
-            IJIDispatch dispatchVirtualServer = (IJIDispatch)JIObjectFactory.narrowObject ( unkVirtualServer.queryInterface ( IJIDispatch.IID ) );
+            final JIComServer virtualServer = new JIComServer ( JIProgId.valueOf ( "VirtualServer.Application" ), args[0], session3 );
+            final IJIComObject unkVirtualServer = virtualServer.createInstance ();
+            final IJIDispatch dispatchVirtualServer = (IJIDispatch)JIObjectFactory.narrowObject ( unkVirtualServer.queryInterface ( IJIDispatch.IID ) );
 
         }
-        catch ( UnknownHostException e )
+        catch ( final UnknownHostException e )
         {
             e.printStackTrace ();
         }
-        catch ( JIException e )
+        catch ( final JIException e )
         {
             e.printStackTrace ();
         }
-        catch ( SecurityException e )
+        catch ( final SecurityException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();

@@ -29,11 +29,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Map.Entry;
-import java.util.logging.Level;
 
 import org.jinterop.dcom.common.IJIAuthInfo;
 import org.jinterop.dcom.common.IJIUnreferenced;
@@ -41,6 +40,8 @@ import org.jinterop.dcom.common.JIErrorCodes;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
 import org.jinterop.dcom.impls.JIObjectFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -58,6 +59,8 @@ import org.jinterop.dcom.impls.JIObjectFactory;
  */
 public final class JISession
 {
+
+    private final static Logger logger = LoggerFactory.getLogger ( JISession.class );
 
     private static Random randomGen = new Random ( Double.doubleToRawLongBits ( Math.random () ) );
 
@@ -93,11 +96,11 @@ public final class JISession
 
     private static ArrayList listOfSessions = new ArrayList ();
 
-    private List listOfDeferencedIpids = new ArrayList ();
+    private final List listOfDeferencedIpids = new ArrayList ();
 
     private static Timer releaseRefsTimer = new Timer ( true );
 
-    private Map mapOfUnreferencedHandlers = new HashMap ();
+    private final Map mapOfUnreferencedHandlers = new HashMap ();
 
     private int timeout = 0;
 
@@ -107,7 +110,7 @@ public final class JISession
 
     private boolean isSSO = false;
 
-    private ArrayList links = new ArrayList ();
+    private final ArrayList links = new ArrayList ();
 
     private static final Map mapOfOxidsVsJISessions = new HashMap ();
 
@@ -123,7 +126,7 @@ public final class JISession
 
         public final byte[] oid;
 
-        private IPID_SessionID_Holder ( String IPID, int sessionID, boolean isOnlySessionId, byte[] oid )
+        private IPID_SessionID_Holder ( final String IPID, final int sessionID, final boolean isOnlySessionId, final byte[] oid )
         {
             this.IPID = IPID;
             this.isOnlySessionIDPresent = isOnlySessionId;
@@ -138,13 +141,14 @@ public final class JISession
     static ReferenceQueue referenceQueueOfCOMObjects = new ReferenceQueue ();
 
     static Thread cleanUpThread = new Thread ( new Runnable () {
+        @Override
         public void run ()
         {
             try
             {
                 while ( true )
                 {
-                    Reference r = referenceQueueOfCOMObjects.remove ();
+                    final Reference r = referenceQueueOfCOMObjects.remove ();
                     if ( r != null )
                     {
                         // Object is no longer referenced.
@@ -174,12 +178,9 @@ public final class JISession
                             {
                                 destroySession ( session );
                             }
-                            catch ( Exception e )
+                            catch ( final Exception e )
                             {
-                                if ( JISystem.getLogger ().isLoggable ( Level.FINEST ) )
-                                {
-                                    JISystem.getLogger ().finest ( "exception from destroy session in clean up thread: " + e.getMessage () );
-                                }
+                                logger.warn ( "exception from destroy session in clean up thread", e );
                             }
                         }
                         else
@@ -192,41 +193,38 @@ public final class JISession
 
                             try
                             {
-                                String IPID = holder.IPID;
+                                final String IPID = holder.IPID;
                                 //JIComOxidRuntime.delIPIDReference(IPID);
                                 //session.releaseRef(IPID); Not doing release anymore, this causes a lot of calls to
                                 //go across, so will save these in this list and then the cleanup thread will deal with
                                 //this every 3 minutes.
                                 session.addDereferencedIpids ( IPID, holder.oid );
                                 holder = null;
-                                IJIUnreferenced unreferenced = (IJIUnreferenced)session.getUnreferencedHandler ( IPID );
+                                final IJIUnreferenced unreferenced = session.getUnreferencedHandler ( IPID );
                                 if ( unreferenced != null )
                                 {
                                     unreferenced.unReferenced ();
                                 }
                                 session.unregisterUnreferencedHandler ( IPID );
                             }
-                            catch ( Exception e )
+                            catch ( final Exception e )
                             {
-                                if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-                                {
-                                    JISystem.getLogger ().info ( "exception from removing a IPID from session in clean up thread: " + e.getMessage () );
-                                }
+                                logger.warn ( "exception from removing a IPID from session in clean up thread", e );
                             }
                         }
                     }
 
                 }
             }
-            catch ( Exception e )
+            catch ( final Exception e )
             {
-                JISystem.getLogger ().throwing ( "JISession", "CleanupThread:run()", e );
+                logger.warn ( "CleanupThread:run()", e );
             }
         }
     }, "jI_GarbageCollector" );
 
     //from JDK bug http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4665037
-    private static String getLocalHost ( String destination )
+    private static String getLocalHost ( final String destination )
     {
         DatagramSocket sock;
         InetAddress intendedDestination;
@@ -235,7 +233,7 @@ public final class JISession
             sock = new DatagramSocket ();
             intendedDestination = InetAddress.getByName ( destination );
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             return "127.0.0.1";
         }
@@ -248,12 +246,12 @@ public final class JISession
         JISystem.internal_initLogger ();
         try
         {
-            InetAddress localhostAddr = InetAddress.getLocalHost ();
+            final InetAddress localhostAddr = InetAddress.getLocalHost ();
             localhost = localhostAddr.getAddress ();
             localhostStr = localhostAddr.getHostAddress ();
             localhostStr2 = localhostAddr.getCanonicalHostName ();
         }
-        catch ( UnknownHostException e )
+        catch ( final UnknownHostException e )
         {
         }
 
@@ -272,19 +270,20 @@ public final class JISession
         releaseRefsTimer.scheduleAtFixedRate ( new Release_References_TimerTask (), 0, 3 * 60 * 1000 );
 
         Runtime.getRuntime ().addShutdownHook ( new Thread ( new Runnable () {
+            @Override
             public void run ()
             {
                 int i = 0;
                 while ( i < listOfSessions.size () )
                 {
-                    JISession session = (JISession) ( listOfSessions.get ( i ) );
+                    final JISession session = (JISession)listOfSessions.get ( i );
                     try
                     {
                         JISession.destroySession ( session );
                     }
-                    catch ( JIException e )
+                    catch ( final JIException e )
                     {
-                        JISystem.getLogger ().throwing ( "JISession", "addShutDownHook Thread:run()", e );
+                        logger.warn ( "addShutDownHook Thread:run()", e );
                     }
                     i++;
                 }
@@ -301,6 +300,7 @@ public final class JISession
 
     private static class Release_References_TimerTask extends TimerTask
     {
+        @Override
         public void run ()
         {
 
@@ -316,23 +316,20 @@ public final class JISession
 
                 while ( i < listOfSessionsClone.size () )
                 {
-                    JISession session = (JISession)listOfSessionsClone.get ( i );
+                    final JISession session = (JISession)listOfSessionsClone.get ( i );
 
                     //now iterate over each sessions listOfDereferencedIpids and send a call to release for the entire lot.
-                    ArrayList listToKill = new ArrayList ();
+                    final ArrayList listToKill = new ArrayList ();
                     synchronized ( mutex )
                     {
-                        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-                        {
-                            JISystem.getLogger ().info ( "Release_References_TimerTask:[RUN] Session:  " + session.getSessionIdentifier () + " , listOfDeferencedIpids.size(): " + session.listOfDeferencedIpids.size () );
-                        }
+                        logger.info ( "Release_References_TimerTask:[RUN] Session:  {} , listOfDeferencedIpids.size(): {}", session.getSessionIdentifier (), session.listOfDeferencedIpids.size () );
                         for ( int j = 0; j < session.listOfDeferencedIpids.size (); j++ )
                         {
                             try
                             {
                                 listToKill.add ( session.prepareForReleaseRef ( (String)session.listOfDeferencedIpids.get ( j ) ) );
                             }
-                            catch ( JIException e )
+                            catch ( final JIException e )
                             {
                                 //eaten, will never get thrown from the try block.
                             }
@@ -342,15 +339,15 @@ public final class JISession
 
                     if ( listToKill.size () > 0 )
                     {
-                        JIArray array = new JIArray ( listToKill.toArray ( new JIStruct[listToKill.size ()] ), true );
+                        final JIArray array = new JIArray ( listToKill.toArray ( new JIStruct[listToKill.size ()] ), true );
                         try
                         {
                             session.releaseRefs ( array, false );
                         }
-                        catch ( JIException e )
+                        catch ( final JIException e )
                         {
                             //This release cycle has to go on.
-                            JISystem.getLogger ().logp ( Level.SEVERE, "JISession", "Release_References_TimerTask:run()", "Exception in internal GC", e );
+                            logger.warn ( "Release_References_TimerTask:run() - Exception in internal GC", e );
                         }
                     }
 
@@ -358,15 +355,15 @@ public final class JISession
                 }
 
             }
-            catch ( Exception e )
+            catch ( final Exception e )
             {
                 //This release cycle has to go on.
-                JISystem.getLogger ().logp ( Level.SEVERE, "JISession", "Release_References_TimerTask:run()", "Exception in internal GC", e );
+                logger.warn ( "Release_References_TimerTask:run() - Exception in internal GC", e );
             }
         }
     }
 
-    void setTargetServer ( String targetServer )
+    void setTargetServer ( final String targetServer )
     {
         if ( targetServer.equalsIgnoreCase ( "127.0.0.1" ) )
         {
@@ -404,7 +401,7 @@ public final class JISession
 
     String getTargetServer ()
     {
-        return targetServer;
+        return this.targetServer;
     }
 
     private JISession ()
@@ -424,7 +421,7 @@ public final class JISession
      */
     public IJIAuthInfo getAuthInfo ()
     {
-        return authInfo;
+        return this.authInfo;
     }
 
     /**
@@ -439,14 +436,14 @@ public final class JISession
      * @see JIComServer#JIComServer(JIClsid, JISession)
      * @see JIComServer#JIComServer(JIProgId, JISession)
      */
-    public static JISession createSession ( IJIAuthInfo authInfo )
+    public static JISession createSession ( final IJIAuthInfo authInfo )
     {
         if ( authInfo == null )
         {
             throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_AUTH_NOT_SUPPLIED ) );
         }
 
-        JISession session = new JISession ();
+        final JISession session = new JISession ();
 
         session.authInfo = authInfo;
 
@@ -458,10 +455,7 @@ public final class JISession
             listOfSessions.add ( session );
         }
 
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-        {
-            JISystem.getLogger ().info ( "Created Session: " + session.sessionIdentifier );
-        }
+        logger.info ( "Created Session: {}", session.sessionIdentifier );
         return session;
     }
 
@@ -481,14 +475,14 @@ public final class JISession
      * @see JIComServer#JIComServer(JIClsid, JISession)
      * @see JIComServer#JIComServer(JIProgId, JISession)
      */
-    public static JISession createSession ( String domain, String username, String password )
+    public static JISession createSession ( final String domain, final String username, final String password )
     {
         if ( username == null || password == null || domain == null )
         {
             throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_AUTH_NOT_SUPPLIED ) );
         }
 
-        JISession session = new JISession ();
+        final JISession session = new JISession ();
         session.username = username;
         session.password = password;
         session.domain = domain;
@@ -500,11 +494,7 @@ public final class JISession
             listOfSessions.add ( session );
         }
 
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-        {
-            JISystem.getLogger ().info ( "Created Session: " + session.sessionIdentifier );
-        }
-        //System.out.println("Created Session: " + session.sessionIdentifier);
+        logger.info ( "Created Session: {}", session.sessionIdentifier );
         return session;
     }
 
@@ -518,9 +508,9 @@ public final class JISession
      * @see JIComServer#JIComServer(JIClsid, JISession)
      * @see JIComServer#JIComServer(JIProgId, JISession)
      */
-    public static JISession createSession ( JISession session )
+    public static JISession createSession ( final JISession session )
     {
-        JISession newSession = createSession ( session.getDomain (), session.getUserName (), session.getPassword () );
+        final JISession newSession = createSession ( session.getDomain (), session.getUserName (), session.getPassword () );
         newSession.authInfo = session.authInfo;
         return newSession;
 
@@ -549,7 +539,7 @@ public final class JISession
             throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_WIN_ONLY ) );
         }
 
-        JISession session = new JISession ();
+        final JISession session = new JISession ();
         session.sessionIdentifier = new Object ().hashCode () ^ (int)Runtime.getRuntime ().freeMemory () ^ randomGen.nextInt ();
         session.isSSO = true;
 
@@ -559,10 +549,7 @@ public final class JISession
             listOfSessions.add ( session );
         }
 
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-        {
-            JISystem.getLogger ().info ( "Created Session for SSO: " + session.sessionIdentifier );
-        }
+        logger.info ( "Created Session for SSO: {}", session.sessionIdentifier );
 
         return session;
     }
@@ -574,7 +561,7 @@ public final class JISession
      */
     public boolean isSSOEnabled ()
     {
-        return isSSO;
+        return this.isSSO;
     }
 
     /**
@@ -590,7 +577,7 @@ public final class JISession
      * @throws JIException
      * @see JIObjectFactory#narrowObject
      */
-    public static void destroySession ( JISession session ) throws JIException
+    public static void destroySession ( final JISession session ) throws JIException
     {
         //null session
         if ( session == null )
@@ -615,8 +602,8 @@ public final class JISession
         try
         {
             //session may have been destroyed and this call is from finalize.
-            ArrayList list = new ArrayList ();
-            ArrayList listOfFreeIPIDs = new ArrayList ();
+            final ArrayList list = new ArrayList ();
+            final ArrayList listOfFreeIPIDs = new ArrayList ();
             synchronized ( mutex )
             {
                 if ( session.sessionInDestroy )
@@ -637,18 +624,18 @@ public final class JISession
             {
                 //now take all the objects registered with this session and call release on them.
                 //				Iterator iterator = mapOfObjects.keySet().iterator();
-                Iterator iterator = mapOfObjects.entrySet ().iterator ();
+                final Iterator iterator = mapOfObjects.entrySet ().iterator ();
                 while ( iterator.hasNext () )
                 {
                     //String ipid = (String)session.mapOfObjects.get(iterator.next());
-                    Entry entry = (Entry)iterator.next ();
+                    final Entry entry = (Entry)iterator.next ();
                     //					IPID_SessionID_Holder holder = (IPID_SessionID_Holder)mapOfObjects.get(iterator.next());
-                    IPID_SessionID_Holder holder = (IPID_SessionID_Holder)entry.getValue ();
+                    final IPID_SessionID_Holder holder = (IPID_SessionID_Holder)entry.getValue ();
                     if ( session.getSessionIdentifier () != holder.sessionID.intValue () )
                     {
                         continue;
                     }
-                    String ipid = holder.IPID;
+                    final String ipid = holder.IPID;
                     if ( ipid == null )
                     {
                         continue;
@@ -680,24 +667,21 @@ public final class JISession
             //release is performed if only something is in the session.
             if ( list.size () > 0 )
             {
-                JIArray array = new JIArray ( list.toArray ( new JIStruct[list.size ()] ), true );
+                final JIArray array = new JIArray ( list.toArray ( new JIStruct[list.size ()] ), true );
                 try
                 {
                     session.stub.closeStub (); //close the existing connection
                     session.releaseRefs ( array, true );
                 }
-                catch ( JIException e )
+                catch ( final JIException e )
                 {
                     //This release cycle has to go on.
-                    JISystem.getLogger ().throwing ( "JISession", "destroySession", e );
+                    logger.warn ( "destroySession", e );
                 }
             }
 
             JIComOxidRuntime.clearIPIDsforSession ( session );
-            if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-            {
-                JISystem.getLogger ().info ( "Destroyed Session: " + session.sessionIdentifier );
-            }
+            logger.info ( "Destroyed Session: {}", session.sessionIdentifier );
         }
         finally
         {
@@ -720,13 +704,10 @@ public final class JISession
         session.stub2 = null;
     }
 
-    private static void postDestroy ( JISession session ) throws JIException
+    private static void postDestroy ( final JISession session ) throws JIException
     {
         //now destroy all linked sessions
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-        {
-            JISystem.getLogger ().info ( "About to destroy links for Session: " + session.getSessionIdentifier () + " , size of which is " + session.links.size () );
-        }
+        logger.info ( "About to destroy links for Session: {} , size of which is {}", session.getSessionIdentifier (), session.links.size () );
 
         for ( int i = 0; i < session.links.size (); i++ )
         {
@@ -740,7 +721,7 @@ public final class JISession
 
     //each session is associated with 1 and only 1 stub.
     //adding something new now another stub for IRemUnknown operations
-    void setStub ( JIComServer stub )
+    void setStub ( final JIComServer stub )
     {
         this.stub = stub;
         synchronized ( mutex )
@@ -750,7 +731,7 @@ public final class JISession
     }
 
     //IRemUnknown Stub
-    void setStub2 ( JIRemUnknownServer stub )
+    void setStub2 ( final JIRemUnknownServer stub )
     {
         this.stub2 = stub;
         //no need to add this to the Oxid vs Sessions map as we would be using the same interface pointer as the other stub.
@@ -770,15 +751,15 @@ public final class JISession
      * @exclude
      * @param IPID
      */
-    void addToSession ( IJIComObject comObject, byte[] oid )
+    void addToSession ( final IJIComObject comObject, final byte[] oid )
     {
 
         //nothing will be done if the session is being destroyed.
-        if ( sessionInDestroy )
+        if ( this.sessionInDestroy )
         {
             return;
         }
-        IPID_SessionID_Holder holder = new IPID_SessionID_Holder ( comObject.getIpid (), getSessionIdentifier (), false, oid );
+        final IPID_SessionID_Holder holder = new IPID_SessionID_Holder ( comObject.getIpid (), getSessionIdentifier (), false, oid );
         //mapOfObjects.put(new WeakReference(comObject,referenceQueueOfCOMObjects),holder);
         synchronized ( mapOfObjects )
         {
@@ -786,10 +767,7 @@ public final class JISession
         }
         //setting if NO PING flag has been set to true.
         addToSession ( comObject.getIpid (), oid, ( (JIStdObjRef)comObject.internal_getInterfacePointer ().getObjectReference ( JIInterfacePointer.OBJREF_STANDARD ) ).getFlags () == 0x00001000 );
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-        {
-            JISystem.getLogger ().info ( " for IID: " + comObject.getInterfaceIdentifier () );
-        }
+        logger.info ( "for IID: {}", comObject.getInterfaceIdentifier () );
 
         //		Integer value = (Integer)mapOfIPIDSvsCount.get(comObject.getIpid());
         //		if (value == null)
@@ -803,7 +781,7 @@ public final class JISession
     //just for testing
     private static Map mapOfIPIDSvsCount = Collections.synchronizedMap ( new HashMap () );
 
-    static void debug_addIpids ( String ipid, int num )
+    static void debug_addIpids ( final String ipid, final int num )
     {
         //		Integer value = (Integer)mapOfIPIDSvsCount.get(ipid);
         //		if (value == null)
@@ -813,7 +791,7 @@ public final class JISession
         //		mapOfIPIDSvsCount.put(ipid, new Integer(value.intValue() + num));
     }
 
-    static void debug_delIpids ( String ipid, int num )
+    static void debug_delIpids ( final String ipid, final int num )
     {
         //		Integer value = (Integer)mapOfIPIDSvsCount.get(ipid);
         //		mapOfIPIDSvsCount.put(ipid, new Integer(value.intValue() - num));
@@ -823,17 +801,14 @@ public final class JISession
      * @exclude
      * @param IPID
      */
-    private void addToSession ( String IPID, byte[] oid, boolean dontping )
+    private void addToSession ( final String IPID, final byte[] oid, final boolean dontping )
     {
         //Weak reference of the object
         //mapOfObjects.put(new WeakReference(IPID,referenceQueueOfCOMObjects),IPID);
         //it does not matter if we create a new OID here, the OxidCOMRunttime API uses the OID in the MAP , and not this one.
-        JIObjectId joid = new JIObjectId ( oid, dontping );
+        final JIObjectId joid = new JIObjectId ( oid, dontping );
         JIComOxidRuntime.addUpdateOXIDs ( this, IPID, joid );
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-        {
-            JISystem.getLogger ().info ( "[addToSession] Adding IPID: " + IPID + " to session: " + getSessionIdentifier () );
-        }
+        logger.info ( "[addToSession] Adding IPID: {} to session: {}", IPID, getSessionIdentifier () );
     }
 
     //	private static Map mapOfIPIDSvsCount = new HashMap();
@@ -854,49 +829,44 @@ public final class JISession
     //and so is add_releaseRef (on the same instance), so deadlock won't happen there. If a simulataneous remove and getInterface call comes
     //then getInterface(which internally calls releaseRef) will go through, since releaseRef is not synched but the api it calls i.e. add_releaseRef is synched with the same lock
     //as getInterface. The remove will have to wait till that call gets over.
-    void releaseRef ( String IPID ) throws JIException
+    void releaseRef ( final String IPID ) throws JIException
     {
         releaseRef ( IPID, 5 );
     }
 
-    void releaseRef ( String IPID, int numinstances ) throws JIException
+    void releaseRef ( final String IPID, final int numinstances ) throws JIException
     {
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-        {
-            JISystem.getLogger ().info ( "releaseRef:Reclaiming from Session: " + getSessionIdentifier () + " , the IPID: " + IPID + ", numinstances is " + numinstances );
-        }
-        JICallBuilder obj = new JICallBuilder ( true );
+        logger.info ( "releaseRef:Reclaiming from Session: {} , the IPID: {}, numinstances is {}", numinstances, new Object[] { getSessionIdentifier (), IPID, numinstances } );
+
+        final JICallBuilder obj = new JICallBuilder ( true );
         obj.setParentIpid ( IPID );
         obj.setOpnum ( 2 );//release
         //length
         obj.addInParamAsShort ( (short)1, JIFlags.FLAG_NULL );
         //ipid to addfref on
-        JIArray array = new JIArray ( new rpc.core.UUID[] { new rpc.core.UUID ( IPID ) }, true );
+        final JIArray array = new JIArray ( new rpc.core.UUID[] { new rpc.core.UUID ( IPID ) }, true );
         obj.addInParamAsArray ( array, JIFlags.FLAG_NULL );
         //TODO requesting 5 for now, will later build caching mechnaism to exhaust 5 refs first before asking for more
         // same with release.
         obj.addInParamAsInt ( numinstances, JIFlags.FLAG_NULL );
         obj.addInParamAsInt ( 0, JIFlags.FLAG_NULL );//private refs = 0
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
+        if ( logger.isInfoEnabled () )
         {
-            JISystem.getLogger ().warning ( "releaseRef: Releasing numinstances " + numinstances + " references of IPID: " + IPID + " session: " + getSessionIdentifier () );
             debug_delIpids ( IPID, numinstances );
+            logger.info ( "releaseRef: Releasing numinstances {} references of IPID: {} session: {}", new Object[] { numinstances, IPID, getSessionIdentifier () } );
         }
-        stub2.addRef_ReleaseRef ( obj );
+        this.stub2.addRef_ReleaseRef ( obj );
     }
 
-    private void addDereferencedIpids ( String IPID, byte[] oid )
+    private void addDereferencedIpids ( final String IPID, final byte[] oid )
     {
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-        {
-            JISystem.getLogger ().info ( "addDereferencedIpids for session : " + getSessionIdentifier () + " , IPID is: " + IPID );
-        }
+        logger.info ( "addDereferencedIpids for session : {} , IPID is: {}", getSessionIdentifier (), IPID );
 
         synchronized ( mutex )
         {
-            if ( !listOfDeferencedIpids.contains ( IPID ) )
+            if ( !this.listOfDeferencedIpids.contains ( IPID ) )
             {
-                listOfDeferencedIpids.add ( IPID );
+                this.listOfDeferencedIpids.add ( IPID );
             }
         }
 
@@ -905,39 +875,33 @@ public final class JISession
         JIComOxidRuntime.delIPIDReference ( IPID, new JIObjectId ( oid, false ), this );
     }
 
-    private void releaseRefs ( JIArray arrayOfStructs, boolean fromDestroy ) throws JIException
+    private void releaseRefs ( final JIArray arrayOfStructs, final boolean fromDestroy ) throws JIException
     {
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-        {
-            JISystem.getLogger ().info ( "In releaseRefs for session : " + getSessionIdentifier () + " , array length is: " + (short) ( ( (Object[])arrayOfStructs.getArrayInstance () ).length ) );
-        }
+        logger.info ( "In releaseRefs for session : {} , array length is: {}", getSessionIdentifier (), (short) ( (Object[])arrayOfStructs.getArrayInstance () ).length );
 
-        JICallBuilder obj = new JICallBuilder ( true );
+        final JICallBuilder obj = new JICallBuilder ( true );
         obj.setOpnum ( 2 );//release
         //length
-        obj.addInParamAsShort ( (short) ( ( (Object[])arrayOfStructs.getArrayInstance () ).length ), JIFlags.FLAG_NULL );
+        obj.addInParamAsShort ( (short) ( (Object[])arrayOfStructs.getArrayInstance () ).length, JIFlags.FLAG_NULL );
         obj.addInParamAsArray ( arrayOfStructs, JIFlags.FLAG_NULL );
         obj.fromDestroySession = fromDestroy;
-        stub2.addRef_ReleaseRef ( obj );
+        this.stub2.addRef_ReleaseRef ( obj );
 
         //ignore the results
     }
 
-    private JIStruct prepareForReleaseRef ( String IPID, int numInstancesfirsttime ) throws JIException
+    private JIStruct prepareForReleaseRef ( final String IPID, final int numInstancesfirsttime ) throws JIException
     {
-        JIStruct remInterface = new JIStruct ();
+        final JIStruct remInterface = new JIStruct ();
         remInterface.addMember ( new rpc.core.UUID ( IPID ) );
         remInterface.addMember ( new Integer ( numInstancesfirsttime + 5 ) ); // numInstancesfirsttime of the original and 5 for the addRef done later on.
         remInterface.addMember ( new Integer ( 0 ) );//private refs = 0
-        if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-        {
-            JISystem.getLogger ().warning ( "prepareForReleaseRef: Releasing numInstancesfirsttime + 5 references of IPID: " + IPID + " session: " + getSessionIdentifier () + " , numInstancesfirsttime is " + numInstancesfirsttime );
-        }
+        logger.warn ( "prepareForReleaseRef: Releasing numInstancesfirsttime + 5 references of IPID: {} session: {} , numInstancesfirsttime is {}", new Object[] { IPID, getSessionIdentifier (), numInstancesfirsttime } );
         debug_delIpids ( IPID, numInstancesfirsttime + 5 );
         return remInterface;
     }
 
-    private JIStruct prepareForReleaseRef ( String IPID ) throws JIException
+    private JIStruct prepareForReleaseRef ( final String IPID ) throws JIException
     {
         return prepareForReleaseRef ( IPID, 5 );
     }
@@ -949,12 +913,12 @@ public final class JISession
      */
     public String getUserName ()
     {
-        return authInfo == null ? username : authInfo.getUserName ();
+        return this.authInfo == null ? this.username : this.authInfo.getUserName ();
     }
 
     String getPassword ()
     {
-        return authInfo == null ? password : authInfo.getPassword ();
+        return this.authInfo == null ? this.password : this.authInfo.getPassword ();
     }
 
     /**
@@ -964,7 +928,7 @@ public final class JISession
      */
     public String getDomain ()
     {
-        return authInfo == null ? domain : authInfo.getDomain ();
+        return this.authInfo == null ? this.domain : this.authInfo.getDomain ();
     }
 
     /**
@@ -974,13 +938,14 @@ public final class JISession
      */
     public int getSessionIdentifier ()
     {
-        return sessionIdentifier;
+        return this.sessionIdentifier;
     }
 
     /**
      * @exclude
      */
-    public boolean equals ( Object obj )
+    @Override
+    public boolean equals ( final Object obj )
     {
 
         if ( obj == null || ! ( obj instanceof JISession ) )
@@ -988,46 +953,45 @@ public final class JISession
             return false;
         }
 
-        JISession temp = (JISession)obj;
-        return temp.sessionIdentifier == sessionIdentifier;
+        final JISession temp = (JISession)obj;
+        return temp.sessionIdentifier == this.sessionIdentifier;
     }
 
     /**
      * @exclude
      */
+    @Override
     public int hashCode ()
     {
-        return sessionIdentifier;
+        return this.sessionIdentifier;
     }
 
+    @Override
     protected void finalize ()
     {
         try
         {
             destroySession ( this );
         }
-        catch ( JIException e )
+        catch ( final JIException e )
         {
-            if ( JISystem.getLogger ().isLoggable ( Level.FINEST ) )
-            {
-                JISystem.getLogger ().finest ( "Exception in finalize when destroying session " + e.getMessage () );
-            }
+            logger.warn ( "Exception in finalize when destroying session", e );
         }
     }
 
-    synchronized IJIUnreferenced getUnreferencedHandler ( String ipid )
+    synchronized IJIUnreferenced getUnreferencedHandler ( final String ipid )
     {
-        return (IJIUnreferenced)mapOfUnreferencedHandlers.get ( ipid );
+        return (IJIUnreferenced)this.mapOfUnreferencedHandlers.get ( ipid );
     }
 
-    synchronized void registerUnreferencedHandler ( String ipid, IJIUnreferenced unreferenced )
+    synchronized void registerUnreferencedHandler ( final String ipid, final IJIUnreferenced unreferenced )
     {
-        mapOfUnreferencedHandlers.put ( ipid, unreferenced );
+        this.mapOfUnreferencedHandlers.put ( ipid, unreferenced );
     }
 
-    synchronized void unregisterUnreferencedHandler ( String ipid )
+    synchronized void unregisterUnreferencedHandler ( final String ipid )
     {
-        mapOfUnreferencedHandlers.remove ( ipid );
+        this.mapOfUnreferencedHandlers.remove ( ipid );
     }
 
     /**
@@ -1043,7 +1007,7 @@ public final class JISession
      * @see IJIComObject#setInstanceLevelSocketTimeout(int)
      * @see IJIComObject#call(JICallBuilder, int)
      */
-    public void setGlobalSocketTimeout ( int timeout )
+    public void setGlobalSocketTimeout ( final int timeout )
     {
         this.timeout = timeout;
     }
@@ -1082,9 +1046,9 @@ public final class JISession
      * @param enable
      *            <code>true</code> to enable, <code>false</code> to disable.
      */
-    public void useSessionSecurity ( boolean enable )
+    public void useSessionSecurity ( final boolean enable )
     {
-        useSessionSecurity = enable;
+        this.useSessionSecurity = enable;
         //		if (enable)
         //		{
         //			useNTLMv2 = enable;
@@ -1103,9 +1067,9 @@ public final class JISession
      * @param enable
      *            <code>true</code> to enable.
      */
-    public void useNTLMv2 ( boolean enable )
+    public void useNTLMv2 ( final boolean enable )
     {
-        useNTLMv2 = enable;
+        this.useNTLMv2 = enable;
     }
 
     /**
@@ -1117,7 +1081,7 @@ public final class JISession
      */
     public boolean isSessionSecurityEnabled ()
     {
-        return !isSSO & useSessionSecurity;
+        return !this.isSSO & this.useSessionSecurity;
     }
 
     /**
@@ -1129,7 +1093,7 @@ public final class JISession
      */
     public boolean isNTLMv2Enabled ()
     {
-        return !isSSO & useNTLMv2;
+        return !this.isSSO & this.useNTLMv2;
     }
 
     /**
@@ -1140,13 +1104,17 @@ public final class JISession
      * 
      * @param session
      */
-    static void linkTwoSessions ( JISession src, JISession target )
+    static void linkTwoSessions ( final JISession src, final JISession target )
     {
         if ( src.sessionInDestroy || target.sessionInDestroy )
+        {
             return;
+        }
 
         if ( src.equals ( target ) )
+        {
             return;
+        }
 
         synchronized ( mutex )
         {
@@ -1160,13 +1128,17 @@ public final class JISession
     /**
      * Removes session from src sessions list.
      */
-    static void unLinkSession ( JISession src, JISession tobeunlinked )
+    static void unLinkSession ( final JISession src, final JISession tobeunlinked )
     {
         if ( src.sessionInDestroy )
+        {
             return;
+        }
 
         if ( src.equals ( tobeunlinked ) )
+        {
             return;
+        }
 
         synchronized ( mutex )
         {
@@ -1186,7 +1158,7 @@ public final class JISession
      * 
      * @exclude
      */
-    static JISession resolveSessionForOxid ( JIOxid oxid )
+    static JISession resolveSessionForOxid ( final JIOxid oxid )
     {
         synchronized ( mutex )
         {
@@ -1196,7 +1168,7 @@ public final class JISession
 
     boolean isSessionInDestroy ()
     {
-        return sessionInDestroy;
+        return this.sessionInDestroy;
     }
 
 }

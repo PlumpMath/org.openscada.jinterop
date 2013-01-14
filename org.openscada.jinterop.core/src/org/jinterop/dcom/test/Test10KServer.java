@@ -11,13 +11,13 @@ import org.jinterop.dcom.impls.automation.IJIDispatch;
 public class Test10KServer
 {
 
-    private JIComServer comStub = null;
+    private final JIComServer comStub = null;
 
-    private IJIDispatch dispatch = null;
+    private final IJIDispatch dispatch = null;
 
-    private IJIComObject unknown = null;
+    private final IJIComObject unknown = null;
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
 
         try
@@ -33,21 +33,22 @@ public class Test10KServer
             for ( int i = 0; i < 10000; ++i )
             {
 
-                JISession session = JISession.createSession ( args[1], args[2], args[3] );
-                JIComServer comServer = new JIComServer ( JIProgId.valueOf ( "MSMQ.MSMQQueueInfo" ), args[0], session );
-                IJIComObject unknown = comServer.createInstance ();
-                IJIDispatch dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( unknown.queryInterface ( IJIDispatch.IID ) );
+                final JISession session = JISession.createSession ( args[1], args[2], args[3] );
+                final JIComServer comServer = new JIComServer ( JIProgId.valueOf ( "MSMQ.MSMQQueueInfo" ), args[0], session );
+                final IJIComObject unknown = comServer.createInstance ();
+                final IJIDispatch dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( unknown.queryInterface ( IJIDispatch.IID ) );
                 //JISession.destroySession(session);
                 Thread.sleep ( 150 );
                 if ( i % 100 == 0 )
                 {
-                    System.out.println ( new String ().valueOf ( i ) );
+                    new String ();
+                    System.out.println ( String.valueOf ( i ) );
                 }
                 System.gc ();
             }
 
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();

@@ -25,12 +25,15 @@ import ndr.NdrObject;
 import ndr.NetworkDataRepresentation;
 
 import org.jinterop.dcom.common.JIRuntimeException;
-import org.jinterop.dcom.common.JISystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import rpc.core.UUID;
 
 final class JIRemUnknown extends NdrObject
 {
+
+    private final static Logger logger = LoggerFactory.getLogger ( JIRemUnknown.class );
 
     public static final String IID_IUnknown = "00000143-0000-0000-c000-000000000046";
 
@@ -41,12 +44,13 @@ final class JIRemUnknown extends NdrObject
 
     private JIInterfacePointer iidPtr = null;
 
-    JIRemUnknown ( String ipidOfIUnknown, String requestedIID )
+    JIRemUnknown ( final String ipidOfIUnknown, final String requestedIID )
     {
         this.ipidOfIUnknown = ipidOfIUnknown;
         this.requestedIID = requestedIID;
     }
 
+    @Override
     public int getOpnum ()
     {
         //opnum is 3 as this is a COM interface and 0,1,2 are occupied by IUnknown
@@ -54,36 +58,35 @@ final class JIRemUnknown extends NdrObject
         return 6;
     }
 
-    public void write ( NetworkDataRepresentation ndr )
+    @Override
+    public void write ( final NetworkDataRepresentation ndr )
     {
 
-        JIOrpcThis orpcthis = new JIOrpcThis ();
+        final JIOrpcThis orpcthis = new JIOrpcThis ();
         orpcthis.encode ( ndr );
 
         //now write the IPID
-        UUID uuid = new UUID ( ipidOfIUnknown );
+        UUID uuid = new UUID ( this.ipidOfIUnknown );
         try
         {
             uuid.encode ( ndr, ndr.buf );
         }
-        catch ( NdrException e )
+        catch ( final NdrException e )
         {
-
-            JISystem.getLogger ().throwing ( "JIRemUnknown", "write", e );
+            logger.warn ( "write", e );
         }
 
         ndr.writeUnsignedShort ( 1 );//1 interfaces. (requested IID)
         ndr.writeUnsignedShort ( 0 );//byte alignment
         ndr.writeUnsignedLong ( 1 );//length of the array
-        uuid = new UUID ( requestedIID );
+        uuid = new UUID ( this.requestedIID );
         try
         {
             uuid.encode ( ndr, ndr.buf );
         }
-        catch ( NdrException e )
+        catch ( final NdrException e )
         {
-
-            JISystem.getLogger ().throwing ( "JIRemUnknown", "Performing a QueryInterface for " + requestedIID, e );
+            logger.warn ( "Performing a QueryInterface for " + this.requestedIID, e );
         }
 
         ndr.writeUnsignedLong ( 0 ); //TODO Index Matching , there seems to be a bug in
@@ -91,7 +94,8 @@ final class JIRemUnknown extends NdrObject
                                      // call after that or incomplete request will go. in case no param is present just put an unsigned long = 0.
     }
 
-    public void read ( NetworkDataRepresentation ndr )
+    @Override
+    public void read ( final NetworkDataRepresentation ndr )
     {
         JIOrpcThat.decode ( ndr );
         ndr.readUnsignedLong (); //size will be one
@@ -106,7 +110,7 @@ final class JIRemUnknown extends NdrObject
         ndr.readUnsignedLong ();
 
         //and now the JIInterfacePointer itself.
-        iidPtr = JIInterfacePointer.decode ( ndr, new ArrayList (), JIFlags.FLAG_NULL, new HashMap () );
+        this.iidPtr = JIInterfacePointer.decode ( ndr, new ArrayList (), JIFlags.FLAG_NULL, new HashMap () );
         //final hresult
         hresult1 = ndr.readUnsignedLong ();
         if ( hresult1 != 0 )
@@ -118,7 +122,7 @@ final class JIRemUnknown extends NdrObject
 
     public JIInterfacePointer getInterfacePointer ()
     {
-        return iidPtr;
+        return this.iidPtr;
     }
 
 }

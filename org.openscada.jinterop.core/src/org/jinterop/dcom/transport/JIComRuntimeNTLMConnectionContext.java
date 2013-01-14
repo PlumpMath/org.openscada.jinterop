@@ -48,37 +48,39 @@ public final class JIComRuntimeNTLMConnectionContext extends NtlmConnectionConte
 
     private Properties properties = null;
 
-    private List listOfInterfacesSupported = Collections.synchronizedList ( new ArrayList () );
+    private final List listOfInterfacesSupported = Collections.synchronizedList ( new ArrayList () );
 
     // this returns null, so that a recieve is performed first.
-    public ConnectionOrientedPdu init ( PresentationContext context, Properties properties ) throws IOException
+    @Override
+    public ConnectionOrientedPdu init ( final PresentationContext context, final Properties properties ) throws IOException
     {
         super.init2 ( context, properties );
         this.properties = properties;
-        listOfInterfacesSupported.add ( ( (String)properties.getProperty ( IID ) ).toUpperCase () );
-        listOfInterfacesSupported.add ( ( (String)properties.getProperty ( IID2 ) ).toUpperCase () + ":0.0" );
+        this.listOfInterfacesSupported.add ( properties.getProperty ( IID ).toUpperCase () );
+        this.listOfInterfacesSupported.add ( properties.getProperty ( IID2 ).toUpperCase () + ":0.0" );
         updateListOfInterfacesSupported2 ( (List)properties.get ( "LISTOFSUPPORTEDINTERFACES" ) );
         return null;
     }
 
-    public ConnectionOrientedPdu accept ( ConnectionOrientedPdu pdu ) throws IOException
+    @Override
+    public ConnectionOrientedPdu accept ( final ConnectionOrientedPdu pdu ) throws IOException
     {
         ConnectionOrientedPdu reply = null;
         switch ( pdu.getType () )
         {
             case BindPdu.BIND_TYPE:
-                established = true;
+                this.established = true;
                 PresentationContext[] presentationContexts = ( (BindPdu)pdu ).getContextList ();
                 reply = new BindAcknowledgePdu ();
                 PresentationResult[] result = new PresentationResult[1];
                 for ( int i = 0; i < presentationContexts.length; i++ )
                 {
-                    PresentationContext presentationContext = presentationContexts[i];
+                    final PresentationContext presentationContext = presentationContexts[i];
 
                     boolean contains = false;
-                    synchronized ( listOfInterfacesSupported )
+                    synchronized ( this.listOfInterfacesSupported )
                     {
-                        contains = listOfInterfacesSupported.contains ( presentationContext.abstractSyntax.toString ().toUpperCase () );
+                        contains = this.listOfInterfacesSupported.contains ( presentationContext.abstractSyntax.toString ().toUpperCase () );
                     }
                     if ( !contains )
                     {
@@ -102,18 +104,18 @@ public final class JIComRuntimeNTLMConnectionContext extends NtlmConnectionConte
 
                 break;
             case AlterContextPdu.ALTER_CONTEXT_TYPE:
-                established = true;
+                this.established = true;
 
                 presentationContexts = ( (AlterContextPdu)pdu ).getContextList ();
                 reply = new AlterContextResponsePdu ();
                 result = new PresentationResult[1];
                 for ( int i = 0; i < presentationContexts.length; i++ )
                 {
-                    PresentationContext presentationContext = presentationContexts[i];
+                    final PresentationContext presentationContext = presentationContexts[i];
                     boolean contains = false;
-                    synchronized ( listOfInterfacesSupported )
+                    synchronized ( this.listOfInterfacesSupported )
                     {
-                        contains = listOfInterfacesSupported.contains ( presentationContext.abstractSyntax.toString ().toUpperCase () );
+                        contains = this.listOfInterfacesSupported.contains ( presentationContext.abstractSyntax.toString ().toUpperCase () );
                     }
                     if ( !contains )
                     {
@@ -144,24 +146,25 @@ public final class JIComRuntimeNTLMConnectionContext extends NtlmConnectionConte
         return reply;
     }
 
+    @Override
     public boolean isEstablished ()
     {
-        return super.isEstablished () | established;
+        return super.isEstablished () | this.established;
     }
 
-    void updateListOfInterfacesSupported ( List newList )
+    void updateListOfInterfacesSupported ( final List newList )
     {
-        synchronized ( listOfInterfacesSupported )
+        synchronized ( this.listOfInterfacesSupported )
         {
-            listOfInterfacesSupported.addAll ( newList );
+            this.listOfInterfacesSupported.addAll ( newList );
         }
     }
 
-    void updateListOfInterfacesSupported2 ( List newList )
+    void updateListOfInterfacesSupported2 ( final List newList )
     {
         for ( int i = 0; i < newList.size (); i++ )
         {
-            listOfInterfacesSupported.add ( newList.get ( i ) + ":0.0" );
+            this.listOfInterfacesSupported.add ( newList.get ( i ) + ":0.0" );
         }
     }
 

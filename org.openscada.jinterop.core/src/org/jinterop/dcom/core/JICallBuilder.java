@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import ndr.NdrObject;
 import ndr.NetworkDataRepresentation;
@@ -31,6 +30,8 @@ import org.jinterop.dcom.common.JIErrorCodes;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JIRuntimeException;
 import org.jinterop.dcom.common.JISystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import rpc.core.UUID;
 
@@ -63,6 +64,7 @@ import rpc.core.UUID;
  */
 public class JICallBuilder extends NdrObject implements Serializable
 {
+    private final static Logger logger = LoggerFactory.getLogger ( JICallBuilder.class );
 
     static final String CURRENTSESSION = "CURRENTSESSION";
 
@@ -107,7 +109,7 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            out if
      *            dispatch is supported on the COM Object.
      */
-    public JICallBuilder ( boolean dispatchNotSupported )
+    public JICallBuilder ( final boolean dispatchNotSupported )
     {
         this ();
         this.dispatchNotSupported = dispatchNotSupported;
@@ -132,24 +134,24 @@ public class JICallBuilder extends NdrObject implements Serializable
     //after reinit, except parent, nothing is available.
     public void reInit ()
     {
-        opnum = -1;
-        inParams = new ArrayList ();
-        inparamFlags = new ArrayList ();
-        outParams = new ArrayList ();
-        outparamFlags = new ArrayList ();
-        hresult = -1;
-        outparams = null;
-        executed = false;
+        this.opnum = -1;
+        this.inParams = new ArrayList ();
+        this.inparamFlags = new ArrayList ();
+        this.outParams = new ArrayList ();
+        this.outparamFlags = new ArrayList ();
+        this.hresult = -1;
+        this.outparams = null;
+        this.executed = false;
     }
 
-    void setParentIpid ( String IPIDofParent )
+    void setParentIpid ( final String IPIDofParent )
     {
-        enclosingParentsIPID = IPIDofParent;
+        this.enclosingParentsIPID = IPIDofParent;
     }
 
     String getParentIpid ()
     {
-        return enclosingParentsIPID;
+        return this.enclosingParentsIPID;
     }
 
     //	/**Add IN parameter as <code>JIInterfacePointer</code> at the end of the Parameter list.
@@ -170,9 +172,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be)
      */
-    public void addInParamAsComObject ( IJIComObject comObject, int FLAGS )
+    public void addInParamAsComObject ( final IJIComObject comObject, final int FLAGS )
     {
-        insertInParamAsComObjectAt ( inParams.size (), comObject, FLAGS );
+        insertInParamAsComObjectAt ( this.inParams.size (), comObject, FLAGS );
     }
 
     /**
@@ -183,9 +185,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be)
      */
-    public void addInParamAsInt ( int value, int FLAGS )
+    public void addInParamAsInt ( final int value, final int FLAGS )
     {
-        insertInParamAsIntAt ( inParams.size (), value, FLAGS );
+        insertInParamAsIntAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -196,9 +198,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be)
      */
-    public void addInParamAsUnsigned ( IJIUnsigned value, int FLAGS )
+    public void addInParamAsUnsigned ( final IJIUnsigned value, final int FLAGS )
     {
-        insertInParamAsUnsignedAt ( inParams.size (), value, FLAGS );
+        insertInParamAsUnsignedAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -209,9 +211,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be)
      */
-    public void addInParamAsFloat ( float value, int FLAGS )
+    public void addInParamAsFloat ( final float value, final int FLAGS )
     {
-        insertInParamAsFloatAt ( inParams.size (), value, FLAGS );
+        insertInParamAsFloatAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -222,9 +224,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be)
      */
-    public void addInParamAsBoolean ( boolean value, int FLAGS )
+    public void addInParamAsBoolean ( final boolean value, final int FLAGS )
     {
-        insertInParamAsBooleanAt ( inParams.size (), value, FLAGS );
+        insertInParamAsBooleanAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -235,9 +237,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be)
      */
-    public void addInParamAsShort ( short value, int FLAGS )
+    public void addInParamAsShort ( final short value, final int FLAGS )
     {
-        insertInParamAsShortAt ( inParams.size (), value, FLAGS );
+        insertInParamAsShortAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -248,9 +250,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be)
      */
-    public void addInParamAsDouble ( double value, int FLAGS )
+    public void addInParamAsDouble ( final double value, final int FLAGS )
     {
-        insertInParamAsDoubleAt ( inParams.size (), value, FLAGS );
+        insertInParamAsDoubleAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -261,9 +263,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be)
      */
-    public void addInParamAsCharacter ( char value, int FLAGS )
+    public void addInParamAsCharacter ( final char value, final int FLAGS )
     {
-        insertInParamAsCharacterAt ( inParams.size (), value, FLAGS );
+        insertInParamAsCharacterAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -276,9 +278,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            Flags).
      */
     //flags have to be String flags
-    public void addInParamAsString ( String value, int FLAGS )
+    public void addInParamAsString ( final String value, final int FLAGS )
     {
-        insertInParamAsStringAt ( inParams.size (), value, FLAGS );
+        insertInParamAsStringAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -289,9 +291,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void addInParamAsVariant ( JIVariant value, int FLAGS )
+    public void addInParamAsVariant ( final JIVariant value, final int FLAGS )
     {
-        insertInParamAsVariantAt ( inParams.size (), value, FLAGS );
+        insertInParamAsVariantAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -302,9 +304,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void addInParamAsObject ( Object value, int FLAGS )
+    public void addInParamAsObject ( final Object value, final int FLAGS )
     {
-        insertInParamAsObjectAt ( inParams.size (), value, FLAGS );
+        insertInParamAsObjectAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -316,9 +318,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void addInParamAsUUID ( String value, int FLAGS )
+    public void addInParamAsUUID ( final String value, final int FLAGS )
     {
-        insertInParamAsUUIDAt ( inParams.size (), value, FLAGS );
+        insertInParamAsUUIDAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -329,9 +331,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void addInParamAsPointer ( JIPointer value, int FLAGS )
+    public void addInParamAsPointer ( final JIPointer value, final int FLAGS )
     {
-        insertInParamAsPointerAt ( inParams.size (), value, FLAGS );
+        insertInParamAsPointerAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -342,9 +344,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void addInParamAsStruct ( JIStruct value, int FLAGS )
+    public void addInParamAsStruct ( final JIStruct value, final int FLAGS )
     {
-        insertInParamAsStructAt ( inParams.size (), value, FLAGS );
+        insertInParamAsStructAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -355,9 +357,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void addInParamAsArray ( JIArray value, int FLAGS )
+    public void addInParamAsArray ( final JIArray value, final int FLAGS )
     {
-        insertInParamAsArrayAt ( inParams.size (), value, FLAGS );
+        insertInParamAsArrayAt ( this.inParams.size (), value, FLAGS );
     }
 
     /**
@@ -369,12 +371,12 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void setInParams ( Object[] values, int FLAGS )
+    public void setInParams ( final Object[] values, final int FLAGS )
     {
         for ( int i = 0; i < values.length; i++ )
         {
-            inParams.add ( values[i] );
-            inparamFlags.add ( new Integer ( FLAGS ) ); //quite useless but do not want to change logic elsewhere
+            this.inParams.add ( values[i] );
+            this.inparamFlags.add ( new Integer ( FLAGS ) ); //quite useless but do not want to change logic elsewhere
         }
 
     }
@@ -389,10 +391,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsComObjectAt ( int index, IJIComObject value, int FLAGS )
+    public void insertInParamAsComObjectAt ( final int index, final IJIComObject value, final int FLAGS )
     {
-        inParams.add ( index, value );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, value );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -405,10 +407,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsIntAt ( int index, int value, int FLAGS )
+    public void insertInParamAsIntAt ( final int index, final int value, final int FLAGS )
     {
-        inParams.add ( index, new Integer ( value ) );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, new Integer ( value ) );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -421,10 +423,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsUnsignedAt ( int index, IJIUnsigned value, int FLAGS )
+    public void insertInParamAsUnsignedAt ( final int index, final IJIUnsigned value, final int FLAGS )
     {
-        inParams.add ( index, value );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, value );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -437,10 +439,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsFloatAt ( int index, float value, int FLAGS )
+    public void insertInParamAsFloatAt ( final int index, final float value, final int FLAGS )
     {
-        inParams.add ( index, new Float ( value ) );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, new Float ( value ) );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -453,10 +455,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsBooleanAt ( int index, boolean value, int FLAGS )
+    public void insertInParamAsBooleanAt ( final int index, final boolean value, final int FLAGS )
     {
-        inParams.add ( index, Boolean.valueOf ( value ) );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, Boolean.valueOf ( value ) );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -469,10 +471,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsShortAt ( int index, short value, int FLAGS )
+    public void insertInParamAsShortAt ( final int index, final short value, final int FLAGS )
     {
-        inParams.add ( index, new Short ( value ) );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, new Short ( value ) );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -485,10 +487,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsDoubleAt ( int index, double value, int FLAGS )
+    public void insertInParamAsDoubleAt ( final int index, final double value, final int FLAGS )
     {
-        inParams.add ( index, new Double ( value ) );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, new Double ( value ) );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -501,10 +503,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsCharacterAt ( int index, char value, int FLAGS )
+    public void insertInParamAsCharacterAt ( final int index, final char value, final int FLAGS )
     {
-        inParams.add ( index, new Character ( value ) );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, new Character ( value ) );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -519,10 +521,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            Flags).
      */
     //flags have to be String flags
-    public void insertInParamAsStringAt ( int index, String value, int FLAGS )
+    public void insertInParamAsStringAt ( final int index, final String value, final int FLAGS )
     {
-        inParams.add ( index, new JIString ( value, FLAGS ) );
-        inparamFlags.add ( index, new Integer ( JIFlags.FLAG_NULL ) );
+        this.inParams.add ( index, new JIString ( value, FLAGS ) );
+        this.inparamFlags.add ( index, new Integer ( JIFlags.FLAG_NULL ) );
     }
 
     /**
@@ -535,10 +537,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsVariantAt ( int index, JIVariant value, int FLAGS )
+    public void insertInParamAsVariantAt ( final int index, final JIVariant value, final int FLAGS )
     {
-        inParams.add ( index, value );
-        inparamFlags.add ( index, new Integer ( JIFlags.FLAG_NULL ) );
+        this.inParams.add ( index, value );
+        this.inparamFlags.add ( index, new Integer ( JIFlags.FLAG_NULL ) );
     }
 
     /**
@@ -552,10 +554,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            from JIFlags (if need be).
      */
     //this is for dispatch, etc...more or less will never be used.
-    public void insertInParamAsObjectAt ( int index, Object value, int FLAGS )
+    public void insertInParamAsObjectAt ( final int index, final Object value, final int FLAGS )
     {
-        inParams.add ( index, value );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, value );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -569,10 +571,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsUUIDAt ( int index, String value, int FLAGS )
+    public void insertInParamAsUUIDAt ( final int index, final String value, final int FLAGS )
     {
-        inParams.add ( index, new rpc.core.UUID ( value ) );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, new rpc.core.UUID ( value ) );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -585,10 +587,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsPointerAt ( int index, JIPointer value, int FLAGS )
+    public void insertInParamAsPointerAt ( final int index, final JIPointer value, final int FLAGS )
     {
-        inParams.add ( index, value );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, value );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -601,10 +603,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsStructAt ( int index, JIStruct value, int FLAGS )
+    public void insertInParamAsStructAt ( final int index, final JIStruct value, final int FLAGS )
     {
-        inParams.add ( index, value );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, value );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -617,10 +619,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void insertInParamAsArrayAt ( int index, JIArray value, int FLAGS )
+    public void insertInParamAsArrayAt ( final int index, final JIArray value, final int FLAGS )
     {
-        inParams.add ( index, value );
-        inparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.inParams.add ( index, value );
+        this.inparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -632,10 +634,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void removeInParamAt ( int index, int FLAGS )
+    public void removeInParamAt ( final int index, final int FLAGS )
     {
-        Object value = inParams.remove ( index );
-        inparamFlags.remove ( index );
+        final Object value = this.inParams.remove ( index );
+        this.inparamFlags.remove ( index );
     }
 
     /**
@@ -647,9 +649,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @return Primitives are returned as there Derieved types.
      */
     //Will just provide 1 getter, for outParams there would be overloads like inParam setters.
-    public Object getInParamAt ( int index )
+    public Object getInParamAt ( final int index )
     {
-        return inParams.get ( index );
+        return this.inParams.get ( index );
     }
 
     /**
@@ -659,9 +661,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param clazz
      * @param FLAGS
      */
-    public void addOutParamAsType ( Class clazz, int FLAGS )
+    public void addOutParamAsType ( final Class clazz, final int FLAGS )
     {
-        insertOutParamAt ( outParams.size (), clazz, FLAGS );
+        insertOutParamAt ( this.outParams.size (), clazz, FLAGS );
     }
 
     /**
@@ -672,9 +674,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param outparam
      * @param FLAGS
      */
-    public void addOutParamAsObject ( Object outparam, int FLAGS )
+    public void addOutParamAsObject ( final Object outparam, final int FLAGS )
     {
-        insertOutParamAt ( outParams.size (), outparam, FLAGS );
+        insertOutParamAt ( this.outParams.size (), outparam, FLAGS );
     }
 
     /**
@@ -687,10 +689,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            can be either a Class or an Object
      * @param FLAGS
      */
-    public void insertOutParamAt ( int index, Object classOrInstance, int FLAGS )
+    public void insertOutParamAt ( final int index, final Object classOrInstance, final int FLAGS )
     {
-        outParams.add ( index, classOrInstance );
-        outparamFlags.add ( index, new Integer ( FLAGS ) );
+        this.outParams.add ( index, classOrInstance );
+        this.outparamFlags.add ( index, new Integer ( FLAGS ) );
     }
 
     /**
@@ -701,9 +703,9 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public Object getOutParamAt ( int index )
+    public Object getOutParamAt ( final int index )
     {
-        return outParams.get ( index );
+        return this.outParams.get ( index );
     }
 
     /**
@@ -715,10 +717,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void removeOutParamAt ( int index, int FLAGS )
+    public void removeOutParamAt ( final int index, final int FLAGS )
     {
-        outParams.remove ( index );
-        outparamFlags.remove ( index );
+        this.outParams.remove ( index );
+        this.outparamFlags.remove ( index );
     }
 
     /**
@@ -730,12 +732,12 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void setOutParams ( Object[] values, int FLAGS )
+    public void setOutParams ( final Object[] values, final int FLAGS )
     {
         for ( int i = 0; i < values.length; i++ )
         {
-            outParams.add ( values[i] );
-            outparamFlags.add ( new Integer ( FLAGS ) );
+            this.outParams.add ( values[i] );
+            this.outparamFlags.add ( new Integer ( FLAGS ) );
         }
 
     }
@@ -750,7 +752,7 @@ public class JICallBuilder extends NdrObject implements Serializable
     public Object[] getResults ()
     {
         //checkIfCalled();
-        return outparams;
+        return this.outparams;
     }
 
     /**
@@ -760,10 +762,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public int getResultAsIntAt ( int index )
+    public int getResultAsIntAt ( final int index )
     {
         checkIfCalled ();
-        return ( (Integer)outparams[index] ).intValue ();
+        return ( (Integer)this.outparams[index] ).intValue ();
     }
 
     /**
@@ -774,10 +776,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public float getResultAsFloatAt ( int index )
+    public float getResultAsFloatAt ( final int index )
     {
         checkIfCalled ();
-        return ( (Float)outparams[index] ).floatValue ();
+        return ( (Float)this.outparams[index] ).floatValue ();
     }
 
     /**
@@ -788,10 +790,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public boolean getResultAsBooleanAt ( int index )
+    public boolean getResultAsBooleanAt ( final int index )
     {
         checkIfCalled ();
-        return ( (Boolean)outparams[index] ).booleanValue ();
+        return ( (Boolean)this.outparams[index] ).booleanValue ();
     }
 
     /**
@@ -802,10 +804,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public short getResultAsShortAt ( int index )
+    public short getResultAsShortAt ( final int index )
     {
         checkIfCalled ();
-        return ( (Short)outparams[index] ).shortValue ();
+        return ( (Short)this.outparams[index] ).shortValue ();
     }
 
     /**
@@ -816,10 +818,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public double getResultAsDoubleAt ( int index )
+    public double getResultAsDoubleAt ( final int index )
     {
         checkIfCalled ();
-        return ( (Double)outparams[index] ).doubleValue ();
+        return ( (Double)this.outparams[index] ).doubleValue ();
     }
 
     /**
@@ -829,10 +831,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public char getResultAsCharacterAt ( int index )
+    public char getResultAsCharacterAt ( final int index )
     {
         checkIfCalled ();
-        return ( (Character)outparams[index] ).charValue ();
+        return ( (Character)this.outparams[index] ).charValue ();
     }
 
     /**
@@ -843,10 +845,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public JIString getResultAsStringAt ( int index )
+    public JIString getResultAsStringAt ( final int index )
     {
         checkIfCalled ();
-        return ( (JIString)outparams[index] );
+        return (JIString)this.outparams[index];
     }
 
     /**
@@ -857,10 +859,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public JIVariant getResultAsVariantAt ( int index )
+    public JIVariant getResultAsVariantAt ( final int index )
     {
         checkIfCalled ();
-        return ( (JIVariant)outparams[index] );
+        return (JIVariant)this.outparams[index];
     }
 
     /**
@@ -871,10 +873,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public String getResultAsUUIDStrAt ( int index )
+    public String getResultAsUUIDStrAt ( final int index )
     {
         checkIfCalled ();
-        return ( (UUID)outparams[index] ).toString ();
+        return ( (UUID)this.outparams[index] ).toString ();
     }
 
     /**
@@ -885,10 +887,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public JIPointer getResultAsPointerAt ( int index )
+    public JIPointer getResultAsPointerAt ( final int index )
     {
         checkIfCalled ();
-        return ( (JIPointer)outparams[index] );
+        return (JIPointer)this.outparams[index];
     }
 
     /**
@@ -899,10 +901,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public JIStruct getResultAsStructAt ( int index )
+    public JIStruct getResultAsStructAt ( final int index )
     {
         checkIfCalled ();
-        return ( (JIStruct)outparams[index] );
+        return (JIStruct)this.outparams[index];
     }
 
     /**
@@ -913,10 +915,10 @@ public class JICallBuilder extends NdrObject implements Serializable
      *            0 based index
      * @return
      */
-    public JIArray getResultAsArrayAt ( int index )
+    public JIArray getResultAsArrayAt ( final int index )
     {
         checkIfCalled ();
-        return ( (JIArray)outparams[index] );
+        return (JIArray)this.outparams[index];
     }
 
     /**
@@ -927,7 +929,7 @@ public class JICallBuilder extends NdrObject implements Serializable
     public Object[] getResultsInCaseOfException ()
     {
         //checkIfCalled();
-        return resultsOfException;
+        return this.resultsOfException;
     }
 
     /**
@@ -939,12 +941,12 @@ public class JICallBuilder extends NdrObject implements Serializable
      */
     public int getHRESULT ()
     {
-        return hresult;
+        return this.hresult;
     }
 
     private void checkIfCalled ()
     {
-        if ( !executed )
+        if ( !this.executed )
         {
             throw new IllegalStateException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_API_INCORRECTLY_CALLED ) );
         }
@@ -957,7 +959,7 @@ public class JICallBuilder extends NdrObject implements Serializable
      */
     public Object[] getInParams ()
     {
-        return inParams.toArray ();
+        return this.inParams.toArray ();
     }
 
     /**
@@ -967,7 +969,7 @@ public class JICallBuilder extends NdrObject implements Serializable
      */
     public Object[] getOutParams ()
     {
-        return outParams.toArray ();
+        return this.outParams.toArray ();
     }
 
     /**
@@ -977,7 +979,7 @@ public class JICallBuilder extends NdrObject implements Serializable
      */
     public Integer[] getInparamFlags ()
     {
-        return (Integer[])inparamFlags.toArray ( new Integer[0] );
+        return (Integer[])this.inparamFlags.toArray ( new Integer[0] );
     }
 
     /**
@@ -987,18 +989,19 @@ public class JICallBuilder extends NdrObject implements Serializable
      */
     public Integer[] getOutparamFlags ()
     {
-        return (Integer[])outparamFlags.toArray ( new Integer[0] );
+        return (Integer[])this.outparamFlags.toArray ( new Integer[0] );
     }
 
     /**
      * Returns the opnum of the API which will be invoked at the
      * <code>COM</code> server.
      */
+    @Override
     public int getOpnum ()
     {
         //opnum is 3 as this is a COM interface and 0,1,2 are occupied by IUnknown
         //TODO remember this for extending com components also.
-        return opnum;
+        return this.opnum;
     }
 
     //All Methods are 0 index based
@@ -1019,17 +1022,17 @@ public class JICallBuilder extends NdrObject implements Serializable
      * Alternatively, you can use the IJIDispatch interface, if the object
      * supports it.
      */
-    public void setOpnum ( int num )
+    public void setOpnum ( final int num )
     {
         int dispatch = 0;
-        if ( !dispatchNotSupported )
+        if ( !this.dispatchNotSupported )
         {
             dispatch = 4; //4 apis.
         }
-        opnum = dispatch + num + 3; //0,1,2, Q.I
+        this.opnum = dispatch + num + 3; //0,1,2, Q.I
     }
 
-    void write2 ( NetworkDataRepresentation ndr )
+    void write2 ( final NetworkDataRepresentation ndr )
     {
         //reset buffer size here...
         //calculate rough length required length + 16 for the last bytes
@@ -1042,7 +1045,8 @@ public class JICallBuilder extends NdrObject implements Serializable
     /**
      * @exclude
      */
-    public void write ( NetworkDataRepresentation ndr )
+    @Override
+    public void write ( final NetworkDataRepresentation ndr )
     {
 
         //reset buffer size here...
@@ -1050,7 +1054,7 @@ public class JICallBuilder extends NdrObject implements Serializable
         //plus adding 30 more for the verifier etc. 
         ndr.getBuffer ().buf = new byte[bufferLength () + 16];
 
-        JIOrpcThis orpcthis = new JIOrpcThis ();
+        final JIOrpcThis orpcthis = new JIOrpcThis ();
         orpcthis.encode ( ndr );
 
         writePacket ( ndr );
@@ -1063,14 +1067,14 @@ public class JICallBuilder extends NdrObject implements Serializable
 
     }
 
-    private void writePacket ( NetworkDataRepresentation ndr )
+    private void writePacket ( final NetworkDataRepresentation ndr )
     {
-        if ( session == null )
+        if ( this.session == null )
         {
             throw new IllegalStateException ( "Programming Error ! Session not attached with this call ! ... Please rectify ! " );
         }
 
-        Object[] inparams = inParams.toArray ();
+        final Object[] inparams = this.inParams.toArray ();
 
         int index = 0;
         if ( inparams != null )
@@ -1086,14 +1090,14 @@ public class JICallBuilder extends NdrObject implements Serializable
             //			}
             while ( index < inparams.length )
             {
-                List listOfDefferedPointers = new ArrayList ();
+                final List listOfDefferedPointers = new ArrayList ();
                 if ( inparams[index] == null )
                 {
                     JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, new Integer ( 0 ), listOfDefferedPointers, JIFlags.FLAG_NULL );
                 }
                 else
                 {
-                    JIMarshalUnMarshalHelper.serialize ( ndr, inparams[index].getClass (), inparams[index], listOfDefferedPointers, ( (Integer)inparamFlags.get ( index ) ).intValue () );
+                    JIMarshalUnMarshalHelper.serialize ( ndr, inparams[index].getClass (), inparams[index], listOfDefferedPointers, ( (Integer)this.inparamFlags.get ( index ) ).intValue () );
                 }
 
                 int x = 0;
@@ -1121,8 +1125,8 @@ public class JICallBuilder extends NdrObject implements Serializable
                     //					should be serialized in place (following th rules of the struct serialization ofcourse) and should not go to the end of the list.
 
                     //JIMarshalUnMarshalHelper.serialize(ndr,JIPointer.class,(JIPointer)listOfDefferedPointers.get(x),listOfDefferedPointers,inparamFlags);
-                    ArrayList newList = new ArrayList ();
-                    JIMarshalUnMarshalHelper.serialize ( ndr, JIPointer.class, (JIPointer)listOfDefferedPointers.get ( x ), newList, ( (Integer)inparamFlags.get ( index ) ).intValue () );
+                    final ArrayList newList = new ArrayList ();
+                    JIMarshalUnMarshalHelper.serialize ( ndr, JIPointer.class, listOfDefferedPointers.get ( x ), newList, ( (Integer)this.inparamFlags.get ( index ) ).intValue () );
                     x++; //incrementing index
                     listOfDefferedPointers.addAll ( x, newList );
                 }
@@ -1135,7 +1139,8 @@ public class JICallBuilder extends NdrObject implements Serializable
     /**
      * @exclude
      */
-    public void read ( NetworkDataRepresentation ndr )
+    @Override
+    public void read ( final NetworkDataRepresentation ndr )
     {
         //		if (opnum == 10) FOR TESTING ONLY
         //		{
@@ -1156,7 +1161,7 @@ public class JICallBuilder extends NdrObject implements Serializable
         //			read2(ndr2);
         //		}
         //interpret based on the out params flags
-        JIOrpcThat orpcThat = JIOrpcThat.decode ( ndr );
+        final JIOrpcThat orpcThat = JIOrpcThat.decode ( ndr );
         readPacket ( ndr, false );
         readResult ( ndr );
     }
@@ -1167,7 +1172,7 @@ public class JICallBuilder extends NdrObject implements Serializable
      * @exclude
      * @param ndr
      */
-    void read2 ( NetworkDataRepresentation ndr )
+    void read2 ( final NetworkDataRepresentation ndr )
     {
         JIOrpcThis.decode ( ndr );
         readPacket ( ndr, true );
@@ -1175,48 +1180,48 @@ public class JICallBuilder extends NdrObject implements Serializable
         //hresult = 0;
     }
 
-    private void readPacket ( NetworkDataRepresentation ndr, boolean fromCallback )
+    private void readPacket ( final NetworkDataRepresentation ndr, final boolean fromCallback )
     {
 
-        if ( session == null )
+        if ( this.session == null )
         {
             throw new IllegalStateException ( "Programming Error ! Session not attached with this call ! ... Please rectify ! " );
         }
 
         int index = 0;
 
-        outparams = outParams.toArray ();
+        this.outparams = this.outParams.toArray ();
 
-        if ( JISystem.getLogger ().isLoggable ( Level.FINEST ) )
+        if ( logger.isDebugEnabled () )
         {
-            String str = "";
-            for ( int i = 0; i < outparams.length; i++ )
+            final StringBuilder str = new StringBuilder ();
+            for ( int i = 0; i < this.outparams.length; i++ )
             {
-                str = str + "Out Param:[" + i + "]" + outparams[i] + "\n";
+                str.append ( "Out Param:[" + i + "]" + this.outparams[i] + "\n" );
             }
 
-            JISystem.getLogger ().finest ( str );
+            logger.debug ( str.toString () );
         }
 
-        ArrayList comObjects = new ArrayList ();
-        Map additionalData = new HashMap ();
-        additionalData.put ( CURRENTSESSION, session );
+        final ArrayList comObjects = new ArrayList ();
+        final Map additionalData = new HashMap ();
+        additionalData.put ( CURRENTSESSION, this.session );
         additionalData.put ( COMOBJECTS, comObjects );
-        ArrayList results = new ArrayList ();
+        final ArrayList results = new ArrayList ();
         //user has nothing to return.
-        if ( outparams != null && outparams.length > 0 )
+        if ( this.outparams != null && this.outparams.length > 0 )
         {
-            while ( index < outparams.length )
+            while ( index < this.outparams.length )
             {
-                List listOfDefferedPointers = new ArrayList ();
-                results.add ( JIMarshalUnMarshalHelper.deSerialize ( ndr, outparams[index], listOfDefferedPointers, ( (Integer)outparamFlags.get ( index ) ).intValue (), additionalData ) );
+                final List listOfDefferedPointers = new ArrayList ();
+                results.add ( JIMarshalUnMarshalHelper.deSerialize ( ndr, this.outparams[index], listOfDefferedPointers, ( (Integer)this.outparamFlags.get ( index ) ).intValue (), additionalData ) );
                 int x = 0;
 
                 while ( x < listOfDefferedPointers.size () )
                 {
 
-                    ArrayList newList = new ArrayList ();
-                    JIPointer replacement = (JIPointer)JIMarshalUnMarshalHelper.deSerialize ( ndr, (JIPointer)listOfDefferedPointers.get ( x ), newList, ( (Integer)outparamFlags.get ( index ) ).intValue (), additionalData );
+                    final ArrayList newList = new ArrayList ();
+                    final JIPointer replacement = (JIPointer)JIMarshalUnMarshalHelper.deSerialize ( ndr, listOfDefferedPointers.get ( x ), newList, ( (Integer)this.outparamFlags.get ( index ) ).intValue (), additionalData );
                     ( (JIPointer)listOfDefferedPointers.get ( x ) ).replaceSelfWithNewPointer ( replacement ); //this should replace the value in the original place.	
                     x++;
                     listOfDefferedPointers.addAll ( x, newList );
@@ -1227,24 +1232,24 @@ public class JICallBuilder extends NdrObject implements Serializable
             //now create the right COM Objects, it is required here only and no place else. 
             for ( int i = 0; i < comObjects.size (); i++ )
             {
-                JIComObjectImpl comObjectImpl = (JIComObjectImpl)comObjects.get ( i );
+                final JIComObjectImpl comObjectImpl = (JIComObjectImpl)comObjects.get ( i );
                 try
                 {
                     IJIComObject comObject = null;
                     if ( fromCallback )
                     {
                         //this is a new IP , so make a new JIComServer for this.
-                        JISession newsession = JISession.createSession ( session );
-                        newsession.setGlobalSocketTimeout ( session.getGlobalSocketTimeout () );
-                        newsession.useSessionSecurity ( session.isSessionSecurityEnabled () );
-                        newsession.useNTLMv2 ( session.isNTLMv2Enabled () );
-                        JIComServer comServer = new JIComServer ( newsession, comObjectImpl.internal_getInterfacePointer (), null );
+                        final JISession newsession = JISession.createSession ( this.session );
+                        newsession.setGlobalSocketTimeout ( this.session.getGlobalSocketTimeout () );
+                        newsession.useSessionSecurity ( this.session.isSessionSecurityEnabled () );
+                        newsession.useNTLMv2 ( this.session.isNTLMv2Enabled () );
+                        final JIComServer comServer = new JIComServer ( newsession, comObjectImpl.internal_getInterfacePointer (), null );
                         comObject = comServer.getInstance ();
-                        JIFrameworkHelper.link2Sessions ( session, newsession );
+                        JIFrameworkHelper.link2Sessions ( this.session, newsession );
                     }
                     else
                     {
-                        comObject = JIFrameworkHelper.instantiateComObject2 ( session, comObjectImpl.internal_getInterfacePointer () );
+                        comObject = JIFrameworkHelper.instantiateComObject2 ( this.session, comObjectImpl.internal_getInterfacePointer () );
                     }
 
                     comObjectImpl.replaceMembers ( comObject );
@@ -1256,9 +1261,9 @@ public class JICallBuilder extends NdrObject implements Serializable
                     }
 
                 }
-                catch ( JIException e )
+                catch ( final JIException e )
                 {
-                    JISystem.getLogger ().throwing ( "JICallBuilder", "readPacket", e );
+                    logger.error ( "readPacket", e );
                     throw new JIRuntimeException ( e.getErrorCode () );
                 }
                 //replace the members of the original com objects by the completed ones.
@@ -1267,28 +1272,28 @@ public class JICallBuilder extends NdrObject implements Serializable
             comObjects.clear ();
         }
 
-        outparams = results.toArray ();
-        executed = true;
+        this.outparams = results.toArray ();
+        this.executed = true;
     }
 
-    private void readResult ( NetworkDataRepresentation ndr )
+    private void readResult ( final NetworkDataRepresentation ndr )
     {
         //last has to be the result.
-        hresult = ndr.readUnsignedLong ();
+        this.hresult = ndr.readUnsignedLong ();
 
-        if ( hresult != 0 )
+        if ( this.hresult != 0 )
         {
             //something exception occured at server, set up results
-            resultsOfException = outparams;
-            outparams = null;
-            throw new JIRuntimeException ( hresult );
+            this.resultsOfException = this.outparams;
+            this.outparams = null;
+            throw new JIRuntimeException ( this.hresult );
         }
     }
 
     private int bufferLength ()
     {
         int length = 0;
-        Object[] inparams = inParams.toArray ();
+        final Object[] inparams = this.inParams.toArray ();
         for ( int i = 0; i < inparams.length; i++ )
         {
             if ( inparams[i] == null )
@@ -1296,7 +1301,7 @@ public class JICallBuilder extends NdrObject implements Serializable
                 length = length + 4;
                 continue;
             }
-            int length2 = JIMarshalUnMarshalHelper.getLengthInBytes ( inparams[i].getClass (), inparams[i], JIFlags.FLAG_NULL );
+            final int length2 = JIMarshalUnMarshalHelper.getLengthInBytes ( inparams[i].getClass (), inparams[i], JIFlags.FLAG_NULL );
             length = length + length2;
         }
 
@@ -1312,16 +1317,16 @@ public class JICallBuilder extends NdrObject implements Serializable
     public boolean isError ()
     {
         checkIfCalled ();
-        return hresult != 0;
+        return this.hresult != 0;
     }
 
-    void attachSession ( JISession session )
+    void attachSession ( final JISession session )
     {
         this.session = session;
     }
 
     JISession getSession ()
     {
-        return session;
+        return this.session;
     }
 }

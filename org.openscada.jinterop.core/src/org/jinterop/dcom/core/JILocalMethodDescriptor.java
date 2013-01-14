@@ -56,7 +56,7 @@ public final class JILocalMethodDescriptor
      * @param parameters
      *            pass <code>null</code> if the method has no parameters.
      */
-    public JILocalMethodDescriptor ( String methodName, JILocalParamsDescriptor parameters )
+    public JILocalMethodDescriptor ( final String methodName, final JILocalParamsDescriptor parameters )
     {
         this.methodName = methodName;
         setParameterObject ( parameters );
@@ -73,19 +73,19 @@ public final class JILocalMethodDescriptor
      * @param parameters
      *            pass <code>null</code> if the method has no parameters.
      */
-    public JILocalMethodDescriptor ( String methodName, int dispId, JILocalParamsDescriptor parameters )
+    public JILocalMethodDescriptor ( final String methodName, final int dispId, final JILocalParamsDescriptor parameters )
     {
         this.methodName = methodName;
         this.dispId = dispId;
         setParameterObject ( parameters );
     }
 
-    void setMethodNum ( int methodNum )
+    void setMethodNum ( final int methodNum )
     {
         this.methodNum = methodNum;
     }
 
-    private void setParameterObject ( JILocalParamsDescriptor parameters )
+    private void setParameterObject ( final JILocalParamsDescriptor parameters )
     {
 
         if ( parameters == null )
@@ -94,12 +94,12 @@ public final class JILocalMethodDescriptor
         }
 
         this.parameters = parameters;
-        Object[] params = parameters.getInParams ();
-        inparametersAsClass = new Class[params.length];
+        final Object[] params = parameters.getInParams ();
+        this.inparametersAsClass = new Class[params.length];
 
         for ( int i = 0; i < params.length; i++ )
         {
-            Object obj = params[i];
+            final Object obj = params[i];
             if ( obj instanceof Class )
             {
                 Class c = (Class)obj;
@@ -143,11 +143,11 @@ public final class JILocalMethodDescriptor
                         c = void.class;
                     }
                 }
-                inparametersAsClass[i] = c;
+                this.inparametersAsClass[i] = c;
             }
             else
             {
-                inparametersAsClass[i] = obj.getClass ();
+                this.inparametersAsClass[i] = obj.getClass ();
             }
         }
 
@@ -160,7 +160,7 @@ public final class JILocalMethodDescriptor
      */
     public String getMethodName ()
     {
-        return methodName;
+        return this.methodName;
     }
 
     /**
@@ -170,7 +170,7 @@ public final class JILocalMethodDescriptor
      */
     public int getMethodNum ()
     {
-        return methodNum;
+        return this.methodNum;
     }
 
     /**
@@ -180,7 +180,7 @@ public final class JILocalMethodDescriptor
      */
     public int getMethodDispID ()
     {
-        return dispId;
+        return this.dispId;
     }
 
     /**
@@ -190,7 +190,7 @@ public final class JILocalMethodDescriptor
      */
     public JILocalParamsDescriptor getParameterObject ()
     {
-        return parameters;
+        return this.parameters;
     }
 
     /**
@@ -199,6 +199,6 @@ public final class JILocalMethodDescriptor
      */
     Class[] getInparametersAsClass ()
     {
-        return inparametersAsClass;
+        return this.inparametersAsClass;
     }
 }

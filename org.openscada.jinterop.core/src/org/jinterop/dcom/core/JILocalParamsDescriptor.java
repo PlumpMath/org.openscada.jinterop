@@ -52,7 +52,7 @@ import ndr.NetworkDataRepresentation;
 public final class JILocalParamsDescriptor implements Serializable
 {
 
-    private JICallBuilder callObject = new JICallBuilder ();
+    private final JICallBuilder callObject = new JICallBuilder ();
 
     private static final long serialVersionUID = -4274963180104543505L;
 
@@ -61,10 +61,10 @@ public final class JILocalParamsDescriptor implements Serializable
      * @param ndr
      * @return
      */
-    Object[] read ( NetworkDataRepresentation ndr )
+    Object[] read ( final NetworkDataRepresentation ndr )
     {
-        callObject.read2 ( ndr );
-        return callObject.getResults ();
+        this.callObject.read2 ( ndr );
+        return this.callObject.getResults ();
     }
 
     /**
@@ -74,9 +74,9 @@ public final class JILocalParamsDescriptor implements Serializable
      * @param clazz
      * @param FLAGS
      */
-    public void addInParamAsType ( Class clazz, int FLAGS )
+    public void addInParamAsType ( final Class clazz, final int FLAGS )
     {
-        callObject.addOutParamAsType ( clazz, FLAGS );
+        this.callObject.addOutParamAsType ( clazz, FLAGS );
     }
 
     /**
@@ -88,9 +88,9 @@ public final class JILocalParamsDescriptor implements Serializable
      * @param param
      * @param FLAGS
      */
-    public void addInParamAsObject ( Object param, int FLAGS )
+    public void addInParamAsObject ( final Object param, final int FLAGS )
     {
-        callObject.addOutParamAsObject ( param, FLAGS );
+        this.callObject.addOutParamAsObject ( param, FLAGS );
     }
 
     /**
@@ -98,9 +98,9 @@ public final class JILocalParamsDescriptor implements Serializable
      * @param params
      * @param FLAGS
      */
-    void setInParams ( Object[] params, int FLAGS )
+    void setInParams ( final Object[] params, final int FLAGS )
     {
-        callObject.setOutParams ( params, FLAGS );
+        this.callObject.setOutParams ( params, FLAGS );
     }
 
     /**
@@ -112,9 +112,9 @@ public final class JILocalParamsDescriptor implements Serializable
      * @param FLAGS
      *            from JIFlags (if need be).
      */
-    public void removeInParamAt ( int index, int FLAGS )
+    public void removeInParamAt ( final int index, final int FLAGS )
     {
-        callObject.removeOutParamAt ( index, FLAGS );
+        this.callObject.removeOutParamAt ( index, FLAGS );
     }
 
     /**
@@ -123,12 +123,12 @@ public final class JILocalParamsDescriptor implements Serializable
      */
     Object[] getInParams ()
     {
-        return callObject.getOutParams ();
+        return this.callObject.getOutParams ();
     }
 
-    void setSession ( JISession session )
+    void setSession ( final JISession session )
     {
-        callObject.attachSession ( session );
+        this.callObject.attachSession ( session );
     }
 
 }

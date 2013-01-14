@@ -34,79 +34,79 @@ public class MSExcel
 
     private JISession session = null;
 
-    public MSExcel ( String address, String[] args ) throws JIException, UnknownHostException
+    public MSExcel ( final String address, final String[] args ) throws JIException, UnknownHostException
     {
-        session = JISession.createSession ( args[1], args[2], args[3] );
-        comServer = new JIComServer ( JIProgId.valueOf ( "Excel.Application" ), address, session );
+        this.session = JISession.createSession ( args[1], args[2], args[3] );
+        this.comServer = new JIComServer ( JIProgId.valueOf ( "Excel.Application" ), address, this.session );
     }
 
     public void startExcel () throws JIException
     {
-        unknown = comServer.createInstance ();
-        dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( unknown.queryInterface ( IJIDispatch.IID ) );
-        IJITypeInfo typeInfo = dispatch.getTypeInfo ( 0 );
+        this.unknown = this.comServer.createInstance ();
+        this.dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( this.unknown.queryInterface ( IJIDispatch.IID ) );
+        final IJITypeInfo typeInfo = this.dispatch.getTypeInfo ( 0 );
         typeInfo.getFuncDesc ( 0 );
     }
 
     public void showExcel () throws JIException
     {
-        int dispId = dispatch.getIDsOfNames ( "Visible" );
-        JIVariant variant = new JIVariant ( true );
-        dispatch.put ( dispId, variant );
+        final int dispId = this.dispatch.getIDsOfNames ( "Visible" );
+        final JIVariant variant = new JIVariant ( true );
+        this.dispatch.put ( dispId, variant );
     }
 
     public void createWorkSheet () throws JIException
     {
-        int dispId = dispatch.getIDsOfNames ( "Workbooks" );
+        int dispId = this.dispatch.getIDsOfNames ( "Workbooks" );
         Object[] out = new Object[] { JIVariant.class };
         JIVariant[] outVal2 = null;
-        JIVariant outVal = dispatch.get ( dispId );
-        dispatchOfWorkBook = (IJIDispatch)JIObjectFactory.narrowObject ( outVal.getObjectAsComObject () );
+        final JIVariant outVal = this.dispatch.get ( dispId );
+        this.dispatchOfWorkBook = (IJIDispatch)JIObjectFactory.narrowObject ( outVal.getObjectAsComObject () );
 
-        int[] dispIds = dispatchOfWorkBook.getIDsOfNames ( new String[] { "Add", "Template" } );
+        final int[] dispIds = this.dispatchOfWorkBook.getIDsOfNames ( new String[] { "Add", "Template" } );
 
         out = new Object[] { JIVariant.class };
-        dispId = dispatchOfWorkBook.getIDsOfNames ( "Add" );
+        dispId = this.dispatchOfWorkBook.getIDsOfNames ( "Add" );
 
-        outVal2 = dispatchOfWorkBook.callMethodA ( dispId, new Object[] { new Integer ( xlWorksheet ) } );
-        dispatchOfWorkBook = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
+        outVal2 = this.dispatchOfWorkBook.callMethodA ( dispId, new Object[] { new Integer ( this.xlWorksheet ) } );
+        this.dispatchOfWorkBook = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
 
-        dispId = dispatchOfWorkBook.getIDsOfNames ( "Worksheets" );
-        JIVariant variant = new JIVariant ( (short)1 );
+        dispId = this.dispatchOfWorkBook.getIDsOfNames ( "Worksheets" );
+        final JIVariant variant = new JIVariant ( (short)1 );
         out = new Object[] { JIVariant.class };
-        outVal2 = dispatchOfWorkBook.get ( dispId, new Object[] { variant } );
+        outVal2 = this.dispatchOfWorkBook.get ( dispId, new Object[] { variant } );
 
-        dispatchOfWorkSheet = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
+        this.dispatchOfWorkSheet = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
 
     }
 
     public void pasteStringToWorkSheet () throws JIException
     {
-        int dispId = dispatchOfWorkSheet.getIDsOfNames ( "Range" );
+        int dispId = this.dispatchOfWorkSheet.getIDsOfNames ( "Range" );
 
-        JIVariant variant = new JIVariant ( new JIString ( "A1" ) );
+        final JIVariant variant = new JIVariant ( new JIString ( "A1" ) );
         Object[] out = new Object[] { JIVariant.class };
         JIVariant outVal, outVal2[] = null;
-        outVal2 = dispatchOfWorkSheet.get ( dispId, new Object[] { variant } );
+        outVal2 = this.dispatchOfWorkSheet.get ( dispId, new Object[] { variant } );
 
-        IJIDispatch dispRange = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
+        final IJIDispatch dispRange = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
 
         dispId = dispRange.getIDsOfNames ( "Select" );
         out = new Object[] { JIVariant.class };
         outVal = dispRange.get ( dispId );
 
-        dispId = dispatchOfWorkBook.getIDsOfNames ( "ActiveSheet" );
+        dispId = this.dispatchOfWorkBook.getIDsOfNames ( "ActiveSheet" );
         out = new Object[] { JIVariant.class };
-        outVal = dispatchOfWorkBook.get ( dispId );
+        outVal = this.dispatchOfWorkBook.get ( dispId );
 
-        IJIDispatch dispatchActiveSheet = (IJIDispatch)JIObjectFactory.narrowObject ( outVal.getObjectAsComObject () );
+        final IJIDispatch dispatchActiveSheet = (IJIDispatch)JIObjectFactory.narrowObject ( outVal.getObjectAsComObject () );
         dispId = dispatchActiveSheet.getIDsOfNames ( "Paste" );
         out = new Object[] { JIVariant.class };
         try
         {
             outVal = dispatchActiveSheet.callMethodA ( dispId );
         }
-        catch ( JIException e )
+        catch ( final JIException e )
         {
             throw e;
         }
@@ -115,18 +115,18 @@ public class MSExcel
     public void createXYChart () throws JIException
     {
         //column 2.
-        int dispId = dispatchOfWorkSheet.getIDsOfNames ( "Columns" );
+        int dispId = this.dispatchOfWorkSheet.getIDsOfNames ( "Columns" );
 
-        Double cols = new Double ( 2 );
+        final Double cols = new Double ( 2 );
         Object[] out = new Object[] { JIVariant.class };
         JIVariant outVal, outVal2[] = null;
-        outVal2 = dispatchOfWorkSheet.get ( dispId, new Object[] { cols } );
+        outVal2 = this.dispatchOfWorkSheet.get ( dispId, new Object[] { cols } );
 
-        IJIDispatch dispatchRange = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
+        final IJIDispatch dispatchRange = (IJIDispatch)JIObjectFactory.narrowObject ( outVal2[0].getObjectAsComObject () );
 
-        dispId = dispatchOfWorkBook.getIDsOfNames ( "Charts" );
+        dispId = this.dispatchOfWorkBook.getIDsOfNames ( "Charts" );
         out = new Object[] { JIVariant.class };
-        outVal = dispatchOfWorkBook.get ( dispId );
+        outVal = this.dispatchOfWorkBook.get ( dispId );
 
         IJIDispatch dispatchChart = (IJIDispatch)JIObjectFactory.narrowObject ( outVal.getObjectAsComObject () );
 
@@ -136,28 +136,28 @@ public class MSExcel
 
         dispatchChart = (IJIDispatch)JIObjectFactory.narrowObject ( outVal.getObjectAsComObject () );
 
-        dispId = dispatchOfWorkBook.getIDsOfNames ( "ActiveChart" );
+        dispId = this.dispatchOfWorkBook.getIDsOfNames ( "ActiveChart" );
         out = new Object[] { JIVariant.class };
 
-        outVal = dispatchOfWorkBook.get ( dispId );
+        outVal = this.dispatchOfWorkBook.get ( dispId );
 
-        IJIDispatch dispatchActiveChart = (IJIDispatch)JIObjectFactory.narrowObject ( outVal.getObjectAsComObject () );
+        final IJIDispatch dispatchActiveChart = (IJIDispatch)JIObjectFactory.narrowObject ( outVal.getObjectAsComObject () );
 
         dispId = dispatchActiveChart.getIDsOfNames ( "ChartType" );
         out = new Object[] { JIVariant.class };
 
-        dispatchActiveChart.put ( dispId, new JIVariant ( (short)xlXYScatterLinesNoMarkers ) );
+        dispatchActiveChart.put ( dispId, new JIVariant ( (short)this.xlXYScatterLinesNoMarkers ) );
 
-        int[] dispIds = dispatchActiveChart.getIDsOfNames ( new String[] { "SetSourceData", "Source", "PlotBy" } );
+        final int[] dispIds = dispatchActiveChart.getIDsOfNames ( new String[] { "SetSourceData", "Source", "PlotBy" } );
 
         dispId = dispatchActiveChart.getIDsOfNames ( "SetSourceData" );
         out = new Object[] { JIVariant.class };
-        outVal2 = dispatchActiveChart.callMethodA ( dispId, new Object[] { dispatchRange, new Short ( (short)xlColumns ) }, new int[] { dispIds[1], dispIds[2] } );//invoke(dispIds[0],IJIDispatch.DISPATCH_METHOD,new Object[]{variant,new JIArray(new Integer[]{new Integer(dispIds[1]),new Integer(dispIds[2])},true),null,null,null},null);
+        outVal2 = dispatchActiveChart.callMethodA ( dispId, new Object[] { dispatchRange, new Short ( (short)this.xlColumns ) }, new int[] { dispIds[1], dispIds[2] } );//invoke(dispIds[0],IJIDispatch.DISPATCH_METHOD,new Object[]{variant,new JIArray(new Integer[]{new Integer(dispIds[1]),new Integer(dispIds[2])},true),null,null,null},null);
 
-        JISession.destroySession ( session );
+        JISession.destroySession ( this.session );
     }
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
 
         try
@@ -167,14 +167,14 @@ public class MSExcel
                 System.out.println ( "Please provide address domain username password" );
                 return;
             }
-            MSExcel test = new MSExcel ( args[0], args );
+            final MSExcel test = new MSExcel ( args[0], args );
             test.startExcel ();
             test.showExcel ();
             test.createWorkSheet ();
             test.pasteStringToWorkSheet ();
             test.createXYChart ();
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();

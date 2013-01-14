@@ -56,7 +56,7 @@ public final class JIUnion implements Serializable
 
     private static final long serialVersionUID = -3353313619137076876L;
 
-    private HashMap dsVsMember = new HashMap ();
+    private final HashMap dsVsMember = new HashMap ();
 
     private Class discriminantClass = null;
 
@@ -79,7 +79,7 @@ public final class JIUnion implements Serializable
      *             specified
      *             above.
      */
-    public JIUnion ( Class discriminantClass )
+    public JIUnion ( final Class discriminantClass )
     {
         //the discriminant can only be a int, boolean or char
 
@@ -103,14 +103,14 @@ public final class JIUnion implements Serializable
      * @throws IllegalArgumentException
      *             if any parameter is <code>null</code>
      */
-    public void addMember ( Object discriminant, Object member ) throws JIException
+    public void addMember ( final Object discriminant, final Object member ) throws JIException
     {
         if ( discriminant == null || member == null )
         {
             throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_UNION_NULL_DISCRMINANT ) );
         }
 
-        if ( !discriminant.getClass ().equals ( discriminantClass ) )
+        if ( !discriminant.getClass ().equals ( this.discriminantClass ) )
         {
             throw new JIException ( JIErrorCodes.JI_UNION_DISCRMINANT_MISMATCH );
         }
@@ -124,7 +124,7 @@ public final class JIUnion implements Serializable
             ( (JIString)member ).setDeffered ( true );
         }
 
-        dsVsMember.put ( discriminant, member );
+        this.dsVsMember.put ( discriminant, member );
     }
 
     /**
@@ -138,14 +138,14 @@ public final class JIUnion implements Serializable
      *             if <code>discriminant</code> is <code>null</code>
      */
     //used both for reading and writing
-    public void addMember ( Object discriminant, JIStruct member ) throws JIException
+    public void addMember ( final Object discriminant, JIStruct member ) throws JIException
     {
         if ( discriminant == null )
         {
             throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_UNION_NULL_DISCRMINANT ) );
         }
 
-        if ( !discriminant.getClass ().equals ( discriminantClass ) )
+        if ( !discriminant.getClass ().equals ( this.discriminantClass ) )
         {
             throw new JIException ( JIErrorCodes.JI_UNION_DISCRMINANT_MISMATCH );
         }
@@ -155,7 +155,7 @@ public final class JIUnion implements Serializable
             member = JIStruct.MEMBER_IS_EMPTY;
         }
 
-        dsVsMember.put ( discriminant, member );
+        this.dsVsMember.put ( discriminant, member );
         //do not need a seperate list of pointers like the struct , since based on the discriminant only 1 pointer
         //(if present) can be deserialized\serialized.
     }
@@ -166,9 +166,9 @@ public final class JIUnion implements Serializable
      * 
      * @param discriminant
      */
-    public void removeMember ( Object discriminant )
+    public void removeMember ( final Object discriminant )
     {
-        dsVsMember.remove ( discriminant );
+        this.dsVsMember.remove ( discriminant );
     }
 
     /**
@@ -178,22 +178,22 @@ public final class JIUnion implements Serializable
      */
     public Map getMembers ()
     {
-        return dsVsMember;
+        return this.dsVsMember;
     }
 
-    void encode ( NetworkDataRepresentation ndr, List listOfDefferedPointers, int FLAGS )
+    void encode ( final NetworkDataRepresentation ndr, final List listOfDefferedPointers, final int FLAGS )
     {
-        if ( dsVsMember.size () == 0 || dsVsMember.size () > 1 )
+        if ( this.dsVsMember.size () == 0 || this.dsVsMember.size () > 1 )
         {
             throw new JIRuntimeException ( JIErrorCodes.JI_UNION_DISCRMINANT_SERIALIZATION_ERROR );
         }
 
         //first write the discriminant and then the member
-        Iterator keys = dsVsMember.keySet ().iterator ();
-        JIMarshalUnMarshalHelper.serialize ( ndr, discriminantClass, keys.next (), listOfDefferedPointers, FLAGS );
+        Iterator keys = this.dsVsMember.keySet ().iterator ();
+        JIMarshalUnMarshalHelper.serialize ( ndr, this.discriminantClass, keys.next (), listOfDefferedPointers, FLAGS );
 
-        keys = dsVsMember.values ().iterator ();
-        Object value = keys.next ();
+        keys = this.dsVsMember.values ().iterator ();
+        final Object value = keys.next ();
 
         //will not write empty union members
         if ( !value.equals ( JIStruct.MEMBER_IS_EMPTY ) )
@@ -203,23 +203,23 @@ public final class JIUnion implements Serializable
 
     }
 
-    JIUnion decode ( NetworkDataRepresentation ndr, List listOfDefferedPointers, int FLAGS, Map additionalData )
+    JIUnion decode ( final NetworkDataRepresentation ndr, final List listOfDefferedPointers, final int FLAGS, final Map additionalData )
     {
         //first read discriminant, and then call the appropriate deserializer of the member
-        if ( dsVsMember.size () == 0 )
+        if ( this.dsVsMember.size () == 0 )
         {
             throw new JIRuntimeException ( JIErrorCodes.JI_UNION_DISCRMINANT_DESERIALIZATION_ERROR );
         }
 
         //shallowClone();
         //first write the discriminant and then the member
-        JIUnion retVal = new JIUnion ();
-        retVal.discriminantClass = discriminantClass;
+        final JIUnion retVal = new JIUnion ();
+        retVal.discriminantClass = this.discriminantClass;
 
-        Object key = JIMarshalUnMarshalHelper.deSerialize ( ndr, discriminantClass, listOfDefferedPointers, FLAGS, additionalData );
+        final Object key = JIMarshalUnMarshalHelper.deSerialize ( ndr, this.discriminantClass, listOfDefferedPointers, FLAGS, additionalData );
 
         //next thing to be deserialized is the member
-        Object value = dsVsMember.get ( key );
+        Object value = this.dsVsMember.get ( key );
 
         //should allow null since this could be a "default"
         if ( value == null )
@@ -243,27 +243,27 @@ public final class JIUnion implements Serializable
     int getLength ()
     {
         int length = 0;
-        Iterator itr = dsVsMember.keySet ().iterator ();
+        final Iterator itr = this.dsVsMember.keySet ().iterator ();
         while ( itr.hasNext () )
         {
-            Object o = itr.next ();
-            int temp = JIMarshalUnMarshalHelper.getLengthInBytes ( o.getClass (), o, JIFlags.FLAG_NULL );
+            final Object o = itr.next ();
+            final int temp = JIMarshalUnMarshalHelper.getLengthInBytes ( o.getClass (), o, JIFlags.FLAG_NULL );
             length = length > temp ? length : temp; //length of the largest member
         }
 
-        return length + JIMarshalUnMarshalHelper.getLengthInBytes ( discriminantClass, null, JIFlags.FLAG_NULL );
+        return length + JIMarshalUnMarshalHelper.getLengthInBytes ( this.discriminantClass, null, JIFlags.FLAG_NULL );
     }
 
     int getAlignment ()
     {
         int alignment = 0;
 
-        if ( discriminantClass.equals ( Integer.class ) )
+        if ( this.discriminantClass.equals ( Integer.class ) )
         {
             //align with 4 bytes
             alignment = 4;
         }
-        else if ( discriminantClass.equals ( Short.class ) )
+        else if ( this.discriminantClass.equals ( Short.class ) )
         {
             //align with 2
             alignment = 2;

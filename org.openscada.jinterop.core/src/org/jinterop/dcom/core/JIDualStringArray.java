@@ -39,25 +39,25 @@ final class JIDualStringArray implements Serializable
 
     //static boolean test = false;
     //Will get called from Oxid Resolver
-    JIDualStringArray ( int port )
+    JIDualStringArray ( final int port )
     {
         //create bindings here.
-        stringBinding = new JIStringBinding[2]; //only 1
-        stringBinding[0] = new JIStringBinding ( port, false );
+        this.stringBinding = new JIStringBinding[2]; //only 1
+        this.stringBinding[0] = new JIStringBinding ( port, false );
 
-        length = stringBinding[0].getLength ();
+        this.length = this.stringBinding[0].getLength ();
 
-        stringBinding[1] = new JIStringBinding ( port, true );
+        this.stringBinding[1] = new JIStringBinding ( port, true );
 
-        length = length + stringBinding[1].getLength () + 2; //null termination
+        this.length = this.length + this.stringBinding[1].getLength () + 2; //null termination
 
-        secOffset = length;
+        this.secOffset = this.length;
 
-        securityBinding = new JISecurityBinding[1]; //support only winnt NTLM
-        securityBinding[0] = new JISecurityBinding ( 0x0a, 0xffff, "" );
-        length = length + securityBinding[0].getLength ();
+        this.securityBinding = new JISecurityBinding[1]; //support only winnt NTLM
+        this.securityBinding[0] = new JISecurityBinding ( 0x0a, 0xffff, "" );
+        this.length = this.length + this.securityBinding[0].getLength ();
 
-        length = length + 2 + 2 + 2; //null termination, 2 bytes for num entries and 2 bytes for sec offset.
+        this.length = this.length + 2 + 2 + 2; //null termination, 2 bytes for num entries and 2 bytes for sec offset.
     }
 
     private JIStringBinding[] stringBinding = null;
@@ -68,29 +68,31 @@ final class JIDualStringArray implements Serializable
 
     private int secOffset = 0;
 
-    static JIDualStringArray decode ( NetworkDataRepresentation ndr )
+    static JIDualStringArray decode ( final NetworkDataRepresentation ndr )
     {
-        JIDualStringArray dualStringArray = new JIDualStringArray ();
+        final JIDualStringArray dualStringArray = new JIDualStringArray ();
 
         //first extract number of entries
-        int numEntries = ndr.readUnsignedShort ();
+        final int numEntries = ndr.readUnsignedShort ();
 
         //return empty
         if ( numEntries == 0 )
+        {
             return dualStringArray;
+        }
 
         //extract security offset
-        int securityOffset = ndr.readUnsignedShort ();
+        final int securityOffset = ndr.readUnsignedShort ();
 
-        ArrayList listOfStringBindings = new ArrayList ();
-        ArrayList listOfSecurityBindings = new ArrayList ();
+        final ArrayList listOfStringBindings = new ArrayList ();
+        final ArrayList listOfSecurityBindings = new ArrayList ();
 
         boolean stringbinding = true;
         while ( true )
         {
             if ( stringbinding )
             {
-                JIStringBinding s = JIStringBinding.decode ( ndr );
+                final JIStringBinding s = JIStringBinding.decode ( ndr );
                 if ( s == null )
                 {
                     stringbinding = false;
@@ -105,7 +107,7 @@ final class JIDualStringArray implements Serializable
             }
             else
             {
-                JISecurityBinding s = JISecurityBinding.decode ( ndr );
+                final JISecurityBinding s = JISecurityBinding.decode ( ndr );
                 if ( s == null )
                 {
                     //null termination
@@ -129,32 +131,32 @@ final class JIDualStringArray implements Serializable
 
     public JIStringBinding[] getStringBindings ()
     {
-        return stringBinding;
+        return this.stringBinding;
     }
 
     public JISecurityBinding[] getSecurityBindings ()
     {
-        return securityBinding;
+        return this.securityBinding;
     }
 
     public int getLength ()
     {
-        return length;
+        return this.length;
     }
 
-    public void encode ( NetworkDataRepresentation ndr )
+    public void encode ( final NetworkDataRepresentation ndr )
     {
         //fill num entries
         //this is total length/2. since they are all shorts
-        ndr.writeUnsignedShort ( ( length - 4 ) / 2 );
-        ndr.writeUnsignedShort ( ( secOffset ) / 2 );
+        ndr.writeUnsignedShort ( ( this.length - 4 ) / 2 );
+        ndr.writeUnsignedShort ( this.secOffset / 2 );
 
         int i = 0;
-        if ( stringBinding != null )
+        if ( this.stringBinding != null )
         {
-            while ( i < stringBinding.length )
+            while ( i < this.stringBinding.length )
             {
-                stringBinding[i].encode ( ndr );
+                this.stringBinding[i].encode ( ndr );
                 i++;
             }
             ndr.writeUnsignedShort ( 0 );
@@ -162,11 +164,11 @@ final class JIDualStringArray implements Serializable
 
         i = 0;
 
-        if ( securityBinding != null )
+        if ( this.securityBinding != null )
         {
-            while ( i < securityBinding.length )
+            while ( i < this.securityBinding.length )
             {
-                securityBinding[i].encode ( ndr );
+                this.securityBinding[i].encode ( ndr );
                 i++;
             }
             ndr.writeUnsignedShort ( 0 );

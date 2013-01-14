@@ -27,14 +27,14 @@ import org.jinterop.dcom.common.JIException;
 public final class JIAutomationException extends JIException
 {
 
-    public JIAutomationException ( JIException e )
+    public JIAutomationException ( final JIException e )
     {
         super ( e.getErrorCode (), e.getMessage (), e.getCause () );
     }
 
-    private JIExcepInfo excepInfo = new JIExcepInfo ();
+    private final JIExcepInfo excepInfo = new JIExcepInfo ();
 
-    void setExcepInfo ( JIExcepInfo excepInfo )
+    void setExcepInfo ( final JIExcepInfo excepInfo )
     {
         this.excepInfo.errorCode = excepInfo.errorCode;
         this.excepInfo.excepDesc = excepInfo.excepDesc;
@@ -49,7 +49,7 @@ public final class JIAutomationException extends JIException
      */
     public JIExcepInfo getExcepInfo ()
     {
-        return excepInfo;
+        return this.excepInfo;
     }
 
     /**

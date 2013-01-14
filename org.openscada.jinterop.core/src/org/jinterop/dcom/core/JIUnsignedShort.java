@@ -30,7 +30,7 @@ public final class JIUnsignedShort implements IJIUnsigned
 
     private final Integer shortValue;
 
-    JIUnsignedShort ( Integer shortValue )
+    JIUnsignedShort ( final Integer shortValue )
     {
         if ( shortValue == null || shortValue.intValue () < 0 )
         {
@@ -39,14 +39,16 @@ public final class JIUnsignedShort implements IJIUnsigned
         this.shortValue = shortValue;
     }
 
+    @Override
     public int getType ()
     {
         return JIFlags.FLAG_REPRESENTATION_UNSIGNED_SHORT;
     }
 
+    @Override
     public Number getValue ()
     {
-        return shortValue;
+        return this.shortValue;
     }
 
 }

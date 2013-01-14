@@ -25,8 +25,9 @@ import java.util.Map;
 import ndr.NdrException;
 import ndr.NetworkDataRepresentation;
 
-import org.jinterop.dcom.common.JISystem;
 import org.jinterop.dcom.impls.automation.IJIDispatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -50,6 +51,8 @@ import org.jinterop.dcom.impls.automation.IJIDispatch;
  */
 final class JIInterfacePointer implements Serializable
 {
+
+    private final static Logger logger = LoggerFactory.getLogger ( JIInterfacePointer.class );
 
     //	static boolean inTest = true;
 
@@ -101,22 +104,22 @@ final class JIInterfacePointer implements Serializable
      * @param oxid
      * @param oid
      */
-    JIInterfacePointer ( String iid, int port, JIStdObjRef objref )
+    JIInterfacePointer ( final String iid, final int port, final JIStdObjRef objref )
     {
-        member = new JIPointer ( new JIInterfacePointerBody ( iid, port, objref ), false );
+        this.member = new JIPointer ( new JIInterfacePointerBody ( iid, port, objref ), false );
     }
 
-    JIInterfacePointer ( String iid, JIInterfacePointer interfacePointer )
+    JIInterfacePointer ( final String iid, final JIInterfacePointer interfacePointer )
     {
-        member = new JIPointer ( new JIInterfacePointerBody ( iid, interfacePointer ), false );
+        this.member = new JIPointer ( new JIInterfacePointerBody ( iid, interfacePointer ), false );
     }
 
-    void setDeffered ( boolean deffered )
+    void setDeffered ( final boolean deffered )
     {
-        member.setDeffered ( true );
+        this.member.setDeffered ( true );
     }
 
-    static JIInterfacePointer decode ( NetworkDataRepresentation ndr, List defferedPointers, int FLAG, Map additionalData )
+    static JIInterfacePointer decode ( final NetworkDataRepresentation ndr, final List defferedPointers, final int FLAG, final Map additionalData )
     {
         JIInterfacePointer ptr = new JIInterfacePointer ();
         if ( ( FLAG & JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2 ) == JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2 )
@@ -141,7 +144,7 @@ final class JIInterfacePointer implements Serializable
      */
     int getObjectType ()
     {
-        return ( (JIInterfacePointerBody) ( member.getReferent () ) ).getObjectType ();
+        return ( (JIInterfacePointerBody)this.member.getReferent () ).getObjectType ();
     }
 
     /**
@@ -149,9 +152,9 @@ final class JIInterfacePointer implements Serializable
      * @param objectType
      * @return
      */
-    Object getObjectReference ( int objectType )
+    Object getObjectReference ( final int objectType )
     {
-        return ( (JIInterfacePointerBody) ( member.getReferent () ) ).getObjectReference ( objectType );
+        return ( (JIInterfacePointerBody)this.member.getReferent () ).getObjectReference ( objectType );
     }
 
     /**
@@ -161,7 +164,7 @@ final class JIInterfacePointer implements Serializable
      */
     public String getIID ()
     {
-        return ( (JIInterfacePointerBody) ( member.getReferent () ) ).getIID ();
+        return ( (JIInterfacePointerBody)this.member.getReferent () ).getIID ();
     }
 
     /**
@@ -170,7 +173,7 @@ final class JIInterfacePointer implements Serializable
      */
     public String getIPID ()
     {
-        return ( (JIInterfacePointerBody) ( member.getReferent () ) ).getIPID ();
+        return ( (JIInterfacePointerBody)this.member.getReferent () ).getIPID ();
     }
 
     /**
@@ -179,7 +182,7 @@ final class JIInterfacePointer implements Serializable
      */
     public byte[] getOID ()
     {
-        return ( (JIStdObjRef) ( (JIInterfacePointerBody) ( member.getReferent () ) ).getObjectReference ( JIInterfacePointer.OBJREF_STANDARD ) ).getObjectId ();
+        return ( (JIStdObjRef) ( (JIInterfacePointerBody)this.member.getReferent () ).getObjectReference ( JIInterfacePointer.OBJREF_STANDARD ) ).getObjectId ();
     }
 
     /**
@@ -188,7 +191,7 @@ final class JIInterfacePointer implements Serializable
      */
     byte[] getOXID ()
     {
-        return ( (JIStdObjRef) ( (JIInterfacePointerBody) ( member.getReferent () ) ).getObjectReference ( JIInterfacePointer.OBJREF_STANDARD ) ).getOxid ();
+        return ( (JIStdObjRef) ( (JIInterfacePointerBody)this.member.getReferent () ).getObjectReference ( JIInterfacePointer.OBJREF_STANDARD ) ).getOxid ();
     }
 
     /**
@@ -197,7 +200,7 @@ final class JIInterfacePointer implements Serializable
      */
     JIDualStringArray getStringBindings ()
     {
-        return ( (JIInterfacePointerBody) ( member.getReferent () ) ).getStringBindings ();
+        return ( (JIInterfacePointerBody)this.member.getReferent () ).getStringBindings ();
     }
 
     /**
@@ -206,10 +209,10 @@ final class JIInterfacePointer implements Serializable
      */
     int getLength ()
     {
-        return ( (JIInterfacePointerBody) ( member.getReferent () ) ).getLength ();
+        return ( (JIInterfacePointerBody)this.member.getReferent () ).getLength ();
     }
 
-    void encode ( NetworkDataRepresentation ndr, List defferedPointers, int FLAG )
+    void encode ( final NetworkDataRepresentation ndr, final List defferedPointers, final int FLAG )
     {
 
         if ( ( FLAG & JIFlags.FLAG_REPRESENTATION_SET_JIINTERFACEPTR_NULL_FOR_VARIANT ) == JIFlags.FLAG_REPRESENTATION_SET_JIINTERFACEPTR_NULL_FOR_VARIANT )
@@ -218,16 +221,17 @@ final class JIInterfacePointer implements Serializable
             JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, new Integer ( 0 ), defferedPointers, FLAG );
             return;
         }
-        JIMarshalUnMarshalHelper.serialize ( ndr, member.getClass (), member, defferedPointers, FLAG );
+        JIMarshalUnMarshalHelper.serialize ( ndr, this.member.getClass (), this.member, defferedPointers, FLAG );
     }
 
+    @Override
     public String toString ()
     {
-        String retVal = "JIInterfacePointer[IID:" + getIID () + " , ObjRef: " + getObjectReference ( JIInterfacePointer.OBJREF_STANDARD ) + "]";
+        final String retVal = "JIInterfacePointer[IID:" + getIID () + " , ObjRef: " + getObjectReference ( JIInterfacePointer.OBJREF_STANDARD ) + "]";
         return retVal;
     }
 
-    public static boolean isOxidEqual ( JIInterfacePointer src, JIInterfacePointer target )
+    public static boolean isOxidEqual ( final JIInterfacePointer src, final JIInterfacePointer target )
     {
         if ( src == null || target == null )
         {
@@ -287,6 +291,8 @@ final class JIInterfacePointer implements Serializable
  */
 class JIInterfacePointerBody implements Serializable
 {
+    private final static Logger logger = LoggerFactory.getLogger ( JIInterfacePointerBody.class );
+
     private static final long serialVersionUID = 2597456459096838320L;
 
     private String iid = null;
@@ -314,36 +320,36 @@ class JIInterfacePointerBody implements Serializable
      * @param oxid
      * @param oid
      */
-    JIInterfacePointerBody ( String iid, int port, JIStdObjRef objref )
+    JIInterfacePointerBody ( final String iid, final int port, final JIStdObjRef objref )
     {
         this.iid = iid;
         this.stdObjRef = objref;
         this.port = port;
-        resolverAddr = new JIDualStringArray ( port );
-        length = 40 + 4 + 4 + 16 + resolverAddr.getLength ();
+        this.resolverAddr = new JIDualStringArray ( port );
+        this.length = 40 + 4 + 4 + 16 + this.resolverAddr.getLength ();
     }
 
-    JIInterfacePointerBody ( String iid, JIInterfacePointer interfacePointer )
+    JIInterfacePointerBody ( final String iid, final JIInterfacePointer interfacePointer )
     {
         this.iid = iid;
-        stdObjRef = (JIStdObjRef)interfacePointer.getObjectReference ( JIInterfacePointer.OBJREF_STANDARD );
-        resolverAddr = interfacePointer.getStringBindings ();
-        length = 40 + 4 + 4 + 16 + resolverAddr.getLength ();
+        this.stdObjRef = (JIStdObjRef)interfacePointer.getObjectReference ( JIInterfacePointer.OBJREF_STANDARD );
+        this.resolverAddr = interfacePointer.getStringBindings ();
+        this.length = 40 + 4 + 4 + 16 + this.resolverAddr.getLength ();
     }
 
-    static JIInterfacePointerBody decode ( NetworkDataRepresentation ndr, int Flags )
+    static JIInterfacePointerBody decode ( final NetworkDataRepresentation ndr, final int Flags )
     {
         if ( ( Flags & JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2 ) == JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2 )
         {
             return decode2 ( ndr );
         }
-        int length = ndr.readUnsignedLong ();
+        final int length = ndr.readUnsignedLong ();
         ndr.readUnsignedLong ();//length
 
-        JIInterfacePointerBody ptr = new JIInterfacePointerBody ();
+        final JIInterfacePointerBody ptr = new JIInterfacePointerBody ();
         ptr.length = length;
         //check for MEOW
-        byte b[] = new byte[4];
+        final byte b[] = new byte[4];
         ndr.readOctetArray ( b, 0, 4 );
 
         int i = 0;
@@ -366,13 +372,13 @@ class JIInterfacePointerBody implements Serializable
 
         try
         {
-            rpc.core.UUID ipid2 = new rpc.core.UUID ();
+            final rpc.core.UUID ipid2 = new rpc.core.UUID ();
             ipid2.decode ( ndr, ndr.getBuffer () );
             ptr.iid = ipid2.toString ();
         }
-        catch ( NdrException e )
+        catch ( final NdrException e )
         {
-            JISystem.getLogger ().throwing ( "JIInterfacePointer", "decode", e );
+            logger.warn ( "decode", e );
         }
 
         ptr.stdObjRef = JIStdObjRef.decode ( ndr );
@@ -382,13 +388,13 @@ class JIInterfacePointerBody implements Serializable
         return ptr;
     }
 
-    static JIInterfacePointerBody decode2 ( NetworkDataRepresentation ndr )
+    static JIInterfacePointerBody decode2 ( final NetworkDataRepresentation ndr )
     {
 
-        JIInterfacePointerBody ptr = new JIInterfacePointerBody ();
+        final JIInterfacePointerBody ptr = new JIInterfacePointerBody ();
 
         //check for MEOW
-        byte b[] = new byte[4];
+        final byte b[] = new byte[4];
         ndr.readOctetArray ( b, 0, 4 );
 
         int i = 0;
@@ -411,13 +417,13 @@ class JIInterfacePointerBody implements Serializable
 
         try
         {
-            rpc.core.UUID ipid2 = new rpc.core.UUID ();
+            final rpc.core.UUID ipid2 = new rpc.core.UUID ();
             ipid2.decode ( ndr, ndr.getBuffer () );
             ptr.iid = ipid2.toString ();
         }
-        catch ( NdrException e )
+        catch ( final NdrException e )
         {
-            JISystem.getLogger ().throwing ( "JIInterfacePointer", "decode", e );
+            logger.warn ( "decode", e );
         }
 
         ptr.stdObjRef = JIStdObjRef.decode ( ndr );
@@ -433,7 +439,7 @@ class JIInterfacePointerBody implements Serializable
      */
     int getObjectType ()
     {
-        return objectType;
+        return this.objectType;
     }
 
     /**
@@ -441,11 +447,11 @@ class JIInterfacePointerBody implements Serializable
      * @param objectType
      * @return
      */
-    Object getObjectReference ( int objectType )
+    Object getObjectReference ( final int objectType )
     {
         if ( objectType == JIInterfacePointer.OBJREF_STANDARD )
         {
-            return stdObjRef;
+            return this.stdObjRef;
         }
         else
         {
@@ -460,7 +466,7 @@ class JIInterfacePointerBody implements Serializable
      */
     String getIID ()
     {
-        return iid;
+        return this.iid;
     }
 
     /**
@@ -469,7 +475,7 @@ class JIInterfacePointerBody implements Serializable
      */
     String getIPID ()
     {
-        return stdObjRef.getIpid ();
+        return this.stdObjRef.getIpid ();
     }
 
     /**
@@ -478,7 +484,7 @@ class JIInterfacePointerBody implements Serializable
      */
     byte[] getOID ()
     {
-        return stdObjRef.getObjectId ();
+        return this.stdObjRef.getObjectId ();
     }
 
     /**
@@ -487,7 +493,7 @@ class JIInterfacePointerBody implements Serializable
      */
     JIDualStringArray getStringBindings ()
     {
-        return resolverAddr;
+        return this.resolverAddr;
     }
 
     /**
@@ -496,17 +502,17 @@ class JIInterfacePointerBody implements Serializable
      */
     int getLength ()
     {
-        return length;
+        return this.length;
     }
 
-    void encode ( NetworkDataRepresentation ndr, int FLAGS )
+    void encode ( final NetworkDataRepresentation ndr, final int FLAGS )
     {
 
         //now for length
         //the length for STDOBJREF is fixed 40 bytes : 4,4,8,8,16.
         //Dual string array has to be computed, since that can vary. MEOW = 4., flag stdobjref = 4
         // + 16 bytes of ipid
-        int length = 40 + 4 + 4 + 16 + resolverAddr.getLength ();
+        final int length = 40 + 4 + 4 + 16 + this.resolverAddr.getLength ();
 
         ndr.writeUnsignedLong ( length );
         ndr.writeUnsignedLong ( length );
@@ -517,7 +523,7 @@ class JIInterfacePointerBody implements Serializable
 
         try
         {
-            rpc.core.UUID ipid2 = new rpc.core.UUID ( iid );
+            rpc.core.UUID ipid2 = new rpc.core.UUID ( this.iid );
 
             if ( ( FLAGS & JIFlags.FLAG_REPRESENTATION_USE_IUNKNOWN_IID ) == JIFlags.FLAG_REPRESENTATION_USE_IUNKNOWN_IID )
             {
@@ -530,15 +536,15 @@ class JIInterfacePointerBody implements Serializable
 
             ipid2.encode ( ndr, ndr.getBuffer () );
         }
-        catch ( NdrException e )
+        catch ( final NdrException e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();
         }
 
-        stdObjRef.encode ( ndr );
+        this.stdObjRef.encode ( ndr );
 
-        resolverAddr.encode ( ndr );
+        this.resolverAddr.encode ( ndr );
 
     }
 

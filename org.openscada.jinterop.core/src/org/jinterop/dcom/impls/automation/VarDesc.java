@@ -59,30 +59,30 @@ public final class VarDesc implements Serializable
 
     public final int varkind;
 
-    VarDesc ( JIPointer values )
+    VarDesc ( final JIPointer values )
     {
         this ( values.isNull () ? null : (JIStruct)values.getReferent () );
     }
 
-    VarDesc ( JIStruct filledStruct )
+    VarDesc ( final JIStruct filledStruct )
     {
         if ( filledStruct == null )
         {
-            memberId = -1;
-            lpstrSchema = null;
-            u = null;
-            elemdescVar = null;
-            wVarFlags = -1;
-            varkind = -1;
+            this.memberId = -1;
+            this.lpstrSchema = null;
+            this.u = null;
+            this.elemdescVar = null;
+            this.wVarFlags = -1;
+            this.varkind = -1;
             return;
         }
 
-        memberId = ( (Integer)filledStruct.getMember ( 0 ) ).intValue ();
-        lpstrSchema = (JIPointer)filledStruct.getMember ( 1 );
-        u = (JIUnion)filledStruct.getMember ( 2 );
-        elemdescVar = new ElemDesc ( (JIStruct)filledStruct.getMember ( 3 ) );
-        wVarFlags = ( (Short)filledStruct.getMember ( 4 ) ).shortValue ();
-        varkind = ( (Integer)filledStruct.getMember ( 5 ) ).intValue ();
+        this.memberId = ( (Integer)filledStruct.getMember ( 0 ) ).intValue ();
+        this.lpstrSchema = (JIPointer)filledStruct.getMember ( 1 );
+        this.u = (JIUnion)filledStruct.getMember ( 2 );
+        this.elemdescVar = new ElemDesc ( (JIStruct)filledStruct.getMember ( 3 ) );
+        this.wVarFlags = ( (Short)filledStruct.getMember ( 4 ) ).shortValue ();
+        this.varkind = ( (Integer)filledStruct.getMember ( 5 ) ).intValue ();
     }
 
 }

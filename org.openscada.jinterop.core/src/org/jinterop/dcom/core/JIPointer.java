@@ -70,7 +70,7 @@ public final class JIPointer implements Serializable
         {
             value = Integer.class;
             isReferenceTypePtr = true;
-            isNull = true;
+            this.isNull = true;
         }
 
         //Should not defer since the enclosing struct,union,array will defer it by itself
@@ -100,7 +100,7 @@ public final class JIPointer implements Serializable
             //as 0x0.
             value = new Integer ( 0 );
             isReferenceTypePtr = true;
-            isNull = true;
+            this.isNull = true;
         }
 
         //		if (value.getClass().equals(JIArray.class))
@@ -125,7 +125,7 @@ public final class JIPointer implements Serializable
      * @param flags
      *            JIFlags only.
      */
-    void setFlags ( int flags )
+    void setFlags ( final int flags )
     {
         this.flags = flags;
     }
@@ -138,7 +138,7 @@ public final class JIPointer implements Serializable
      * 
      * @param value
      */
-    public JIPointer ( Object value )
+    public JIPointer ( final Object value )
     {
         this ( value, false );
     }
@@ -150,27 +150,27 @@ public final class JIPointer implements Serializable
      */
     public Object getReferent ()
     {
-        return isNull ? null : referent;
+        return this.isNull ? null : this.referent;
     }
 
-    void encode ( NetworkDataRepresentation ndr, List defferedPointers, int FLAG )
+    void encode ( final NetworkDataRepresentation ndr, final List defferedPointers, int FLAG )
     {
 
-        FLAG = FLAG | flags;
-        if ( isNull )
+        FLAG = FLAG | this.flags;
+        if ( this.isNull )
         {
             JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, new Integer ( 0 ), defferedPointers, FLAG );
             return;
         }
         //it is deffered or part of an array, this logic will not get called twice since the
         //deffered list will come in withb FLAG_NULL
-        if ( !isNull && ( isDeffered || ( FLAG & JIFlags.FLAG_REPRESENTATION_ARRAY ) == JIFlags.FLAG_REPRESENTATION_ARRAY /*||
-                                                                                                                          (FLAG & JIFlags.FLAG_REPRESENTATION_NESTED_POINTER ) == JIFlags.FLAG_REPRESENTATION_NESTED_POINTER*/) )
+        if ( !this.isNull && ( this.isDeffered || ( FLAG & JIFlags.FLAG_REPRESENTATION_ARRAY ) == JIFlags.FLAG_REPRESENTATION_ARRAY /*||
+                                                                                                                                    (FLAG & JIFlags.FLAG_REPRESENTATION_NESTED_POINTER ) == JIFlags.FLAG_REPRESENTATION_NESTED_POINTER*/) )
         {
-            int referentIdToPut = referentId == -1 ? referent.hashCode () : referentId;
+            final int referentIdToPut = this.referentId == -1 ? this.referent.hashCode () : this.referentId;
             JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, new Integer ( referentIdToPut ), defferedPointers, FLAG );
-            isDeffered = false;
-            isReferenceTypePtr = true;
+            this.isDeffered = false;
+            this.isReferenceTypePtr = true;
             //			try{
             defferedPointers.add ( this );
             //			}catch(NullPointerException e)
@@ -180,46 +180,46 @@ public final class JIPointer implements Serializable
             return;
         }
 
-        if ( !isNull && !isReferenceTypePtr )
+        if ( !this.isNull && !this.isReferenceTypePtr )
         {
-            int referentIdToPut = referentId == -1 ? referent.hashCode () : referentId;
+            final int referentIdToPut = this.referentId == -1 ? this.referent.hashCode () : this.referentId;
             JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, new Integer ( referentIdToPut ), defferedPointers, FLAG );
         }
 
         try
         {
-            if ( !isNull && referent.getClass ().equals ( JIVariant.class ) && ( (JIVariant)referent ).isArray () )
+            if ( !this.isNull && this.referent.getClass ().equals ( JIVariant.class ) && ( (JIVariant)this.referent ).isArray () )
             {
                 //write the length first before all elements
                 //ndr.writeUnsignedLong(((Object[])(((JIVariant)referent).getObject())).length);
-                JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, new Integer ( ( (Object[]) ( ( (JIVariant)referent ).getObject () ) ).length ), defferedPointers, FLAG );
+                JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, new Integer ( ( (Object[]) ( (JIVariant)this.referent ).getObject () ).length ), defferedPointers, FLAG );
             }
         }
-        catch ( JIException e )
+        catch ( final JIException e )
         {
             throw new JIRuntimeException ( e.getErrorCode () );
         }
 
-        JIMarshalUnMarshalHelper.serialize ( ndr, referent.getClass (), referent, defferedPointers, FLAG );
+        JIMarshalUnMarshalHelper.serialize ( ndr, this.referent.getClass (), this.referent, defferedPointers, FLAG );
 
     }
 
     //class of type being decoded. If the type being expected is an array , the varType
     //should be the actual array type and not JIArray.
-    JIPointer decode ( NetworkDataRepresentation ndr, List defferedPointers, int FLAG, Map additionalData )
+    JIPointer decode ( final NetworkDataRepresentation ndr, final List defferedPointers, int FLAG, final Map additionalData )
     {
         //shallowClone();
-        FLAG = FLAG | flags;
+        FLAG = FLAG | this.flags;
 
-        JIPointer retVal = new JIPointer ();
-        retVal.setFlags ( flags );
-        retVal.isNull = isNull;
+        final JIPointer retVal = new JIPointer ();
+        retVal.setFlags ( this.flags );
+        retVal.isNull = this.isNull;
         //retVal.isDeffered = isDeffered;
-        if ( isDeffered || ( FLAG & JIFlags.FLAG_REPRESENTATION_ARRAY ) == JIFlags.FLAG_REPRESENTATION_ARRAY
+        if ( this.isDeffered || ( FLAG & JIFlags.FLAG_REPRESENTATION_ARRAY ) == JIFlags.FLAG_REPRESENTATION_ARRAY
         /*|| (FLAG & JIFlags.FLAG_REPRESENTATION_NESTED_POINTER ) == JIFlags.FLAG_REPRESENTATION_NESTED_POINTER */)
         {
             retVal.referentId = ( (Integer)JIMarshalUnMarshalHelper.deSerialize ( ndr, Integer.class, defferedPointers, FLAG, additionalData ) ).intValue ();
-            retVal.referent = referent; //will only be the class or object
+            retVal.referent = this.referent; //will only be the class or object
             if ( retVal.referentId == 0 )
             {
                 //null pointer
@@ -235,11 +235,11 @@ public final class JIPointer implements Serializable
             return retVal;
         }
 
-        if ( !isReferenceTypePtr )
+        if ( !this.isReferenceTypePtr )
         {
             //referentId = ndr.readUnsignedLong();
             retVal.referentId = ( (Integer)JIMarshalUnMarshalHelper.deSerialize ( ndr, Integer.class, defferedPointers, FLAG, additionalData ) ).intValue ();
-            retVal.referent = referent; //will only be the class or object
+            retVal.referent = this.referent; //will only be the class or object
             if ( retVal.referentId == 0 )
             {
                 //null pointer
@@ -249,21 +249,21 @@ public final class JIPointer implements Serializable
             }
         }
 
-        retVal.referent = JIMarshalUnMarshalHelper.deSerialize ( ndr, referent, defferedPointers, FLAG, additionalData );
+        retVal.referent = JIMarshalUnMarshalHelper.deSerialize ( ndr, this.referent, defferedPointers, FLAG, additionalData );
         return retVal;
     }
 
-    void setDeffered ( boolean deffered )
+    void setDeffered ( final boolean deffered )
     {
-        isDeffered = deffered;
+        this.isDeffered = deffered;
     }
 
     boolean getDeffered ()
     {
-        return isDeffered;
+        return this.isDeffered;
     }
 
-    void setReferent ( int referent )
+    void setReferent ( final int referent )
     {
         this.referentId = referent;
     }
@@ -275,7 +275,7 @@ public final class JIPointer implements Serializable
      */
     public boolean isReference ()
     {
-        return isReferenceTypePtr;
+        return this.isReferenceTypePtr;
     }
 
     /**
@@ -285,7 +285,7 @@ public final class JIPointer implements Serializable
      */
     public Integer getReferentIdentifier ()
     {
-        return new Integer ( referentId );
+        return new Integer ( this.referentId );
     }
 
     /**
@@ -294,19 +294,19 @@ public final class JIPointer implements Serializable
      */
     int getLength ()
     {
-        if ( isNull )
+        if ( this.isNull )
         {
             return 4;
         }
         //4 for pointer
-        if ( referent instanceof Class )
+        if ( this.referent instanceof Class )
         {
-            return 4 + JIMarshalUnMarshalHelper.getLengthInBytes ( (Class)referent, referent, JIFlags.FLAG_NULL );
+            return 4 + JIMarshalUnMarshalHelper.getLengthInBytes ( (Class)this.referent, this.referent, JIFlags.FLAG_NULL );
         }
-        return 4 + JIMarshalUnMarshalHelper.getLengthInBytes ( referent.getClass (), referent, JIFlags.FLAG_NULL );
+        return 4 + JIMarshalUnMarshalHelper.getLengthInBytes ( this.referent.getClass (), this.referent, JIFlags.FLAG_NULL );
     }
 
-    void replaceSelfWithNewPointer ( JIPointer replacement )
+    void replaceSelfWithNewPointer ( final JIPointer replacement )
     {
         this.isDeffered = replacement.isDeffered;
         this.isNull = replacement.isNull;
@@ -321,16 +321,17 @@ public final class JIPointer implements Serializable
      */
     public boolean isNull ()
     {
-        return isNull;
+        return this.isNull;
     }
 
-    void setValue ( Object value )
+    void setValue ( final Object value )
     {
-        referent = value;
+        this.referent = value;
     }
 
+    @Override
     public String toString ()
     {
-        return referent == null ? "[null]" : "[" + referent.toString () + "]";
+        return this.referent == null ? "[null]" : "[" + this.referent.toString () + "]";
     }
 }

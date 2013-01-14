@@ -45,27 +45,29 @@ public final class JIComRuntimeConnectionContext extends BasicConnectionContext
     private Properties properties = null;
 
     // this returns null, so that a recieve is performed first.
-    public ConnectionOrientedPdu init ( PresentationContext context, Properties properties ) throws IOException
+    @Override
+    public ConnectionOrientedPdu init ( final PresentationContext context, final Properties properties ) throws IOException
     {
         super.init ( context, properties );
         this.properties = properties;
         return null;
     }
 
-    public ConnectionOrientedPdu accept ( ConnectionOrientedPdu pdu ) throws IOException
+    @Override
+    public ConnectionOrientedPdu accept ( final ConnectionOrientedPdu pdu ) throws IOException
     {
         ConnectionOrientedPdu reply = null;
         switch ( pdu.getType () )
         {
             case BindPdu.BIND_TYPE:
-                established = true;
+                this.established = true;
                 PresentationContext[] presentationContexts = ( (BindPdu)pdu ).getContextList ();
                 reply = new BindAcknowledgePdu ();
                 PresentationResult[] result = new PresentationResult[1];
                 for ( int i = 0; i < presentationContexts.length; i++ )
                 {
-                    PresentationContext presentationContext = presentationContexts[i];
-                    if ( !presentationContext.abstractSyntax.toString ().toUpperCase ().equalsIgnoreCase ( properties.getProperty ( IID ) ) )
+                    final PresentationContext presentationContext = presentationContexts[i];
+                    if ( !presentationContext.abstractSyntax.toString ().toUpperCase ().equalsIgnoreCase ( this.properties.getProperty ( IID ) ) )
                     {
                         //create a fault PDU stating the syntax is not supported.
                         result[0] = new PresentationResult ( PresentationResult.PROVIDER_REJECTION, PresentationResult.ABSTRACT_SYNTAX_NOT_SUPPORTED, new PresentationSyntax ( UUID.NIL_UUID + ":0.0" ) );
@@ -84,15 +86,15 @@ public final class JIComRuntimeConnectionContext extends BasicConnectionContext
                 ( (BindAcknowledgePdu)reply ).setCallId ( pdu.getCallId () );
                 break;
             case AlterContextPdu.ALTER_CONTEXT_TYPE:
-                established = true;
+                this.established = true;
 
                 presentationContexts = ( (AlterContextPdu)pdu ).getContextList ();
                 reply = new AlterContextResponsePdu ();
                 result = new PresentationResult[1];
                 for ( int i = 0; i < presentationContexts.length; i++ )
                 {
-                    PresentationContext presentationContext = presentationContexts[i];
-                    if ( !presentationContext.abstractSyntax.toString ().toUpperCase ().equalsIgnoreCase ( properties.getProperty ( IID ) ) )
+                    final PresentationContext presentationContext = presentationContexts[i];
+                    if ( !presentationContext.abstractSyntax.toString ().toUpperCase ().equalsIgnoreCase ( this.properties.getProperty ( IID ) ) )
                     {
                         //create a fault PDU stating the syntax is not supported.
                         result[0] = new PresentationResult ( PresentationResult.PROVIDER_REJECTION, PresentationResult.ABSTRACT_SYNTAX_NOT_SUPPORTED, new PresentationSyntax ( UUID.NIL_UUID + ":0.0" ) );
@@ -119,9 +121,10 @@ public final class JIComRuntimeConnectionContext extends BasicConnectionContext
         return reply;
     }
 
+    @Override
     public boolean isEstablished ()
     {
-        return super.isEstablished () | established;
+        return super.isEstablished () | this.established;
     }
 
 }

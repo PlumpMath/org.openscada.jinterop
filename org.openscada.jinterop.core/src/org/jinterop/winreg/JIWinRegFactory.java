@@ -75,7 +75,7 @@ public class JIWinRegFactory
      * @return
      * @throws UnknownHostException
      */
-    public IJIWinReg getWinreg ( IJIAuthInfo authInfo, String serverName, boolean smbTransport ) throws UnknownHostException
+    public IJIWinReg getWinreg ( final IJIAuthInfo authInfo, final String serverName, final boolean smbTransport ) throws UnknownHostException
     {
         if ( smbTransport )
         {
@@ -96,7 +96,7 @@ public class JIWinRegFactory
      * @return
      * @throws UnknownHostException
      */
-    public IJIWinReg getWinreg ( String serverName, boolean smbTransport ) throws UnknownHostException
+    public IJIWinReg getWinreg ( final String serverName, final boolean smbTransport ) throws UnknownHostException
     {
         if ( smbTransport )
         {

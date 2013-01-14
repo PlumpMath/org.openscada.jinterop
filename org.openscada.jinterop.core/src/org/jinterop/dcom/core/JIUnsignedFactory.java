@@ -53,7 +53,7 @@ public final class JIUnsignedFactory
      * @see JIFlags#FLAG_REPRESENTATION_UNSIGNED_SHORT
      * @see JIFlags#FLAG_REPRESENTATION_UNSIGNED_INT
      */
-    public static IJIUnsigned getUnsigned ( Number value, int flag )
+    public static IJIUnsigned getUnsigned ( final Number value, final int flag )
     {
         IJIUnsigned retVal = null;
 

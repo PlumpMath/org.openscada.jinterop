@@ -23,29 +23,29 @@ public class TestCOMServer
 
     private IJIComObject unknown = null;
 
-    public TestCOMServer ( String address, String[] args ) throws JIException, UnknownHostException
+    public TestCOMServer ( final String address, final String[] args ) throws JIException, UnknownHostException
     {
-        JISession session = JISession.createSession ( args[1], args[2], args[3] );
+        final JISession session = JISession.createSession ( args[1], args[2], args[3] );
 
         //instead of this the ProgID "TestCOMServer.ITestCOMServer"	can be used as well.
         //comStub = new JIComServer(JIProgId.valueOf(session,"TestCOMServer.ITestCOMServer"),address,session);
         //CLSID of ITestCOMServer
-        comStub = new JIComServer ( JIClsid.valueOf ( "44A9CD09-0D9B-4FD2-9B8A-0151F2E0CAD1" ), address, session );
+        this.comStub = new JIComServer ( JIClsid.valueOf ( "44A9CD09-0D9B-4FD2-9B8A-0151F2E0CAD1" ), address, session );
     }
 
     public void execute () throws JIException
     {
-        unknown = comStub.createInstance ();
+        this.unknown = this.comStub.createInstance ();
         //CLSID of IITestCOMServer
-        IJIComObject comObject = (IJIComObject)unknown.queryInterface ( "4AE62432-FD04-4BF9-B8AC-56AA12A47FF9" );
-        dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( comObject.queryInterface ( IJIDispatch.IID ) );
+        final IJIComObject comObject = this.unknown.queryInterface ( "4AE62432-FD04-4BF9-B8AC-56AA12A47FF9" );
+        this.dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( comObject.queryInterface ( IJIDispatch.IID ) );
 
         //Now call via automation
-        Object results[] = dispatch.callMethodA ( "Add", new Object[] { new Integer ( 1 ), new Integer ( 2 ), new JIVariant ( 0, true ) } );
+        Object results[] = this.dispatch.callMethodA ( "Add", new Object[] { new Integer ( 1 ), new Integer ( 2 ), new JIVariant ( 0, true ) } );
         System.out.println ( results[1] );
 
         //now without automation
-        JICallBuilder callObject = new JICallBuilder ();
+        final JICallBuilder callObject = new JICallBuilder ();
         callObject.setOpnum ( 1 );//obtained from the IDL or TypeLib.
         callObject.addInParamAsInt ( 1, JIFlags.FLAG_NULL );
         callObject.addInParamAsInt ( 2, JIFlags.FLAG_NULL );
@@ -54,10 +54,10 @@ public class TestCOMServer
         callObject.addOutParamAsObject ( Integer.class, JIFlags.FLAG_NULL );
         results = comObject.call ( callObject );
         System.out.println ( results[0] );
-        JISession.destroySession ( dispatch.getAssociatedSession () );
+        JISession.destroySession ( this.dispatch.getAssociatedSession () );
     }
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
 
         try
@@ -67,10 +67,10 @@ public class TestCOMServer
                 System.out.println ( "Please provide address domain username password" );
                 return;
             }
-            TestCOMServer test = new TestCOMServer ( args[0], args );
+            final TestCOMServer test = new TestCOMServer ( args[0], args );
             test.execute ();
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();

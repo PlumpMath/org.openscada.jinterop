@@ -1,7 +1,6 @@
 package org.jinterop.dcom.test;
 
 import java.net.UnknownHostException;
-import java.util.logging.Level;
 
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
@@ -25,10 +24,11 @@ public class QtpComTest
 
     private JISession session = null;
 
-    public QtpComTest ( String address, String domain, String username, String password ) throws JIException, UnknownHostException
+    public QtpComTest ( final String address, final String domain, final String username, final String password ) throws JIException, UnknownHostException
     {
 
-        JISystem.getLogger ().setLevel ( Level.FINEST );
+        // JR: JISystem.getLogger ().setLevel ( Level.FINEST );
+        // JR: configure using slf4j now
 
         /*Let the j-Interop library do this for you. You can set the "autoRegistration" flag in the
 
@@ -40,9 +40,9 @@ public class QtpComTest
 
         JISystem.setAutoRegisteration ( true );
 
-        session = JISession.createSession ( domain, username, password );
+        this.session = JISession.createSession ( domain, username, password );
 
-        comServer = new JIComServer ( JIProgId.valueOf ( "QuickTest.Application" ), address, session );
+        this.comServer = new JIComServer ( JIProgId.valueOf ( "QuickTest.Application" ), address, this.session );
 
         //                    session.setGlobalSocketTimeout(30000);
 
@@ -51,11 +51,11 @@ public class QtpComTest
     public void startQTP () throws JIException
     {
 
-        System.out.println ( comServer.getProperties () );
+        System.out.println ( this.comServer.getProperties () );
 
-        unknown = comServer.createInstance ();
+        this.unknown = this.comServer.createInstance ();
 
-        dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( unknown.queryInterface ( IJIDispatch.IID ) );
+        this.dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( this.unknown.queryInterface ( IJIDispatch.IID ) );
 
         //System.out.println(((JIVariant)dispatch.get("Version")).getObjectAsString().getString());
 
@@ -64,30 +64,30 @@ public class QtpComTest
     public void showQtp () throws JIException
     {
 
-        int dispId = dispatch.getIDsOfNames ( "Visible" );
+        final int dispId = this.dispatch.getIDsOfNames ( "Visible" );
 
-        JIVariant variant = new JIVariant ( true );
+        final JIVariant variant = new JIVariant ( true );
 
-        dispatch.put ( dispId, variant );
+        this.dispatch.put ( dispId, variant );
 
     }
 
     public void envQtp () throws JIException
     {
 
-        dispatch.callMethodA ( "Open", new Object[] { new JIString ( "C:\\Programme\\Mercury Interactive\\QuickTest Professional\\Tests\\Test1" ), new JIVariant ( false ), new JIVariant ( true ) } );
+        this.dispatch.callMethodA ( "Open", new Object[] { new JIString ( "C:\\Programme\\Mercury Interactive\\QuickTest Professional\\Tests\\Test1" ), new JIVariant ( false ), new JIVariant ( true ) } );
 
-        JIVariant variant = dispatch.get ( "Test" );
+        final JIVariant variant = this.dispatch.get ( "Test" );
 
-        IJIDispatch test = (IJIDispatch)JIObjectFactory.narrowObject ( variant.getObjectAsComObject () );
+        final IJIDispatch test = (IJIDispatch)JIObjectFactory.narrowObject ( variant.getObjectAsComObject () );
         System.out.println ( test.get ( "Author" ) );
 
         //and this is the original session associated with dispatch.
-        JISession.destroySession ( session );
+        JISession.destroySession ( this.session );
 
     }
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
 
         //"localhost", "ctron", "mpitonia", "ChrisSarah1"
@@ -99,7 +99,7 @@ public class QtpComTest
         try
         {
 
-            QtpComTest comQtp = new QtpComTest ( "localhost", "domain", "username", "password" );
+            final QtpComTest comQtp = new QtpComTest ( "localhost", "domain", "username", "password" );
 
             comQtp.startQTP ();
 
@@ -108,7 +108,7 @@ public class QtpComTest
             comQtp.envQtp ();
 
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
 
             e.printStackTrace ();

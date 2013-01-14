@@ -27,36 +27,38 @@ final class JISetId implements Serializable
 
     byte[] setid = null;
 
-    JISetId ( byte[] setid )
+    JISetId ( final byte[] setid )
     {
         this.setid = setid;
     }
 
     byte[] getSetID ()
     {
-        return setid;
+        return this.setid;
     }
 
+    @Override
     public int hashCode ()
     {
         int result = 1;
         //from SUN
-        for ( int i = 0; i < setid.length; i++ )
+        for ( int i = 0; i < this.setid.length; i++ )
         {
-            result = 31 * result + setid[i];
+            result = 31 * result + this.setid[i];
         }
         return result;
         //return Arrays.hashCode(setid);
     }
 
-    public boolean equals ( Object obj )
+    @Override
+    public boolean equals ( final Object obj )
     {
         if ( ! ( obj instanceof JISetId ) )
         {
             return false;
         }
 
-        return Arrays.equals ( setid, ( (JISetId)obj ).getSetID () );
+        return Arrays.equals ( this.setid, ( (JISetId)obj ).getSetID () );
     }
 
 }

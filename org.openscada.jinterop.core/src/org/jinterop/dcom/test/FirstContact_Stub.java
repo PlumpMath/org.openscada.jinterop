@@ -37,10 +37,10 @@ public class FirstContact_Stub implements FirstContact
 
     JISession session = null;
 
-    public FirstContact_Stub ( String address ) throws Exception
+    public FirstContact_Stub ( final String address ) throws Exception
     {
-        JIArray arry123 = new JIArray ( new Byte[10][0], true );
-        JIStruct struct123 = new JIStruct ();
+        final JIArray arry123 = new JIArray ( new Byte[10][0], true );
+        final JIStruct struct123 = new JIStruct ();
         struct123.addMember ( arry123 );
         struct123.addMember ( 0, new Integer ( 1 ) );
         struct123.addMember ( 0, new JIPointer ( arry123 ) );
@@ -49,7 +49,7 @@ public class FirstContact_Stub implements FirstContact
         JISystem.setAutoRegisteration ( true );
         JISystem.setInBuiltLogHandler ( false );
         //Config.setProperty("jcifs.smb.client.domain","ITLINFOSYS");
-        session = JISession.createSession ( "FDGNT", "roopchand", "QweQwe007" );
+        this.session = JISession.createSession ( "FDGNT", "roopchand", "QweQwe007" );
         //session = JISession.createSession("10.74.85.56","itl-hw-38602a\\Vikram","Infosys@123");
         //session = JISession.createSession("federation","administrator","enterprise");
         //stub = new JIComServer(JIClsid.valueOf("8B21775E-717D-11CE-AB5B-D41203C10000"),address,session);
@@ -57,7 +57,7 @@ public class FirstContact_Stub implements FirstContact
         //stub = new JIComServer(JIProgId.valueOf(session,"VirtualServer.Application"),address,session);
 
         // stub = new JIComServer(JIProgId.valueOf(session,"ArrayTry.myarray"),address,session);
-        stub = new JIComServer ( JIProgId.valueOf ( "ATLDemo.TestSafeArray" ), address, session );
+        this.stub = new JIComServer ( JIProgId.valueOf ( "ATLDemo.TestSafeArray" ), address, this.session );
         //stub = new JIComServer(JIProgId.valueOf(session,"SafeArrayDemo.SafeArrayTest"),address,session);
         //stub = new JIComServer(JIProgId.valueOf(session,"Project1.Class1"),address,session);
         //stub = new JIComServer(JIProgId.valueOf(session,"TLI.TLIApplication"),address,session);
@@ -71,6 +71,7 @@ public class FirstContact_Stub implements FirstContact
     //		return "4d9f4ab8-7d1c-11cf-861e-0020af6e7c57:0.0";
     //	}
 
+    @Override
     public void obtainReference ()
     {
         try
@@ -92,10 +93,10 @@ public class FirstContact_Stub implements FirstContact
             //init();
             //
 
-            ResourceBundle bundle = JISystem.getErrorMessages ();
-            IJIComObject unknown = stub.createInstance ();
-            IJIDispatch dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( unknown.queryInterface ( IJIDispatch.IID ) );
-            JIVariant variants = dispatch.callMethodA ( "GetDispatch" );
+            final ResourceBundle bundle = JISystem.getErrorMessages ();
+            final IJIComObject unknown = this.stub.createInstance ();
+            final IJIDispatch dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( unknown.queryInterface ( IJIDispatch.IID ) );
+            final JIVariant variants = dispatch.callMethodA ( "GetDispatch" );
 
             //			dispatch.callMethodA("TestVariant1", new Object[]{variants[1]} );
 
@@ -122,7 +123,7 @@ public class FirstContact_Stub implements FirstContact
             //JIVariant t1234 = dispatch.callMethodA("GetStooges");
 
             // dispatch.callMethod("testArrayOfVariants",new Object[]{new JIArray(new JIVariant[]{new JIVariant(new JIArray(new JIString[]{new JIString("ab"),new JIString("cd")}))},true)});
-            IJIComObject handle2 = (IJIComObject)unknown.queryInterface ( "620012E2-69E3-4DC0-B553-AE252524D2F6" );
+            final IJIComObject handle2 = unknown.queryInterface ( "620012E2-69E3-4DC0-B553-AE252524D2F6" );
             //IJIComObject handle3 = (IJIComObject)unknown.queryInterface(IJITypeLib.IID);
             //JIArray arry34 = new JIArray(new JIVariant[]{new JIVariant(new JIString("40807810804000300798")),new JIVariant(new JIString("1"))},true);
             //JIVariant[] c2 = dispatch.callMethodA("Request", new Object[]{new JIString("rtrtr"),new JIVariant(new JIVariant(arry34)),JIVariant.EMPTY()_BYREF,JIVariant.EMPTY()_BYREF} );
@@ -132,10 +133,10 @@ public class FirstContact_Stub implements FirstContact
             callObject.setOpnum ( 156 );
             callObject.addInParamAsPointer ( new JIPointer ( new JIArray ( new JIVariant[] {}, true ) ), JIFlags.FLAG_NULL );
             //callObject.addInParamAsArray(new JIArray(new JIVariant[]{new JIVariant(new JIArray(new JIString[]{new JIString("ab"),new JIString("cd")}))},true), JIFlags.FLAG_NULL);
-            Object[] r = handle2.call ( callObject );
+            final Object[] r = handle2.call ( callObject );
 
-            Object[] t123 = dispatch.callMethodA ( "GetFlavorsWithPrices", new Object[] { JIVariant.EMPTY_BYREF () } );
-            Object[] t12 = dispatch.callMethodA ( "GetFlavors", new Object[] { JIVariant.EMPTY_BYREF () } );
+            final Object[] t123 = dispatch.callMethodA ( "GetFlavorsWithPrices", new Object[] { JIVariant.EMPTY_BYREF () } );
+            final Object[] t12 = dispatch.callMethodA ( "GetFlavors", new Object[] { JIVariant.EMPTY_BYREF () } );
             //dispatch.callMethodA("testSAFEARRAY01", new Object[]{new JIVariant(new JIArray(new Integer[]{new Integer(1),new Integer(2),new Integer(4)},true), true)});
             //JIArray arry34 = new JIArray(new JIVariant[]{new JIVariant(new JIString("40807810804000300798")),new JIVariant(new JIString("1"))},true);
             //dispatch.callMethodA("Request", new Object[]{new Integer(8194),arry34,JIVariant.EMPTY()_BYREF,JIVariant.EMPTY()_BYREF} );
@@ -155,7 +156,7 @@ public class FirstContact_Stub implements FirstContact
             ret01 = ( (JIVariant)ret0[2] ).getObjectAsArray ();
             ret01 = ( (JIVariant)ret0[3] ).getObjectAsArray ();
 
-            JIVariant tr = dispatch.callMethodA ( "testHresult2" );
+            final JIVariant tr = dispatch.callMethodA ( "testHresult2" );
 
             //IJIComObject handle2 = (IJIComObject)unknown.queryInterface("FA11DECE-7660-11D2-9C43-006008AD8BC06");
 
@@ -163,11 +164,11 @@ public class FirstContact_Stub implements FirstContact
 
             dispatch.callMethod ( "testUnsignedInt", new Object[] { JIUnsignedFactory.getUnsigned ( new Short ( (short)-200 ), JIFlags.FLAG_REPRESENTATION_UNSIGNED_BYTE ) } );
 
-            JIStruct filetime = new JIStruct ();
+            final JIStruct filetime = new JIStruct ();
             filetime.addMember ( Integer.class );
             filetime.addMember ( Integer.class );
 
-            JIStruct ONEVENTSTRUCT = new JIStruct ();
+            final JIStruct ONEVENTSTRUCT = new JIStruct ();
             ONEVENTSTRUCT.addMember ( Short.class );
             ONEVENTSTRUCT.addMember ( Short.class );
             ONEVENTSTRUCT.addMember ( new JIString ( JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR ) );
@@ -204,12 +205,12 @@ public class FirstContact_Stub implements FirstContact
             callObject.addInParamAsUnsigned ( JIUnsignedFactory.getUnsigned ( new Short ( (short)200 ), JIFlags.FLAG_REPRESENTATION_UNSIGNED_BYTE ), JIFlags.FLAG_NULL );
             handle2.call ( callObject );
 
-            JIArray aIn = new JIArray ( new JIVariant[] { new JIVariant ( new JIString ( "40807810804000300798" ) ), new JIVariant ( new JIString ( "1" ) ) }, true );
-            JIVariant varArray = new JIVariant ( aIn );
+            final JIArray aIn = new JIArray ( new JIVariant[] { new JIVariant ( new JIString ( "40807810804000300798" ) ), new JIVariant ( new JIString ( "1" ) ) }, true );
+            final JIVariant varArray = new JIVariant ( aIn );
 
             callObject.setOpnum ( 3 );
 
-            JIVariant vOpt = new JIVariant ( 8194 );
+            final JIVariant vOpt = new JIVariant ( 8194 );
 
             //		    callObject.addInParamAsInt(8194,JIFlags.FLAG_NULL);
             callObject.addInParamAsShort ( (short)8194, JIFlags.FLAG_NULL );
@@ -224,10 +225,10 @@ public class FirstContact_Stub implements FirstContact
             callObject.addOutParamAsType ( JIVariant.class, JIFlags.FLAG_NULL );
             callObject.addOutParamAsType ( Integer.class, JIFlags.FLAG_NULL );
 
-            Object[] t = handle2.call ( callObject );
+            final Object[] t = handle2.call ( callObject );
 
             //since this is a byRef (check using the isByReflagSet())
-            JIArray arrt = ( (JIVariant)t[0] ).getObjectAsVariant ().getObjectAsArray ();
+            final JIArray arrt = ( (JIVariant)t[0] ).getObjectAsVariant ().getObjectAsArray ();
             System.out.println ( arrt );
 
             callObject.setOpnum ( 16 );
@@ -279,8 +280,8 @@ public class FirstContact_Stub implements FirstContact
             //JIArray arrtt = (c[2]).getObjectAsVariant().getObjectAsArray();
             //System.out.println(arrtt);
 
-            IJIComObject handle = (IJIComObject)unknown.queryInterface ( "620012E2-69E3-4DC0-B553-AE252524D2F6" );
-            JICallBuilder callObject2 = new JICallBuilder ();
+            final IJIComObject handle = unknown.queryInterface ( "620012E2-69E3-4DC0-B553-AE252524D2F6" );
+            final JICallBuilder callObject2 = new JICallBuilder ();
 
             //JIVariant variantwe = new JIVariant();
             //JIVariant[] rett = dispatch.callMethodA("GetFlavors", new Object[]{JIVariant.EMPTY()});
@@ -294,18 +295,18 @@ public class FirstContact_Stub implements FirstContact
             JIVariant[] bhalue = dispatch.get ( "TestProperty1", new Object[] { new Short ( (short)1 ) } );
             bhalue = dispatch.get ( "TestProperty2", new Object[] { new Short ( (short)1 ), new Short ( (short)2 ) } );
 
-            IJITypeInfo typeInfo = dispatch.getTypeInfo ( 0 );
-            FuncDesc funcDesc = typeInfo.getFuncDesc ( 0 );
-            Object[] re = typeInfo.getNames ( funcDesc.memberId, 100 );
-            Object[] arry = typeInfo.getDocumentation ( funcDesc.memberId );
-            JIString mops = typeInfo.getMops ( funcDesc.memberId );
+            final IJITypeInfo typeInfo = dispatch.getTypeInfo ( 0 );
+            final FuncDesc funcDesc = typeInfo.getFuncDesc ( 0 );
+            final Object[] re = typeInfo.getNames ( funcDesc.memberId, 100 );
+            final Object[] arry = typeInfo.getDocumentation ( funcDesc.memberId );
+            final JIString mops = typeInfo.getMops ( funcDesc.memberId );
             //int[] ids = typeInfo.getIdOfNames(new String[]{"QueryInterface"});
             //IJIUnknown unknown2 = typeInfo.createInstance(JIObjectFactory.IID_IDispatch);
-            int hrefType = typeInfo.getRefTypeOfImplType ( 0 );
-            IJITypeInfo info = typeInfo.getRefTypeInfo ( hrefType );
+            final int hrefType = typeInfo.getRefTypeOfImplType ( 0 );
+            final IJITypeInfo info = typeInfo.getRefTypeInfo ( hrefType );
             //int implTypeFlags = typeInfo.getImplTypeFlags(1);
             //VarDesc varDesc = typeInfo.getVarDesc(0);
-            IJITypeLib typeLib = (IJITypeLib) ( (Object[])typeInfo.getContainingTypeLib () )[0];
+            final IJITypeLib typeLib = (IJITypeLib)typeInfo.getContainingTypeLib ()[0];
             int type = typeLib.getTypeInfoCount ();
             typeLib.getLibAttr ();
             typeLib.findName ( new JIString ( "QueryInterface", JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR ), 0, (short)1 );
@@ -330,9 +331,9 @@ public class FirstContact_Stub implements FirstContact
                 //				//dispatch.invoke(i,1,new Object[]{params,null,new Integer(2),new Integer(0)},new Object[]{JIVariant.class});
             }
 
-            JICallBuilder obj = new JICallBuilder ();
-            Object[] in = null;
-            Object[] out = null;
+            final JICallBuilder obj = new JICallBuilder ();
+            final Object[] in = null;
+            final Object[] out = null;
             //			obj.setOpnum(13);//31);//30);//29);//32);
             Object[] result = null;
             //
@@ -422,7 +423,7 @@ public class FirstContact_Stub implements FirstContact
 
             obj.reInit ();
             obj.setOpnum ( 53 );
-            obj.addInParamAsPointer ( new JIPointer ( ( new Integer ( 100 ) ) ), JIFlags.FLAG_NULL );
+            obj.addInParamAsPointer ( new JIPointer ( new Integer ( 100 ) ), JIFlags.FLAG_NULL );
             handle.call ( obj );
 
             obj.reInit ();
@@ -447,7 +448,7 @@ public class FirstContact_Stub implements FirstContact
             obj.addOutParamAsObject ( new JIString ( JIFlags.FLAG_REPRESENTATION_STRING_BSTR ), JIFlags.FLAG_NULL );
             handle.call ( obj );
 
-            Object[] ret = dispatch.callMethodA ( "testBSTR01", new Object[] { new JIVariant ( new JIString ( "Hello" ), true ) } );
+            final Object[] ret = dispatch.callMethodA ( "testBSTR01", new Object[] { new JIVariant ( new JIString ( "Hello" ), true ) } );
 
             obj.reInit ();
             obj.setOpnum ( 138 );
@@ -464,12 +465,12 @@ public class FirstContact_Stub implements FirstContact
             //		ret = dispatch.callMethodA("testBSTR03",new Object[]{new JIVariant(new JIString("Hello"),true)});
 
             //dispatch.callMethod("testIntPtr3D1",new Object[]{new JIVariant(100,true)});
-            JIArray array = new JIArray ( new Object[][] { { new Date () }, { handle }, { handle }, { handle } } );
+            final JIArray array = new JIArray ( new Object[][] { { new Date () }, { handle }, { handle }, { handle } } );
 
-            JIVariant[] variant3 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( array, true ) } );
-            JIArray array2 = variant3[1].getObjectAsArray ();
+            final JIVariant[] variant3 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( array, true ) } );
+            final JIArray array2 = variant3[1].getObjectAsArray ();
 
-            Object[][] newValue = { { new JIString ( "defe" ), new Boolean ( false ), new Double ( 98765.0 / 12345.0 ) }, { new Date (), new Integer ( 5454 ), new Float ( 22.0 / 7.0 ) }, { new Boolean ( true ), new JIString ( "dffe" ), new Date () } };
+            final Object[][] newValue = { { new JIString ( "defe" ), new Boolean ( false ), new Double ( 98765.0 / 12345.0 ) }, { new Date (), new Integer ( 5454 ), new Float ( 22.0 / 7.0 ) }, { new Boolean ( true ), new JIString ( "dffe" ), new Date () } };
             //JIVariant variant2[] = dispatch.callMethodA(0x82,new Object[]{new JIVariant(new JIArray(new Integer[]{Integer.valueOf(100),Integer.valueOf(100),Integer.valueOf(200)}),true)});
             //variant2[1].getObjectAsArray();
             JIVariant[] variant2 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIArray ( newValue ), true ) } );
@@ -484,20 +485,20 @@ public class FirstContact_Stub implements FirstContact
             variant = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( true, true ) } );
             //JIVariant[] variant = dispatch.callMethodA("test3variants",new Object[]{new JIVariant(100,true),new JIVariant(400,true),new JIVariant(300,true),new Integer(200)});
             //JIVariant[] variant  = dispatch.callMethodA("testSA",new Object[]{new JIVariant(new JIString("Qweqrt2e"),true)});
-            JIVariant[] variant11 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIString ( "Qwertweer" ), true ) } );
-            JIVariant[] variant111 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIString ( "2qe4twreggwfgwdfgwdgfssdgwegwertgwertwweQA" ), true ) } );
-            JIVariant[] variant222 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIString ( "Q4624twegewgA" ), true ) } );
-            JIVariant[] variant333 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIString ( "ABdfgfdgdgdgfdgfC" ), true ) } );
-            JIVariant[] variant444 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIString ( "ABdfggdgdgfdgfgfdfgdfgdgfdgfC" ), true ) } );
-            JIVariant[] variant555 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIString ( "ABCDEFGH" ), true ) } );
-            JIVariant[] variant4 = dispatch.callMethodA ( "testVariants678", new Object[] { new JIVariant ( 100 ), new JIVariant ( true ), new JIVariant ( 100, true ) } );
+            final JIVariant[] variant11 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIString ( "Qwertweer" ), true ) } );
+            final JIVariant[] variant111 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIString ( "2qe4twreggwfgwdfgwdgfssdgwegwertgwertwweQA" ), true ) } );
+            final JIVariant[] variant222 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIString ( "Q4624twegewgA" ), true ) } );
+            final JIVariant[] variant333 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIString ( "ABdfgfdgdgdgfdgfC" ), true ) } );
+            final JIVariant[] variant444 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIString ( "ABdfggdgdgfdgfgfdfgdfgdgfdgfC" ), true ) } );
+            final JIVariant[] variant555 = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new JIString ( "ABCDEFGH" ), true ) } );
+            final JIVariant[] variant4 = dispatch.callMethodA ( "testVariants678", new Object[] { new JIVariant ( 100 ), new JIVariant ( true ), new JIVariant ( 100, true ) } );
             variant = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( 100, true ) } );
 
             //this is failing as well...variant within a variant
 
             //....
 
-            JIArray array3 = variant4[1].getObjectAsArray ();
+            final JIArray array3 = variant4[1].getObjectAsArray ();
 
             variant = dispatch.callMethodA ( "testSA", new Object[] { new JIVariant ( new Date ( System.currentTimeMillis () ), true ) } );
             variant2 = dispatch.callMethodA ( "testSAFEARRAY01", new Object[] { new JIVariant ( new JIArray ( new Integer[] { new Integer ( 100 ), new Integer ( 100 ), new Integer ( 200 ) } ) ) } );
@@ -512,18 +513,18 @@ public class FirstContact_Stub implements FirstContact
 
             //dispatch.callMethod(0x64,new Object[]{new JIVariant(dispatch),new JIVariant(true,true)});
 
-            int jj = 0;
+            final int jj = 0;
             //Just testing
             obj.reInit ();
             obj.setOpnum ( 4 );
 
-            JILocalInterfaceDefinition interfaceDefinition = new JILocalInterfaceDefinition ( "620012E2-69E3-4DC0-B553-AE252524D2F6" );
-            JILocalCoClass component = new JILocalCoClass ( interfaceDefinition, Test.class );
-            JILocalParamsDescriptor runtimeObject = new JILocalParamsDescriptor ();
-            JILocalMethodDescriptor methodDescriptor = new JILocalMethodDescriptor ( "test", 1, runtimeObject );
+            final JILocalInterfaceDefinition interfaceDefinition = new JILocalInterfaceDefinition ( "620012E2-69E3-4DC0-B553-AE252524D2F6" );
+            final JILocalCoClass component = new JILocalCoClass ( interfaceDefinition, Test.class );
+            final JILocalParamsDescriptor runtimeObject = new JILocalParamsDescriptor ();
+            final JILocalMethodDescriptor methodDescriptor = new JILocalMethodDescriptor ( "test", 1, runtimeObject );
             interfaceDefinition.addMethodDescriptor ( methodDescriptor );
 
-            IJIComObject objMyCOM = JIObjectFactory.buildObject ( session, component );
+            final IJIComObject objMyCOM = JIObjectFactory.buildObject ( this.session, component );
             obj.addInParamAsVariant ( new JIVariant ( objMyCOM ), JIFlags.FLAG_NULL );
             obj.addOutParamAsType ( JIVariant.class, JIFlags.FLAG_NULL );
             result = handle.call ( obj );
@@ -1299,7 +1300,7 @@ public class FirstContact_Stub implements FirstContact
             i++;
 
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();
@@ -1308,9 +1309,9 @@ public class FirstContact_Stub implements FirstContact
         {
             try
             {
-                JISession.destroySession ( session );
+                JISession.destroySession ( this.session );
             }
-            catch ( JIException e )
+            catch ( final JIException e )
             {
                 // TODO Auto-generated catch block
                 e.printStackTrace ();

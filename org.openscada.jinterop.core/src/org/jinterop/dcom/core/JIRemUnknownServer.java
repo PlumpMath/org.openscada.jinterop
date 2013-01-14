@@ -67,7 +67,7 @@ final class JIRemUnknownServer extends Stub
      *            in the "ncacn_ip_tcp:host[port]" format
      * @throws JIException
      */
-    JIRemUnknownServer ( JISession session, String remUnknownIpid, String address ) throws JIException
+    JIRemUnknownServer ( final JISession session, final String remUnknownIpid, final String address ) throws JIException
     {
         super ();
 
@@ -103,16 +103,17 @@ final class JIRemUnknownServer extends Stub
         }
 
         // Now will setup syntax for IRemUnknown and the address. 
-        syntax = "00000143-0000-0000-c000-000000000046:0.0";
+        this.syntax = "00000143-0000-0000-c000-000000000046:0.0";
         //and currently only TCPIP is supported.
         setAddress ( address );
         this.remunknownIPID = remUnknownIpid;
         this.session.setStub2 ( this );
     }
 
+    @Override
     protected String getSyntax ()
     {
-        return syntax;
+        return this.syntax;
     }
 
     /**
@@ -124,12 +125,12 @@ final class JIRemUnknownServer extends Stub
      * @return
      * @throws JIException
      */
-    Object[] call ( JICallBuilder obj, String targetIID, int socketTimeout ) throws JIException
+    Object[] call ( final JICallBuilder obj, final String targetIID, final int socketTimeout ) throws JIException
     {
-        synchronized ( mutex )
+        synchronized ( this.mutex )
         {
 
-            if ( session.isSessionInDestroy () && !obj.fromDestroySession )
+            if ( this.session.isSessionInDestroy () && !obj.fromDestroySession )
             {
                 throw new JIException ( JIErrorCodes.JI_SESSION_DESTROYED );
             }
@@ -141,7 +142,7 @@ final class JIRemUnknownServer extends Stub
             else
             //for cases where it was something earlier, but is now being set to 0.
             {
-                if ( timeoutModifiedfrom0 )
+                if ( this.timeoutModifiedfrom0 )
                 {
                     setSocketTimeOut ( socketTimeout );
                 }
@@ -163,15 +164,15 @@ final class JIRemUnknownServer extends Stub
                 call ( Endpoint.IDEMPOTENT, obj );
 
             }
-            catch ( FaultException e )
+            catch ( final FaultException e )
             {
                 throw new JIException ( e.status, e );
             }
-            catch ( IOException e )
+            catch ( final IOException e )
             {
                 throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
             }
-            catch ( JIRuntimeException e1 )
+            catch ( final JIRuntimeException e1 )
             {
                 throw new JIException ( e1 );
             }
@@ -181,23 +182,23 @@ final class JIRemUnknownServer extends Stub
 
     }
 
-    void addRef_ReleaseRef ( JICallBuilder obj ) throws JIException
+    void addRef_ReleaseRef ( final JICallBuilder obj ) throws JIException
     {
-        synchronized ( mutex )
+        synchronized ( this.mutex )
         {
 
-            if ( remunknownIPID == null )
+            if ( this.remunknownIPID == null )
             {
                 return;
             }
             //now also set the Object ID for IRemUnknown call this will be the IPID of the returned JIRemActivation or IOxidResolver
-            obj.setParentIpid ( remunknownIPID );
-            obj.attachSession ( session );
+            obj.setParentIpid ( this.remunknownIPID );
+            obj.attachSession ( this.session );
             try
             {
-                call ( obj, JIRemUnknown.IID_IUnknown, session.getGlobalSocketTimeout () );
+                call ( obj, JIRemUnknown.IID_IUnknown, this.session.getGlobalSocketTimeout () );
             }
-            catch ( JIRuntimeException e1 )
+            catch ( final JIRuntimeException e1 )
             {
                 throw new JIException ( e1 );
             }
@@ -211,21 +212,21 @@ final class JIRemUnknownServer extends Stub
         {
             detach ();
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             //			e.printStackTrace();
         }
     }
 
-    void setSocketTimeOut ( int timeout )
+    void setSocketTimeOut ( final int timeout )
     {
         if ( timeout == 0 )
         {
-            timeoutModifiedfrom0 = false;
+            this.timeoutModifiedfrom0 = false;
         }
         else
         {
-            timeoutModifiedfrom0 = true;
+            this.timeoutModifiedfrom0 = true;
         }
 
         getProperties ().setProperty ( "rpc.socketTimeout", new Integer ( timeout ).toString () );

@@ -70,24 +70,24 @@ public final class JIString implements Serializable
      * @throws IllegalArgumentException
      *             if <code>type</code> is not a string flag.
      */
-    public JIString ( int type )
+    public JIString ( final int type )
     {
         this.type = type;
         if ( type == JIFlags.FLAG_REPRESENTATION_STRING_LPCTSTR || type == JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR )
         {
-            member = new JIPointer ( String.class, true );
+            this.member = new JIPointer ( String.class, true );
         }
         else if ( type == JIFlags.FLAG_REPRESENTATION_STRING_BSTR )
         {
-            member = new JIPointer ( String.class, false );
+            this.member = new JIPointer ( String.class, false );
         }
         else
         {
             throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_UTIL_FLAG_ERROR ) );
         }
-        Variant = null;
-        VariantByRef = null;
-        member.setFlags ( type | JIFlags.FLAG_REPRESENTATION_VALID_STRING );
+        this.Variant = null;
+        this.VariantByRef = null;
+        this.member.setFlags ( type | JIFlags.FLAG_REPRESENTATION_VALID_STRING );
     }
 
     /**
@@ -103,29 +103,29 @@ public final class JIString implements Serializable
      * @throws IllegalArgumentException
      *             if <code>type</code> is not a string flag.
      */
-    public JIString ( String str, int type )
+    public JIString ( String str, final int type )
     {
-        str = ( str == null ) ? "" : str;
+        str = str == null ? "" : str;
         this.type = type;
         if ( type == JIFlags.FLAG_REPRESENTATION_STRING_LPCTSTR || type == JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR )
         {
-            member = new JIPointer ( str, true );
-            Variant = null;
-            VariantByRef = null;
+            this.member = new JIPointer ( str, true );
+            this.Variant = null;
+            this.VariantByRef = null;
         }
         else if ( type == JIFlags.FLAG_REPRESENTATION_STRING_BSTR )
         {
-            member = new JIPointer ( str, false );
-            member.setReferent ( 0x72657355 );//"User" in LEndian.
-            Variant = new JIVariant ( this );
-            VariantByRef = new JIVariant ( this, true );
+            this.member = new JIPointer ( str, false );
+            this.member.setReferent ( 0x72657355 );//"User" in LEndian.
+            this.Variant = new JIVariant ( this );
+            this.VariantByRef = new JIVariant ( this, true );
         }
         else
         {
             throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_UTIL_FLAG_ERROR ) );
         }
 
-        member.setFlags ( type | JIFlags.FLAG_REPRESENTATION_VALID_STRING );
+        this.member.setFlags ( type | JIFlags.FLAG_REPRESENTATION_VALID_STRING );
 
     }
 
@@ -135,7 +135,7 @@ public final class JIString implements Serializable
      * @param str
      *            value encapsulated by this object.
      */
-    public JIString ( String str )
+    public JIString ( final String str )
     {
         this ( str, JIFlags.FLAG_REPRESENTATION_STRING_BSTR );
     }
@@ -148,7 +148,7 @@ public final class JIString implements Serializable
      */
     public String getString ()
     {
-        return (String)member.getReferent ();
+        return (String)this.member.getReferent ();
     }
 
     /**
@@ -161,36 +161,37 @@ public final class JIString implements Serializable
      */
     public int getType ()
     {
-        return type;
+        return this.type;
     }
 
-    void encode ( NetworkDataRepresentation ndr, List defferedPointers, int FLAG )
+    void encode ( final NetworkDataRepresentation ndr, final List defferedPointers, final int FLAG )
     {
-        JIMarshalUnMarshalHelper.serialize ( ndr, member.getClass (), member, defferedPointers, type | FLAG );
+        JIMarshalUnMarshalHelper.serialize ( ndr, this.member.getClass (), this.member, defferedPointers, this.type | FLAG );
     }
 
-    JIString decode ( NetworkDataRepresentation ndr, List defferedPointers, int FLAG, Map additionalData )
+    JIString decode ( final NetworkDataRepresentation ndr, final List defferedPointers, final int FLAG, final Map additionalData )
     {
-        JIString newString = new JIString ( type );
-        newString.member = (JIPointer)JIMarshalUnMarshalHelper.deSerialize ( ndr, member, defferedPointers, type | FLAG, additionalData );
+        final JIString newString = new JIString ( this.type );
+        newString.member = (JIPointer)JIMarshalUnMarshalHelper.deSerialize ( ndr, this.member, defferedPointers, this.type | FLAG, additionalData );
         return newString;
     }
 
-    void setDeffered ( boolean deffered )
+    void setDeffered ( final boolean deffered )
     {
         /*
         //this condition is required so that only BSTRs are deffered and also since this member could be deffered and
         //setting it to true would spoil the logic
          * this is incorrect logic in the bug sent by Kevin , the ONEVENTSTRUCT consists of LPWSTRs which are deffered
         */
-        if ( member != null && !member.isReference () )
+        if ( this.member != null && !this.member.isReference () )
         {
-            ( (JIPointer)member ).setDeffered ( true );
+            this.member.setDeffered ( true );
         }
     }
 
+    @Override
     public String toString ()
     {
-        return member == null ? "[null]" : "[Type: " + type + " , " + member.toString () + "]";
+        return this.member == null ? "[null]" : "[Type: " + this.type + " , " + this.member.toString () + "]";
     }
 }

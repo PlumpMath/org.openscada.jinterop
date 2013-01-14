@@ -30,7 +30,7 @@ import rpc.core.PresentationSyntax;
 public final class JIComEndpoint extends ConnectionOrientedEndpoint
 {
 
-    JIComEndpoint ( Transport transport, PresentationSyntax syntax )
+    JIComEndpoint ( final Transport transport, final PresentationSyntax syntax )
     {
         super ( transport, syntax );
     }

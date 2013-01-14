@@ -21,12 +21,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.logging.Level;
 
-import org.jinterop.dcom.common.JISystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 final class JIObjectId implements Serializable
 {
+    private final static Logger logger = LoggerFactory.getLogger ( JIObjectId.class );
 
     private static final long serialVersionUID = -4335536047242439700L;
 
@@ -40,13 +41,13 @@ final class JIObjectId implements Serializable
 
     int getIPIDRefCount ()
     {
-        return refcountofIPID;
+        return this.refcountofIPID;
     }
 
     boolean hasExpired ()
     {
         //8 minutes interval...giving COM Client some grace period.
-        if ( ( System.currentTimeMillis () - lastPingTime ) > 8 * 60 * 1000 )
+        if ( System.currentTimeMillis () - this.lastPingTime > 8 * 60 * 1000 )
         {
             return true;
         }
@@ -59,70 +60,70 @@ final class JIObjectId implements Serializable
 
     void updateLastPingTime ()
     {
-        lastPingTime = System.currentTimeMillis ();
+        this.lastPingTime = System.currentTimeMillis ();
     }
 
     void setIPIDRefCountTo0 ()
     {
-        refcountofIPID = 0;
+        this.refcountofIPID = 0;
     }
 
     void decrementIPIDRefCountBy1 ()
     {
-        refcountofIPID--;
+        this.refcountofIPID--;
     }
 
     void incrementIPIDRefCountBy1 ()
     {
-        refcountofIPID++;
+        this.refcountofIPID++;
     }
 
-    JIObjectId ( byte[] oid, boolean dontping )
+    JIObjectId ( final byte[] oid, final boolean dontping )
     {
         this.oid = oid;
         this.dontping = dontping;
         if ( dontping )
         {
-            if ( JISystem.getLogger ().isLoggable ( Level.INFO ) )
-            {
-                JISystem.getLogger ().info ( "DONT PING is true for OID: " + toString () );
-            }
+            logger.info ( "DONT PING is true for OID: {}", this );
         }
     }
 
     byte[] getOID ()
     {
-        return oid;
+        return this.oid;
     }
 
+    @Override
     public int hashCode ()
     {
         int result = 1;
         //from SUN
-        for ( int i = 0; i < oid.length; i++ )
+        for ( int i = 0; i < this.oid.length; i++ )
         {
-            result = 31 * result + oid[i];
+            result = 31 * result + this.oid[i];
         }
         return result;
 
         //return Arrays.hashCode(oid);
     }
 
-    public boolean equals ( Object obj )
+    @Override
+    public boolean equals ( final Object obj )
     {
         if ( ! ( obj instanceof JIObjectId ) )
         {
             return false;
         }
 
-        return Arrays.equals ( oid, ( (JIObjectId)obj ).getOID () );
+        return Arrays.equals ( this.oid, ( (JIObjectId)obj ).getOID () );
     }
 
+    @Override
     public String toString ()
     {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream ();
-        jcifs.util.Hexdump.hexdump ( new PrintStream ( byteArrayOutputStream ), oid, 0, oid.length );
-        return "{ IPID ref count is " + refcountofIPID + " } and OID in bytes[] " + byteArrayOutputStream.toString () + " , hasExpired " + hasExpired () + " } ";
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream ();
+        jcifs.util.Hexdump.hexdump ( new PrintStream ( byteArrayOutputStream ), this.oid, 0, this.oid.length );
+        return "{ IPID ref count is " + this.refcountofIPID + " } and OID in bytes[] " + byteArrayOutputStream.toString () + " , hasExpired " + hasExpired () + " } ";
     }
 
     //	void addIpid(String IPID)

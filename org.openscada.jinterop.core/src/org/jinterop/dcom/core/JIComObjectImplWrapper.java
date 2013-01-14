@@ -36,45 +36,52 @@ public class JIComObjectImplWrapper implements IJIComObject
 
     protected final IJIComObject comObject;
 
-    protected JIComObjectImplWrapper ( IJIComObject comObject )
+    protected JIComObjectImplWrapper ( final IJIComObject comObject )
     {
         this.comObject = comObject;
     }
 
-    public IJIComObject queryInterface ( String iid ) throws JIException
+    @Override
+    public IJIComObject queryInterface ( final String iid ) throws JIException
     {
 
-        return comObject.queryInterface ( iid );
+        return this.comObject.queryInterface ( iid );
     }
 
+    @Override
     public void addRef () throws JIException
     {
-        comObject.addRef ();
+        this.comObject.addRef ();
     }
 
+    @Override
     public void release () throws JIException
     {
-        comObject.release ();
+        this.comObject.release ();
     }
 
+    @Override
     public String getIpid ()
     {
-        return comObject.getIpid ();
+        return this.comObject.getIpid ();
     }
 
-    public Object[] call ( JICallBuilder obj ) throws JIException
+    @Override
+    public Object[] call ( final JICallBuilder obj ) throws JIException
     {
-        return comObject.call ( obj );
+        return this.comObject.call ( obj );
     }
 
+    @Override
     public JIInterfacePointer internal_getInterfacePointer ()
     {
-        return comObject.internal_getInterfacePointer ();
+        return this.comObject.internal_getInterfacePointer ();
     }
 
+    @Override
     public JISession getAssociatedSession ()
     {
-        return comObject.getAssociatedSession ();
+        return this.comObject.getAssociatedSession ();
     }
 
     /**
@@ -82,9 +89,10 @@ public class JIComObjectImplWrapper implements IJIComObject
      * 
      * @return String representation of 128 bit uuid.
      */
+    @Override
     public String getInterfaceIdentifier ()
     {
-        return comObject.getInterfaceIdentifier ();
+        return this.comObject.getInterfaceIdentifier ();
     }
 
     //	/**
@@ -95,68 +103,81 @@ public class JIComObjectImplWrapper implements IJIComObject
     //		return comObject.getAssociatedComServer();
     //	}
 
+    @Override
     public boolean isDispatchSupported ()
     {
-        return comObject.isDispatchSupported ();
+        return this.comObject.isDispatchSupported ();
     }
 
-    public String internal_setConnectionInfo ( IJIComObject connectionPoint, Integer cookie )
+    @Override
+    public String internal_setConnectionInfo ( final IJIComObject connectionPoint, final Integer cookie )
     {
-        return comObject.internal_setConnectionInfo ( connectionPoint, cookie );
+        return this.comObject.internal_setConnectionInfo ( connectionPoint, cookie );
     }
 
-    public Object[] internal_getConnectionInfo ( String identifier )
+    @Override
+    public Object[] internal_getConnectionInfo ( final String identifier )
     {
-        return comObject.internal_getConnectionInfo ( identifier );
+        return this.comObject.internal_getConnectionInfo ( identifier );
     }
 
-    public Object[] internal_removeConnectionInfo ( String identifier )
+    @Override
+    public Object[] internal_removeConnectionInfo ( final String identifier )
     {
-        return comObject.internal_removeConnectionInfo ( identifier );
+        return this.comObject.internal_removeConnectionInfo ( identifier );
     }
 
+    @Override
     public IJIUnreferenced getUnreferencedHandler ()
     {
-        return comObject.getUnreferencedHandler ();
+        return this.comObject.getUnreferencedHandler ();
     }
 
-    public void registerUnreferencedHandler ( IJIUnreferenced unreferenced )
+    @Override
+    public void registerUnreferencedHandler ( final IJIUnreferenced unreferenced )
     {
-        comObject.registerUnreferencedHandler ( unreferenced );
+        this.comObject.registerUnreferencedHandler ( unreferenced );
     }
 
+    @Override
     public void unregisterUnreferencedHandler ()
     {
-        comObject.unregisterUnreferencedHandler ();
+        this.comObject.unregisterUnreferencedHandler ();
     }
 
-    public Object[] call ( JICallBuilder obj, int timeout ) throws JIException
+    @Override
+    public Object[] call ( final JICallBuilder obj, final int timeout ) throws JIException
     {
-        return comObject.call ( obj, timeout );
+        return this.comObject.call ( obj, timeout );
     }
 
+    @Override
     public int getInstanceLevelSocketTimeout ()
     {
-        return comObject.getInstanceLevelSocketTimeout ();
+        return this.comObject.getInstanceLevelSocketTimeout ();
     }
 
-    public void setInstanceLevelSocketTimeout ( int timeout )
+    @Override
+    public void setInstanceLevelSocketTimeout ( final int timeout )
     {
-        comObject.setInstanceLevelSocketTimeout ( timeout );
+        this.comObject.setInstanceLevelSocketTimeout ( timeout );
     }
 
-    public void internal_setDeffered ( boolean deffered )
+    @Override
+    public void internal_setDeffered ( final boolean deffered )
     {
-        comObject.internal_setDeffered ( deffered );
+        this.comObject.internal_setDeffered ( deffered );
     }
 
+    @Override
     public boolean isLocalReference ()
     {
-        return comObject.isLocalReference ();
+        return this.comObject.isLocalReference ();
     }
 
+    @Override
     public String toString ()
     {
-        return comObject.toString ();
+        return this.comObject.toString ();
     }
 }

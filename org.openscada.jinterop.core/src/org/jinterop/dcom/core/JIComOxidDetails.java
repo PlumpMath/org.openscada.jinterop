@@ -17,7 +17,8 @@
 
 package org.jinterop.dcom.core;
 
-import org.jinterop.dcom.common.JISystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Stores the oxid details in memory.
@@ -26,6 +27,8 @@ import org.jinterop.dcom.common.JISystem;
  */
 final class JIComOxidDetails
 {
+
+    private final static Logger logger = LoggerFactory.getLogger ( JIComOxidDetails.class );
 
     private JILocalCoClass referent = null;
 
@@ -47,89 +50,89 @@ final class JIComOxidDetails
 
     private ThreadGroup remUnknownThread = null;
 
-    JIComOxidDetails ( JILocalCoClass javaInstance, JIOxid oxid, JIObjectId oid, String iid, String ipid, JIInterfacePointer ptr, JIComOxidRuntimeHelper helper, int protectionLevel )
+    JIComOxidDetails ( final JILocalCoClass javaInstance, final JIOxid oxid, final JIObjectId oid, final String iid, final String ipid, final JIInterfacePointer ptr, final JIComOxidRuntimeHelper helper, final int protectionLevel )
     {
-        referent = javaInstance;
+        this.referent = javaInstance;
         this.ipid = ipid;
         this.oxid = oxid;
         this.oid = oid;
         this.iid = iid;
         this.protectionLevel = protectionLevel;
-        comRuntimeHelper = helper;
+        this.comRuntimeHelper = helper;
     }
 
-    void setPortForRemUnknown ( int port )
+    void setPortForRemUnknown ( final int port )
     {
-        portForRemUnknown = port;
+        this.portForRemUnknown = port;
     }
 
     int getPortForRemUnknown ()
     {
-        return portForRemUnknown;
+        return this.portForRemUnknown;
     }
 
     String getIID ()
     {
-        return iid;
+        return this.iid;
     }
 
     String getIpid ()
     {
-        return ipid;
+        return this.ipid;
     }
 
     String getRemUnknownIpid ()
     {
-        return remUnknownIpid;
+        return this.remUnknownIpid;
     }
 
-    void setRemUnknownIpid ( String ipid )
+    void setRemUnknownIpid ( final String ipid )
     {
         this.remUnknownIpid = ipid;
     }
 
     JIObjectId getOid ()
     {
-        return oid;
+        return this.oid;
     }
 
     JIOxid getOxid ()
     {
-        return oxid;
+        return this.oxid;
     }
 
     JILocalCoClass getReferent ()
     {
-        return referent;
+        return this.referent;
     }
 
     JIComOxidRuntimeHelper getCOMRuntimeHelper ()
     {
-        return comRuntimeHelper;
+        return this.comRuntimeHelper;
     }
 
     int getProtectionLevel ()
     {
-        return protectionLevel;
+        return this.protectionLevel;
     }
 
-    void setRemUnknownThreadGroup ( ThreadGroup remUnknown )
+    void setRemUnknownThreadGroup ( final ThreadGroup remUnknown )
     {
         this.remUnknownThread = remUnknown;
     }
 
     void interruptRemUnknownThreadGroup ()
     {
-        if ( remUnknownThread != null )
+        if ( this.remUnknownThread != null )
         {
             try
             {
-                remUnknownThread.interrupt ();
+                this.remUnknownThread.interrupt ();
                 //				remUnknownThread.destroy();
             }
-            catch ( Exception e )
+            catch ( final Exception e )
             {
-                JISystem.getLogger ().info ( "JIComOxidDetails interruptRemUnknownThreadGroup " + e.toString () );
+                logger.info ( "JIComOxidDetails interruptRemUnknownThreadGroup", e );
             }
         }
     }

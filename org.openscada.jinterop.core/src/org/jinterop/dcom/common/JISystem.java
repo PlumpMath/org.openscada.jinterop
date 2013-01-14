@@ -91,7 +91,7 @@ public final class JISystem
      * 
      * @return
      */
-    public static Logger getLogger ()
+    private static Logger getLogger ()
     {
         return logger;
     }
@@ -104,7 +104,7 @@ public final class JISystem
      * @param comVersion
      *            new COM version
      */
-    public static void setCOMVersion ( JIComVersion comVersion )
+    public static void setCOMVersion ( final JIComVersion comVersion )
     {
         JISystem.comVersion = comVersion;
     }
@@ -126,7 +126,7 @@ public final class JISystem
      * @param locale
      *            default is <code>Locale.getDefault()</code>.
      */
-    public static void setLocale ( Locale locale )
+    public static void setLocale ( final Locale locale )
     {
         JISystem.locale = locale;
     }
@@ -159,7 +159,7 @@ public final class JISystem
                         resourceBundle = ResourceBundle.getBundle ( "org.jinterop.dcom.jierrormessages", locale );
                     }
                 }
-                catch ( MissingResourceException ex )
+                catch ( final MissingResourceException ex )
                 {
                     //now use the parent US english bundle , which you already have
                     resourceBundle = ResourceBundle.getBundle ( "org.jinterop.dcom.jierrormessages" );
@@ -177,15 +177,15 @@ public final class JISystem
      *            error code
      * @return
      */
-    public static String getLocalizedMessage ( int code )
+    public static String getLocalizedMessage ( final int code )
     {
-        String strKey = Integer.toHexString ( code ).toUpperCase ();
-        char buffer[] = { '0', 'x', '0', '0', '0', '0', '0', '0', '0', '0' };
+        final String strKey = Integer.toHexString ( code ).toUpperCase ();
+        final char buffer[] = { '0', 'x', '0', '0', '0', '0', '0', '0', '0', '0' };
         System.arraycopy ( strKey.toCharArray (), 0, buffer, buffer.length - strKey.length (), strKey.length () );
         return getLocalizedMessage ( String.valueOf ( buffer ) );
     }
 
-    private static String getLocalizedMessage ( String key )
+    private static String getLocalizedMessage ( final String key )
     {
         String message = null;
         try
@@ -193,7 +193,7 @@ public final class JISystem
             message = JISystem.getErrorMessages ().getString ( key );
             message = message + " [" + key + "]";
         }
-        catch ( MissingResourceException r )
+        catch ( final MissingResourceException r )
         {
             message = "Message not found for errorCode: " + key;
         }
@@ -210,7 +210,7 @@ public final class JISystem
      *            user friendly string such as "Excel.Application".
      * @return
      */
-    public static String getClsidFromProgId ( String progId )
+    public static String getClsidFromProgId ( final String progId )
     {
         if ( progId == null )
         {
@@ -228,7 +228,7 @@ public final class JISystem
             }
         }
 
-        return ( (String)mapOfProgIdsVsClsids.get ( progId ) );
+        return (String)mapOfProgIdsVsClsids.get ( progId );
     }
 
     private static void saveDBPathAndLoadFile ()
@@ -239,19 +239,19 @@ public final class JISystem
             loader = JISystem.class.getClassLoader (); // fallback
         }
 
-        Set locations = new HashSet ();
+        final Set locations = new HashSet ();
         if ( loader != null )
         {
             try
             {
-                Enumeration resources = loader.getResources ( "progIdVsClsidDB.properties" );
+                final Enumeration resources = loader.getResources ( "progIdVsClsidDB.properties" );
                 while ( resources.hasMoreElements () )
                 {
                     locations.add ( resources.nextElement () );
                     break;
                 }
             }
-            catch ( IOException ex )
+            catch ( final IOException ex )
             {
             }
         }
@@ -259,7 +259,7 @@ public final class JISystem
         {
             if ( locations.size () == 0 )
             {
-                Enumeration resources = ClassLoader.getSystemResources ( "progIdVsClsidDB.properties" );
+                final Enumeration resources = ClassLoader.getSystemResources ( "progIdVsClsidDB.properties" );
                 while ( resources.hasMoreElements () )
                 {
                     locations.add ( resources.nextElement () );
@@ -267,11 +267,11 @@ public final class JISystem
                 }
             }
         }
-        catch ( IOException ex )
+        catch ( final IOException ex )
         {
         }
 
-        Iterator iterator = locations.iterator ();
+        final Iterator iterator = locations.iterator ();
         while ( iterator.hasNext () )
         {
             try
@@ -292,19 +292,19 @@ public final class JISystem
                         logger.info ( "progIdVsClsidDB file located at: " + url );
                     }
 
-                    URLConnection con = url.openConnection ();
-                    InputStream inputStream = con.getInputStream ();
+                    final URLConnection con = url.openConnection ();
+                    final InputStream inputStream = con.getInputStream ();
                     mapOfProgIdsVsClsids.load ( inputStream );
                     inputStream.close ();
                     //outputStream = con.getOutputStream();
                 }
-                catch ( Exception e )
+                catch ( final Exception e )
                 {
                 }
 
                 //mapOfProgIdsVsClsids.load(new FileInputStream(pathToDB));
             }
-            catch ( Exception ex )
+            catch ( final Exception ex )
             {
                 //ex.printStackTrace();
             }
@@ -328,16 +328,16 @@ public final class JISystem
         {
             try
             {
-                FileOutputStream outputStream = new FileOutputStream ( pathToDB );
+                final FileOutputStream outputStream = new FileOutputStream ( pathToDB );
                 mapOfProgIdsVsClsids.store ( outputStream, "progId Vs ClsidDB" );
                 outputStream.close ();
             }
-            catch ( FileNotFoundException e )
+            catch ( final FileNotFoundException e )
             {
 
                 logger.throwing ( "JISystem", "writeProgIdsToFile", e );
             }
-            catch ( IOException e )
+            catch ( final IOException e )
             {
 
                 logger.throwing ( "JISystem", "writeProgIdsToFile", e );
@@ -352,7 +352,7 @@ public final class JISystem
      * 
      * @exclude
      */
-    public static void internal_setClsidtoProgId ( String progId, String clsid )
+    public static void internal_setClsidtoProgId ( final String progId, final String clsid )
     {
         mapOfProgIdsVsClsids.put ( progId, clsid );
     }
@@ -376,7 +376,7 @@ public final class JISystem
      * 
      * @exclude
      */
-    public static void internal_setSocket ( Object socket )
+    public static void internal_setSocket ( final Object socket )
     {
         //synchronized (socketQueue) 
         {
@@ -395,17 +395,17 @@ public final class JISystem
 
     private static void logSystemPropertiesAndVersion ()
     {
-        Properties pr = System.getProperties ();
-        Iterator itr = pr.keySet ().iterator ();
+        final Properties pr = System.getProperties ();
+        final Iterator itr = pr.keySet ().iterator ();
         String str = "";
-        String jinteropVersion = JISystem.class.getPackage ().getImplementationVersion ();
-        Logger logger = Logger.getLogger ( "org.jinterop" );
+        final String jinteropVersion = JISystem.class.getPackage ().getImplementationVersion ();
+        final Logger logger = Logger.getLogger ( "org.jinterop" );
         if ( logger.isLoggable ( Level.INFO ) )
         {
             logger.info ( "j-Interop Version = " + jinteropVersion + "\n" );
             while ( itr.hasNext () )
             {
-                String key = (String)itr.next ();
+                final String key = (String)itr.next ();
                 str = str + key + " = " + pr.getProperty ( key ) + "\n";
             }
             logger.info ( str );
@@ -426,7 +426,7 @@ public final class JISystem
      *            <code>true</code> if auto registration should be done by the
      *            framework.
      */
-    public static void setAutoRegisteration ( boolean autoRegisteration )
+    public static void setAutoRegisteration ( final boolean autoRegisteration )
     {
         autoRegister = autoRegisteration;
     }
@@ -456,7 +456,7 @@ public final class JISystem
      * @param autoCollection
      *            <code>false</code> if auto collection should be turned off.
      */
-    public static void setJavaCoClassAutoCollection ( boolean autoCollection )
+    public static void setJavaCoClassAutoCollection ( final boolean autoCollection )
     {
         JISystem.autoCollection = autoCollection;
     }
@@ -480,10 +480,10 @@ public final class JISystem
      * @throws IOException
      * @throws SecurityException
      */
-    public static void setInBuiltLogHandler ( boolean useParentHandlers ) throws SecurityException, IOException
+    public static void setInBuiltLogHandler ( final boolean useParentHandlers ) throws SecurityException, IOException
     {
         logger.setUseParentHandlers ( useParentHandlers );
-        FileHandler fileHandler = new FileHandler ( "%t/j-Interop%g.log", 0, 1, true );
+        final FileHandler fileHandler = new FileHandler ( "%t/j-Interop%g.log", 0, 1, true );
         fileHandler.setFormatter ( new SimpleFormatter () );
         logger.addHandler ( fileHandler );
     }
@@ -514,7 +514,7 @@ public final class JISystem
      * @throws IllegalArgumentException
      *             if any parameter is <code>null</code> or of 0 length.
      */
-    public static synchronized void mapHostNametoIP ( String hostname, String IP ) throws UnknownHostException
+    public static synchronized void mapHostNametoIP ( final String hostname, final String IP ) throws UnknownHostException
     {
         if ( hostname == null || IP == null || hostname.trim ().length () == 0 || IP.trim ().length () == 0 )
         {
@@ -533,7 +533,7 @@ public final class JISystem
      * @param hostname
      * @return <code>null</code> if a mapping could not be found.
      */
-    public static synchronized String getIPForHostName ( String hostname )
+    public static synchronized String getIPForHostName ( final String hostname )
     {
         return (String)mapOfHostnamesVsIPs.get ( hostname.trim ().toUpperCase () );
     }

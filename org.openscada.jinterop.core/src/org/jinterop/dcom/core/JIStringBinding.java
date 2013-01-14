@@ -38,11 +38,11 @@ final class JIStringBinding implements Serializable
 
     public int getLength ()
     {
-        return length;
+        return this.length;
     }
 
     //private static boolean test = false;
-    JIStringBinding ( int port, boolean hostname )
+    JIStringBinding ( final int port, final boolean hostname )
     {
         String hostaddress = null;
         if ( !hostname )
@@ -57,25 +57,25 @@ final class JIStringBinding implements Serializable
 
         if ( port == -1 )
         {
-            networkAddress = hostaddress;
+            this.networkAddress = hostaddress;
         }
         else
         {
-            networkAddress = hostaddress + "[" + Integer.toString ( port ) + "]";
+            this.networkAddress = hostaddress + "[" + Integer.toString ( port ) + "]";
         }
 
-        length = 2 + networkAddress.length () * 2 + 2;
-        towerId = 0x7; //TCP_IP
+        this.length = 2 + this.networkAddress.length () * 2 + 2;
+        this.towerId = 0x7; //TCP_IP
     }
 
-    JIStringBinding ( int port )
+    JIStringBinding ( final int port )
     {
         this ( port, false );
     }
 
-    static JIStringBinding decode ( NetworkDataRepresentation ndr )
+    static JIStringBinding decode ( final NetworkDataRepresentation ndr )
     {
-        JIStringBinding stringBinding = new JIStringBinding ();
+        final JIStringBinding stringBinding = new JIStringBinding ();
 
         stringBinding.towerId = ndr.readUnsignedShort ();
 
@@ -88,7 +88,7 @@ final class JIStringBinding implements Serializable
         //now to read the String till a null termination character.
         // a '0' will be represented as 30
         int retVal = -1;
-        StringBuffer buffer = new StringBuffer ();
+        final StringBuffer buffer = new StringBuffer ();
         while ( ( retVal = ndr.readUnsignedShort () ) != 0 )
         {
             //even though this is a unicode string , but will not have anything else
@@ -106,23 +106,23 @@ final class JIStringBinding implements Serializable
 
     public int getTowerId ()
     {
-        return towerId;
+        return this.towerId;
     }
 
     public String getNetworkAddress ()
     {
-        return networkAddress;
+        return this.networkAddress;
     }
 
-    public void encode ( NetworkDataRepresentation ndr )
+    public void encode ( final NetworkDataRepresentation ndr )
     {
-        ndr.writeUnsignedShort ( towerId );
+        ndr.writeUnsignedShort ( this.towerId );
 
         //now to write the network address.
         int i = 0;
-        while ( i < networkAddress.length () )
+        while ( i < this.networkAddress.length () )
         {
-            ndr.writeUnsignedShort ( networkAddress.charAt ( i ) );
+            ndr.writeUnsignedShort ( this.networkAddress.charAt ( i ) );
             i++;
         }
 

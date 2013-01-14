@@ -21,23 +21,23 @@ public class MSPowerPoint
 
     private IJIComObject unknown = null;
 
-    public MSPowerPoint ( String address, String[] args ) throws JIException, UnknownHostException
+    public MSPowerPoint ( final String address, final String[] args ) throws JIException, UnknownHostException
     {
-        JISession session = JISession.createSession ( args[1], args[2], args[3] );
-        comStub = new JIComServer ( JIClsid.valueOf ( "91493441-5A91-11CF-8700-00AA0060263B" ), address, session );
+        final JISession session = JISession.createSession ( args[1], args[2], args[3] );
+        this.comStub = new JIComServer ( JIClsid.valueOf ( "91493441-5A91-11CF-8700-00AA0060263B" ), address, session );
     }
 
     public void startPowerPoint () throws JIException
     {
-        unknown = comStub.createInstance ();
-        dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( (IJIComObject)unknown.queryInterface ( IJIDispatch.IID ) );
+        this.unknown = this.comStub.createInstance ();
+        this.dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( this.unknown.queryInterface ( IJIDispatch.IID ) );
     }
 
     public void showPowerPoint () throws JIException
     {
-        int dispId = dispatch.getIDsOfNames ( "Visible" );
-        JIVariant variant = new JIVariant ( -1 );
-        dispatch.put ( dispId, variant );
+        final int dispId = this.dispatch.getIDsOfNames ( "Visible" );
+        final JIVariant variant = new JIVariant ( -1 );
+        this.dispatch.put ( dispId, variant );
     }
 
     public void performOp () throws JIException, InterruptedException
@@ -45,7 +45,7 @@ public class MSPowerPoint
         //JIVariant variant = dispatch.get("Presentations");
         //JIInterfacePointer ptr = variant.getObjectAsInterfacePointer();
         //IJIDispatch presentations = (IJIDispatch)JIObjectFactory.createCOMInstance(unknown,ptr);
-        IJIDispatch presentations = (IJIDispatch)JIObjectFactory.narrowObject ( dispatch.get ( "Presentations" ).getObjectAsComObject () );
+        final IJIDispatch presentations = (IJIDispatch)JIObjectFactory.narrowObject ( this.dispatch.get ( "Presentations" ).getObjectAsComObject () );
 
         for ( int i = 0; i < 2; i++ )
         {
@@ -53,32 +53,32 @@ public class MSPowerPoint
             //variant = results[0];
             //ptr = variant.getObjectAsInterfacePointer();
             //IJIDispatch presentation = (IJIDispatch)JIObjectFactory.createCOMInstance(unknown,ptr);
-            IJIDispatch presentation = (IJIDispatch)JIObjectFactory.narrowObject ( results[0].getObjectAsComObject () );
+            final IJIDispatch presentation = (IJIDispatch)JIObjectFactory.narrowObject ( results[0].getObjectAsComObject () );
             //variant = presentation.get("Slides");
             //ptr = variant.getObjectAsInterfacePointer();
             //IJIDispatch slides = (IJIDispatch)JIObjectFactory.createCOMInstance(unknown,ptr);
-            IJIDispatch slides = (IJIDispatch)JIObjectFactory.narrowObject ( presentation.get ( "Slides" ).getObjectAsComObject () );
+            final IJIDispatch slides = (IJIDispatch)JIObjectFactory.narrowObject ( presentation.get ( "Slides" ).getObjectAsComObject () );
 
             results = slides.callMethodA ( "Add", new Object[] { new Integer ( 1 ), new Integer ( 1 ) } );
             //variant = results[0];
             //ptr = variant.getObjectAsInterfacePointer();
-            IJIDispatch slide = (IJIDispatch)JIObjectFactory.narrowObject ( results[0].getObjectAsComObject () );
+            final IJIDispatch slide = (IJIDispatch)JIObjectFactory.narrowObject ( results[0].getObjectAsComObject () );
 
             //variant = slide.get("Shapes");
             //ptr = variant.getObjectAsInterfacePointer();
-            IJIDispatch shapes = (IJIDispatch)JIObjectFactory.narrowObject ( slide.get ( "Shapes" ).getObjectAsComObject () );
+            final IJIDispatch shapes = (IJIDispatch)JIObjectFactory.narrowObject ( slide.get ( "Shapes" ).getObjectAsComObject () );
 
             //variant = shapes.get("Title");
             //ptr = variant.getObjectAsInterfacePointer();
-            IJIDispatch shape = (IJIDispatch)JIObjectFactory.narrowObject ( shapes.get ( "Title" ).getObjectAsComObject () );
+            final IJIDispatch shape = (IJIDispatch)JIObjectFactory.narrowObject ( shapes.get ( "Title" ).getObjectAsComObject () );
 
             //variant = shape.get("TextFrame");
             //ptr = variant.getObjectAsInterfacePointer();
-            IJIDispatch textframe = (IJIDispatch)JIObjectFactory.narrowObject ( shape.get ( "TextFrame" ).getObjectAsComObject () );
+            final IJIDispatch textframe = (IJIDispatch)JIObjectFactory.narrowObject ( shape.get ( "TextFrame" ).getObjectAsComObject () );
 
             //variant = textframe.get("TextRange");
             //ptr = variant.getObjectAsInterfacePointer();
-            IJIDispatch textrange = (IJIDispatch)JIObjectFactory.narrowObject ( textframe.get ( "TextRange" ).getObjectAsComObject () );
+            final IJIDispatch textrange = (IJIDispatch)JIObjectFactory.narrowObject ( textframe.get ( "TextRange" ).getObjectAsComObject () );
 
             if ( i == 0 )
             {
@@ -95,15 +95,15 @@ public class MSPowerPoint
                 Thread.sleep ( 3000 );
                 presentation.callMethod ( "Close" );
 
-                dispatch.callMethod ( "Quit" );
+                this.dispatch.callMethod ( "Quit" );
             }
 
         }
 
-        JISession.destroySession ( dispatch.getAssociatedSession () );
+        JISession.destroySession ( this.dispatch.getAssociatedSession () );
     }
 
-    public static void main ( String[] args )
+    public static void main ( final String[] args )
     {
 
         try
@@ -113,12 +113,12 @@ public class MSPowerPoint
                 System.out.println ( "Please provide address domain username password" );
                 return;
             }
-            MSPowerPoint test = new MSPowerPoint ( args[0], args );
+            final MSPowerPoint test = new MSPowerPoint ( args[0], args );
             test.startPowerPoint ();
             test.showPowerPoint ();
             test.performOp ();
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             // TODO Auto-generated catch block
             e.printStackTrace ();
