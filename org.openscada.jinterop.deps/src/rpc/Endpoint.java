@@ -15,7 +15,6 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
 package rpc;
 
 import java.io.IOException;
@@ -24,7 +23,8 @@ import ndr.NdrObject;
 import rpc.core.PresentationSyntax;
 import rpc.core.UUID;
 
-public interface Endpoint {
+public interface Endpoint
+{
 
     public static final int MAYBE = 0x01;
 
@@ -32,13 +32,12 @@ public interface Endpoint {
 
     public static final int BROADCAST = 0x04;
 
-    public Transport getTransport();
+    public Transport getTransport ();
 
-    public PresentationSyntax getSyntax();
+    public PresentationSyntax getSyntax ();
 
-    public void call(int semantics, UUID object, int opnum,
-			NdrObject ndrobj) throws IOException;
+    public void call ( int semantics, UUID object, int opnum, NdrObject ndrobj ) throws IOException;
 
-    public void detach() throws IOException;
+    public void detach () throws IOException;
 
 }

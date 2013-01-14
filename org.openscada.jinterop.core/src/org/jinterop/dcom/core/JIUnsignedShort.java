@@ -22,29 +22,31 @@ import org.jinterop.dcom.common.JISystem;
 
 /**
  * Class representing the unsigned c++ short.
- *
+ * 
  * @since 1.15(b)
- *
  */
-public final class JIUnsignedShort implements IJIUnsigned {
+public final class JIUnsignedShort implements IJIUnsigned
+{
 
-	private final Integer shortValue;
+    private final Integer shortValue;
 
-	JIUnsignedShort(Integer shortValue)
-	{
-		if (shortValue == null || shortValue.intValue() < 0)
-		{
-			throw new IllegalArgumentException(JISystem.getLocalizedMessage(JIErrorCodes.JI_UNSIGNED_NEGATIVE));
-		}
-		this.shortValue = shortValue;
-	}
+    JIUnsignedShort ( Integer shortValue )
+    {
+        if ( shortValue == null || shortValue.intValue () < 0 )
+        {
+            throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_UNSIGNED_NEGATIVE ) );
+        }
+        this.shortValue = shortValue;
+    }
 
-	public int getType() {
-		return JIFlags.FLAG_REPRESENTATION_UNSIGNED_SHORT;
-	}
+    public int getType ()
+    {
+        return JIFlags.FLAG_REPRESENTATION_UNSIGNED_SHORT;
+    }
 
-	public Number getValue() {
-		return shortValue;
-	}
+    public Number getValue ()
+    {
+        return shortValue;
+    }
 
 }

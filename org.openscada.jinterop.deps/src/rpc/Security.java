@@ -21,7 +21,8 @@ import java.io.IOException;
 
 import ndr.NetworkDataRepresentation;
 
-public interface Security {
+public interface Security
+{
 
     public static final String USERNAME = "rpc.security.username";
 
@@ -41,16 +42,14 @@ public interface Security {
 
     public static final int PROTECTION_LEVEL_PRIVACY = 6;
 
-    public int getVerifierLength();
+    public int getVerifierLength ();
 
-    public int getAuthenticationService();
+    public int getAuthenticationService ();
 
-    public int getProtectionLevel();
+    public int getProtectionLevel ();
 
-    public void processIncoming(NetworkDataRepresentation ndr, int index,
-            int length, int verifierIndex, boolean isFragmented) throws IOException;
+    public void processIncoming ( NetworkDataRepresentation ndr, int index, int length, int verifierIndex, boolean isFragmented ) throws IOException;
 
-    public void processOutgoing(NetworkDataRepresentation ndr, int index,
-            int length, int verifierIndex, boolean isFragmented) throws IOException;
+    public void processOutgoing ( NetworkDataRepresentation ndr, int index, int length, int verifierIndex, boolean isFragmented ) throws IOException;
 
 }

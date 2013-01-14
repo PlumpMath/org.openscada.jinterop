@@ -15,7 +15,6 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
 package rpc.core;
 
 import java.util.StringTokenizer;
@@ -25,78 +24,93 @@ import ndr.NdrException;
 import ndr.NdrObject;
 import ndr.NetworkDataRepresentation;
 
-public class PresentationSyntax extends NdrObject {
+public class PresentationSyntax extends NdrObject
+{
 
     private static final int UUID_INDEX = 0;
 
     private static final int VERSION_INDEX = 1;
 
     UUID uuid;
+
     int version;
 
-    public PresentationSyntax() {
+    public PresentationSyntax ()
+    {
     }
 
-    public PresentationSyntax(String syntax) {
-        this();
-        parse(syntax);
+    public PresentationSyntax ( String syntax )
+    {
+        this ();
+        parse ( syntax );
     }
 
-    public PresentationSyntax(UUID uuid, int majorVersion, int minorVersion) {
-        this();
-        setUuid(uuid);
-        setVersion(majorVersion, minorVersion);
+    public PresentationSyntax ( UUID uuid, int majorVersion, int minorVersion )
+    {
+        this ();
+        setUuid ( uuid );
+        setVersion ( majorVersion, minorVersion );
     }
 
-    public UUID getUuid() {
+    public UUID getUuid ()
+    {
         return uuid;
     }
 
-    public void setUuid(UUID uuid) {
+    public void setUuid ( UUID uuid )
+    {
         this.uuid = uuid;
     }
 
-    public int getVersion() {
+    public int getVersion ()
+    {
         return version;
     }
 
-    public void setVersion(int version) {
+    public void setVersion ( int version )
+    {
         this.version = version;
     }
 
-    public int getMajorVersion() {
+    public int getMajorVersion ()
+    {
         return version & 0xffff;
     }
 
-    public int getMinorVersion() {
-        return (version >> 16) & 0xffff;
+    public int getMinorVersion ()
+    {
+        return ( version >> 16 ) & 0xffff;
     }
 
-    public void setVersion(int majorVersion, int minorVersion) {
-        setVersion((majorVersion & 0xffff) | (minorVersion << 16));
+    public void setVersion ( int majorVersion, int minorVersion )
+    {
+        setVersion ( ( majorVersion & 0xffff ) | ( minorVersion << 16 ) );
     }
 
-    public void encode(NetworkDataRepresentation ndr, NdrBuffer dst) throws NdrException {
-        uuid.encode(ndr, dst);
-        dst.enc_ndr_long(version);
-    }
-    public void decode(NetworkDataRepresentation ndr, NdrBuffer src) throws NdrException {
-		uuid = new UUID();
-        uuid.decode(ndr, src);
-        version = src.dec_ndr_long();
+    public void encode ( NetworkDataRepresentation ndr, NdrBuffer dst ) throws NdrException
+    {
+        uuid.encode ( ndr, dst );
+        dst.enc_ndr_long ( version );
     }
 
-    public String toString() {
-        return getUuid().toString() + ":" + getMajorVersion() + "." +
-                getMinorVersion();
+    public void decode ( NetworkDataRepresentation ndr, NdrBuffer src ) throws NdrException
+    {
+        uuid = new UUID ();
+        uuid.decode ( ndr, src );
+        version = src.dec_ndr_long ();
     }
 
-    public void parse(String syntax) {
-        StringTokenizer tokenizer = new StringTokenizer(syntax, ":.");
-        uuid = new UUID();
-        uuid.parse(tokenizer.nextToken());
-        setVersion(Integer.parseInt(tokenizer.nextToken()),
-                Integer.parseInt(tokenizer.nextToken()));
+    public String toString ()
+    {
+        return getUuid ().toString () + ":" + getMajorVersion () + "." + getMinorVersion ();
+    }
+
+    public void parse ( String syntax )
+    {
+        StringTokenizer tokenizer = new StringTokenizer ( syntax, ":." );
+        uuid = new UUID ();
+        uuid.parse ( tokenizer.nextToken () );
+        setVersion ( Integer.parseInt ( tokenizer.nextToken () ), Integer.parseInt ( tokenizer.nextToken () ) );
     }
 
 }

@@ -29,56 +29,55 @@ import org.jinterop.dcom.impls.JIObjectFactory;
 /**
  * @exclude
  * @since 1.0
- *
  */
-final class JIEnumVARIANTImpl extends JIComObjectImplWrapper implements IJIEnumVariant {
+final class JIEnumVARIANTImpl extends JIComObjectImplWrapper implements IJIEnumVariant
+{
 
-	//IJIComObject comObject = null;
+    //IJIComObject comObject = null;
 
-	/**
+    /**
 	 *
 	 */
-	private static final long serialVersionUID = -8405188611519724869L;
+    private static final long serialVersionUID = -8405188611519724869L;
 
-	JIEnumVARIANTImpl(IJIComObject comObject)
-	{
-		super(comObject);
-	}
-
-	public Object[] next(int celt) throws JIException
-	{
-		JICallBuilder callObject = new JICallBuilder(true);
-		callObject.setOpnum(0);
-		callObject.addInParamAsInt(celt,JIFlags.FLAG_NULL);
-		callObject.addOutParamAsObject(new JIArray(JIVariant.class,null,1,true,true),JIFlags.FLAG_NULL);
-		callObject.addOutParamAsType(Integer.class,JIFlags.FLAG_NULL);
-		Object[] result = comObject.call(callObject);
-		return result;
-	}
-
-    public void skip(int celt) throws JIException
+    JIEnumVARIANTImpl ( IJIComObject comObject )
     {
-		JICallBuilder callObject = new JICallBuilder(true);
-		callObject.setOpnum(1);
-		callObject.addInParamAsInt(celt,JIFlags.FLAG_NULL);
-		Object[] result = comObject.call(callObject);
-	}
-
-    public void reset() throws JIException
-    {
-    	JICallBuilder callObject = new JICallBuilder(true);
-		callObject.setOpnum(2);
-		Object[] result = comObject.call(callObject);
+        super ( comObject );
     }
 
-    public IJIEnumVariant Clone() throws JIException
+    public Object[] next ( int celt ) throws JIException
     {
-    	JICallBuilder callObject = new JICallBuilder(true);
-		callObject.setOpnum(3);
-		callObject.addOutParamAsObject(IJIComObject.class,JIFlags.FLAG_NULL);
-		Object[] result = comObject.call(callObject);
-		return (IJIEnumVariant)JIObjectFactory.narrowObject((IJIComObject)result[0]);
+        JICallBuilder callObject = new JICallBuilder ( true );
+        callObject.setOpnum ( 0 );
+        callObject.addInParamAsInt ( celt, JIFlags.FLAG_NULL );
+        callObject.addOutParamAsObject ( new JIArray ( JIVariant.class, null, 1, true, true ), JIFlags.FLAG_NULL );
+        callObject.addOutParamAsType ( Integer.class, JIFlags.FLAG_NULL );
+        Object[] result = comObject.call ( callObject );
+        return result;
     }
 
+    public void skip ( int celt ) throws JIException
+    {
+        JICallBuilder callObject = new JICallBuilder ( true );
+        callObject.setOpnum ( 1 );
+        callObject.addInParamAsInt ( celt, JIFlags.FLAG_NULL );
+        Object[] result = comObject.call ( callObject );
+    }
+
+    public void reset () throws JIException
+    {
+        JICallBuilder callObject = new JICallBuilder ( true );
+        callObject.setOpnum ( 2 );
+        Object[] result = comObject.call ( callObject );
+    }
+
+    public IJIEnumVariant Clone () throws JIException
+    {
+        JICallBuilder callObject = new JICallBuilder ( true );
+        callObject.setOpnum ( 3 );
+        callObject.addOutParamAsObject ( IJIComObject.class, JIFlags.FLAG_NULL );
+        Object[] result = comObject.call ( callObject );
+        return (IJIEnumVariant)JIObjectFactory.narrowObject ( (IJIComObject)result[0] );
+    }
 
 }

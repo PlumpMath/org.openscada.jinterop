@@ -34,93 +34,94 @@ import rpc.pdu.BindPdu;
 /**
  * @exclude
  * @since 1.0
- *
  */
-public final class JIComRuntimeConnectionContext extends BasicConnectionContext {
+public final class JIComRuntimeConnectionContext extends BasicConnectionContext
+{
 
-	  private static final String IID = "IID";
+    private static final String IID = "IID";
 
+    private boolean established = false;
 
-	  private boolean established = false;
-	  private Properties properties = null;
-	  // this returns null, so that a recieve is performed first.
-	  public ConnectionOrientedPdu init(PresentationContext context,
-	            Properties properties) throws IOException {
-	      super.init(context,properties);
-	      this.properties = properties;
-	      return null;
-	   }
+    private Properties properties = null;
 
-	  public ConnectionOrientedPdu accept(ConnectionOrientedPdu pdu)
-      throws IOException {
-		  ConnectionOrientedPdu reply = null;
-		  switch (pdu.getType()) {
-		  	case BindPdu.BIND_TYPE:
-		  		established = true;
-		  		PresentationContext[] presentationContexts = ((BindPdu)pdu).getContextList();
-		  		reply = new BindAcknowledgePdu();
-  				PresentationResult[] result = new PresentationResult[1];
-		  		for (int i = 0; i < presentationContexts.length;i++)
-		  		{
-		  			PresentationContext presentationContext = presentationContexts[i];
-		  			if (!presentationContext.abstractSyntax.toString().toUpperCase().equalsIgnoreCase(properties.getProperty(IID)))
-		  			{
-		  				//create a fault PDU stating the syntax is not supported.
-		  				result[0] = new PresentationResult(PresentationResult.PROVIDER_REJECTION,PresentationResult.ABSTRACT_SYNTAX_NOT_SUPPORTED,new PresentationSyntax(UUID.NIL_UUID + ":0.0"));
-		  				((BindAcknowledgePdu)reply).setResultList(result);
-		  				break;
-		  			}
-		  		}
+    // this returns null, so that a recieve is performed first.
+    public ConnectionOrientedPdu init ( PresentationContext context, Properties properties ) throws IOException
+    {
+        super.init ( context, properties );
+        this.properties = properties;
+        return null;
+    }
 
-		  		//all okay
-		  		if (((BindAcknowledgePdu)reply).getResultList() == null)
-		  		{
-		  			result[0] = new PresentationResult();//this will be acceptance.
-		  			((BindAcknowledgePdu)reply).setAssociationGroupId(new Object().hashCode()); //TODO should I save this ?
-		  			((BindAcknowledgePdu)reply).setResultList(result);
-		  		}
-		  		((BindAcknowledgePdu)reply).setCallId(pdu.getCallId());
-		  		break;
-		  	case AlterContextPdu.ALTER_CONTEXT_TYPE:
-		  		established = true;
+    public ConnectionOrientedPdu accept ( ConnectionOrientedPdu pdu ) throws IOException
+    {
+        ConnectionOrientedPdu reply = null;
+        switch ( pdu.getType () )
+        {
+            case BindPdu.BIND_TYPE:
+                established = true;
+                PresentationContext[] presentationContexts = ( (BindPdu)pdu ).getContextList ();
+                reply = new BindAcknowledgePdu ();
+                PresentationResult[] result = new PresentationResult[1];
+                for ( int i = 0; i < presentationContexts.length; i++ )
+                {
+                    PresentationContext presentationContext = presentationContexts[i];
+                    if ( !presentationContext.abstractSyntax.toString ().toUpperCase ().equalsIgnoreCase ( properties.getProperty ( IID ) ) )
+                    {
+                        //create a fault PDU stating the syntax is not supported.
+                        result[0] = new PresentationResult ( PresentationResult.PROVIDER_REJECTION, PresentationResult.ABSTRACT_SYNTAX_NOT_SUPPORTED, new PresentationSyntax ( UUID.NIL_UUID + ":0.0" ) );
+                        ( (BindAcknowledgePdu)reply ).setResultList ( result );
+                        break;
+                    }
+                }
 
-		  		presentationContexts = ((AlterContextPdu)pdu).getContextList();
-		  		reply = new AlterContextResponsePdu();
-  				result = new PresentationResult[1];
-		  		for (int i = 0; i < presentationContexts.length;i++)
-		  		{
-		  			PresentationContext presentationContext = presentationContexts[i];
-		  			if (!presentationContext.abstractSyntax.toString().toUpperCase().equalsIgnoreCase(properties.getProperty(IID)))
-		  			{
-		  				//create a fault PDU stating the syntax is not supported.
-		  				result[0] = new PresentationResult(PresentationResult.PROVIDER_REJECTION,PresentationResult.ABSTRACT_SYNTAX_NOT_SUPPORTED,new PresentationSyntax(UUID.NIL_UUID + ":0.0"));
-		  				((AlterContextResponsePdu)reply).setResultList(result);
-		  				break;
-		  			}
-		  		}
+                //all okay
+                if ( ( (BindAcknowledgePdu)reply ).getResultList () == null )
+                {
+                    result[0] = new PresentationResult ();//this will be acceptance.
+                    ( (BindAcknowledgePdu)reply ).setAssociationGroupId ( new Object ().hashCode () ); //TODO should I save this ?
+                    ( (BindAcknowledgePdu)reply ).setResultList ( result );
+                }
+                ( (BindAcknowledgePdu)reply ).setCallId ( pdu.getCallId () );
+                break;
+            case AlterContextPdu.ALTER_CONTEXT_TYPE:
+                established = true;
 
-		  		//all okay
-		  		if (((AlterContextResponsePdu)reply).getResultList() == null)
-		  		{
-		  			result[0] = new PresentationResult();//this will be acceptance.
-		  			((AlterContextResponsePdu)reply).setAssociationGroupId(new Object().hashCode()); //TODO should I save this ?
-		  			((AlterContextResponsePdu)reply).setResultList(result);
-		  		}
+                presentationContexts = ( (AlterContextPdu)pdu ).getContextList ();
+                reply = new AlterContextResponsePdu ();
+                result = new PresentationResult[1];
+                for ( int i = 0; i < presentationContexts.length; i++ )
+                {
+                    PresentationContext presentationContext = presentationContexts[i];
+                    if ( !presentationContext.abstractSyntax.toString ().toUpperCase ().equalsIgnoreCase ( properties.getProperty ( IID ) ) )
+                    {
+                        //create a fault PDU stating the syntax is not supported.
+                        result[0] = new PresentationResult ( PresentationResult.PROVIDER_REJECTION, PresentationResult.ABSTRACT_SYNTAX_NOT_SUPPORTED, new PresentationSyntax ( UUID.NIL_UUID + ":0.0" ) );
+                        ( (AlterContextResponsePdu)reply ).setResultList ( result );
+                        break;
+                    }
+                }
 
-		  		((AlterContextResponsePdu)reply).setCallId(pdu.getCallId());
+                //all okay
+                if ( ( (AlterContextResponsePdu)reply ).getResultList () == null )
+                {
+                    result[0] = new PresentationResult ();//this will be acceptance.
+                    ( (AlterContextResponsePdu)reply ).setAssociationGroupId ( new Object ().hashCode () ); //TODO should I save this ?
+                    ( (AlterContextResponsePdu)reply ).setResultList ( result );
+                }
 
-		  	break;
-		  	default:
-		  		reply = super.accept(reply);
-		  }
+                ( (AlterContextResponsePdu)reply ).setCallId ( pdu.getCallId () );
 
-		  return reply;
-	  }
+                break;
+            default:
+                reply = super.accept ( reply );
+        }
 
-	  public boolean isEstablished() {
-	        return super.isEstablished() | established;
-	  }
+        return reply;
+    }
 
-
+    public boolean isEstablished ()
+    {
+        return super.isEstablished () | established;
+    }
 
 }

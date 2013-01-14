@@ -17,32 +17,34 @@
 
 package org.jinterop.dcom.impls.automation;
 
-/** Implements the <i>INVOKEKIND</i> structure of COM Automation.
- *
+/**
+ * Implements the <i>INVOKEKIND</i> structure of COM Automation.
+ * 
  * @since 2.0 (formerly INVOKEKIND)
  */
-public interface InvokeKind {
+public interface InvokeKind
+{
 
-	/**
-	 *  The member is called using a normal function invocation syntax
-	 */
-	public static final Integer INVOKE_FUNC = new Integer(1);
+    /**
+     * The member is called using a normal function invocation syntax
+     */
+    public static final Integer INVOKE_FUNC = new Integer ( 1 );
 
-	/**
-	 * The function is invoked using a normal property-access syntax.
-	 */
-	public static final Integer INVOKE_PROPERTYGET = new Integer(2);
+    /**
+     * The function is invoked using a normal property-access syntax.
+     */
+    public static final Integer INVOKE_PROPERTYGET = new Integer ( 2 );
 
-	/**
-	 * The function is invoked using a property value assignment syntax.
-	 * Syntactically, a typical programming language might represent
-	 * changing a property in the same way as assignment.
-	 * For example:object.property : = value.
-	 */
-	public static final Integer INVOKE_PROPERTYPUT = new Integer(4);
+    /**
+     * The function is invoked using a property value assignment syntax.
+     * Syntactically, a typical programming language might represent
+     * changing a property in the same way as assignment.
+     * For example:object.property : = value.
+     */
+    public static final Integer INVOKE_PROPERTYPUT = new Integer ( 4 );
 
-	/**
-	 *  The function is invoked using a property reference assignment syntax.
-	 */
-	public static final Integer INVOKE_PROPERTYPUTREF = new Integer(8);
+    /**
+     * The function is invoked using a property reference assignment syntax.
+     */
+    public static final Integer INVOKE_PROPERTYPUTREF = new Integer ( 8 );
 }

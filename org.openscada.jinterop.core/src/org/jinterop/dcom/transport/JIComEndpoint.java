@@ -26,17 +26,17 @@ import rpc.core.PresentationSyntax;
 /**
  * @exclude
  * @since 1.0
- *
  */
-public final class JIComEndpoint extends ConnectionOrientedEndpoint {
+public final class JIComEndpoint extends ConnectionOrientedEndpoint
+{
 
-  JIComEndpoint(Transport transport,
-            PresentationSyntax syntax) {
-        super(transport,syntax);
+    JIComEndpoint ( Transport transport, PresentationSyntax syntax )
+    {
+        super ( transport, syntax );
     }
 
-  public void rebindEndPoint() throws IOException
-  {
-	  rebind();
-  }
+    public void rebindEndPoint () throws IOException
+    {
+        rebind ();
+    }
 }

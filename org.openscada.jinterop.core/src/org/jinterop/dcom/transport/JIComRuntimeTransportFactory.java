@@ -24,30 +24,34 @@ import rpc.Transport;
 /**
  * @exclude
  * @since 1.0
- *
  */
-public final class JIComRuntimeTransportFactory extends rpc.TransportFactory {
+public final class JIComRuntimeTransportFactory extends rpc.TransportFactory
+{
 
-	private static JIComRuntimeTransportFactory factory = null;
-	private JIComRuntimeTransportFactory() {}
+    private static JIComRuntimeTransportFactory factory = null;
 
-	public Transport createTransport(String address, Properties properties)
-    	throws ProviderException {
-			return new JIComRuntimeTransport(address, properties);
-	}
+    private JIComRuntimeTransportFactory ()
+    {
+    }
 
-	public static JIComRuntimeTransportFactory getSingleTon()
-	{
-		if (factory == null)
-		{
-			synchronized (JIComTransportFactory.class) {
-				if (factory == null)
-				{
-					factory = new JIComRuntimeTransportFactory();
-				}
-			}
-		}
+    public Transport createTransport ( String address, Properties properties ) throws ProviderException
+    {
+        return new JIComRuntimeTransport ( address, properties );
+    }
 
-		return factory;
-	}
+    public static JIComRuntimeTransportFactory getSingleTon ()
+    {
+        if ( factory == null )
+        {
+            synchronized ( JIComTransportFactory.class )
+            {
+                if ( factory == null )
+                {
+                    factory = new JIComRuntimeTransportFactory ();
+                }
+            }
+        }
+
+        return factory;
+    }
 }

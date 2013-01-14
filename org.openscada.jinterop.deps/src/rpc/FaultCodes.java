@@ -15,11 +15,10 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc;
 
-public interface FaultCodes {
+public interface FaultCodes
+{
 
     /**
      * Fault status indicating the server does not support the RPC protocol

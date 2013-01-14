@@ -14,173 +14,118 @@ import org.jinterop.dcom.core.JIVariant;
 import org.jinterop.dcom.impls.JIObjectFactory;
 import org.jinterop.dcom.impls.automation.IJIDispatch;
 
- 
+public class WshShell
+{
 
-public class WshShell {
+    private final int xlWorksheet = -4167;
 
- 
+    private final int xlXYScatterLinesNoMarkers = 75;
 
-      private final int  xlWorksheet = -4167;
+    private final int xlColumns = 2;
 
-      private final int  xlXYScatterLinesNoMarkers = 75;
+    private JIComServer comServer = null;
 
-      private final int  xlColumns = 2;
+    private IJIDispatch dispatch = null;
 
-     
+    private IJIComObject unknown = null;
 
-      private JIComServer comServer = null;
+    private IJIDispatch dispatchOfWorkSheet = null;
 
-      private IJIDispatch dispatch = null;
+    private IJIDispatch dispatchOfWorkBook = null;
 
-      private IJIComObject unknown = null;
+    private JISession session = null;
 
-      private IJIDispatch dispatchOfWorkSheet = null;
+    public WshShell ( String address, String domain, String username, String password ) throws JIException, UnknownHostException
 
-      private IJIDispatch dispatchOfWorkBook = null;
+    {
 
-      private JISession session = null;
+        JISystem.getLogger ().setLevel ( Level.SEVERE );
 
-     
+        session = JISession.createSession ( domain, username, password );
 
-     
+        comServer = new JIComServer ( JIProgId.valueOf ( "WScript.Shell" ), address, session );
 
-     
+    }
 
-      public WshShell(String address, String domain, String username, String password) throws JIException, UnknownHostException
+    public void startWScript () throws JIException
 
-      {
+    {
 
-            JISystem.getLogger().setLevel(Level.SEVERE);
+        System.out.println ( comServer.getProperties () );
 
-            session = JISession.createSession(domain,username,password);
+        unknown = comServer.createInstance ();
 
-            comServer = new JIComServer(JIProgId.valueOf("WScript.Shell"), address, session);
+        dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( (IJIComObject)unknown.queryInterface ( IJIDispatch.IID ) );
 
-      }
+        JIVariant jv = (JIVariant)dispatch.get ( "CurrentDirectory" );
 
-     
+        System.out.println ( jv.getObjectAsString ().getString () );
 
-      public void startWScript() throws JIException
+        int dispId = dispatch.getIDsOfNames ( "CurrentDirectory" );
 
-      {
+        System.out.println ( dispId );
 
-           
+        JIVariant variant = new JIVariant ( "C://WINDOWS" );
 
- 
+        dispatch.put ( dispId, variant );
 
-           
+        jv = (JIVariant)dispatch.get ( "CurrentDirectory" );
 
-           
+        System.out.println ( jv.getObjectAsString ().getString () );
 
-            System.out.println(comServer.getProperties());
+        try
+        {
+            Thread.sleep ( 60 * 1000 * 3 );
+        }
+        catch ( InterruptedException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace ();
+        }
 
-           
+        //WshShell.Exec
 
-            unknown = comServer.createInstance();
+        System.out.println ( dispatch.callMethodA ( "Exec", new Object[] { new JIString ( "calc" ) } )[0] );
 
-            dispatch = (IJIDispatch)JIObjectFactory.narrowObject((IJIComObject)unknown.queryInterface(IJIDispatch.IID));
+        try
+        {
+            Thread.sleep ( 60 * 1000 * 3 );
+        }
+        catch ( InterruptedException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace ();
+        }
+        //WshShell.Run
 
-     
+        System.out.println ( dispatch.callMethodA ( "Run", new Object[] { new JIString ( "notepad" ), new JIVariant ( 10 ), JIVariant.OPTIONAL_PARAM () } )[0] );
 
-           
+        //JISession.destroySession(session);
 
-            JIVariant jv = (JIVariant)dispatch.get("CurrentDirectory");
+    }
 
-            System.out.println(jv.getObjectAsString().getString());
+    public static void main ( String[] args )
+    {
 
-           
+        try
+        {
 
-            int dispId = dispatch.getIDsOfNames("CurrentDirectory");
+            JISystem.setAutoRegisteration ( true );
 
-            System.out.println(dispId);
+            WshShell wScript = new WshShell ( "localhost", "domain", "username", "password" );
 
-            JIVariant variant = new JIVariant("C://WINDOWS");
+            wScript.startWScript ();
 
-            dispatch.put(dispId,variant);
+        }
+        catch ( Exception e )
+        {
 
-           
+            // TODO Auto-generated catch block
 
-            jv = (JIVariant)dispatch.get("CurrentDirectory");
+            e.printStackTrace ();
 
-            System.out.println(jv.getObjectAsString().getString());
+        }
 
-           
-
-           
-            try {
-				Thread.sleep(60*1000*3);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-            //WshShell.Exec
-
-            System.out.println(dispatch.callMethodA("Exec", new Object[]{new JIString("calc")})[0]);
-
-           
-            try {
-				Thread.sleep(60*1000*3);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            //WshShell.Run
-
-            System.out.println(dispatch.callMethodA("Run", new Object[]{new JIString("notepad"), new JIVariant(10),JIVariant.OPTIONAL_PARAM()})[0]);
-
-           
-
-           
-
-           
-
-            //JISession.destroySession(session);
-
- 
-
-           
-
-      }
-
-     
-
-     
-
-      public static void main(String[] args) {
-
-            try {
-
-                  JISystem.setAutoRegisteration(true);
-
-                 
-
-                 
-
-                  WshShell wScript = new WshShell("localhost", "domain", "username", "password");
-
-                       
-
-                  wScript.startWScript();
-
-                  } catch (Exception e) {
-
-                        // TODO Auto-generated catch block
-
-                        e.printStackTrace();
-
-                  }
-
-      }
-
-     
-
-     
-
-     
-
-     
-
-     
+    }
 
 }

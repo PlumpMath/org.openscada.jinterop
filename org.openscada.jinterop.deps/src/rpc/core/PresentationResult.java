@@ -15,15 +15,14 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc.core;
 
 import ndr.NdrException;
 import ndr.NdrObject;
 import ndr.NetworkDataRepresentation;
 
-public class PresentationResult extends NdrObject {
+public class PresentationResult extends NdrObject
+{
 
     public static final int ACCEPTANCE = 0;
 
@@ -45,51 +44,61 @@ public class PresentationResult extends NdrObject {
 
     public PresentationSyntax transferSyntax;
 
-    public PresentationResult() {
-        this(ACCEPTANCE, REASON_NOT_SPECIFIED,
-                new PresentationSyntax(NetworkDataRepresentation.NDR_SYNTAX));
+    public PresentationResult ()
+    {
+        this ( ACCEPTANCE, REASON_NOT_SPECIFIED, new PresentationSyntax ( NetworkDataRepresentation.NDR_SYNTAX ) );
     }
 
-    public PresentationResult(PresentationSyntax transferSyntax) {
-        this(ACCEPTANCE, REASON_NOT_SPECIFIED, transferSyntax);
+    public PresentationResult ( PresentationSyntax transferSyntax )
+    {
+        this ( ACCEPTANCE, REASON_NOT_SPECIFIED, transferSyntax );
     }
 
-    public PresentationResult(int result, int reason) {
-        this(result, reason, null);
+    public PresentationResult ( int result, int reason )
+    {
+        this ( result, reason, null );
     }
 
-    public PresentationResult(int result, int reason,
-            PresentationSyntax transferSyntax) {
+    public PresentationResult ( int result, int reason, PresentationSyntax transferSyntax )
+    {
         this.result = result;
         this.reason = reason;
         this.transferSyntax = transferSyntax;
     }
 
-    public void read(NetworkDataRepresentation ndr) {
-        ndr.getBuffer().align(4);
-        result = ndr.readUnsignedShort();
-        reason = ndr.readUnsignedShort();
+    public void read ( NetworkDataRepresentation ndr )
+    {
+        ndr.getBuffer ().align ( 4 );
+        result = ndr.readUnsignedShort ();
+        reason = ndr.readUnsignedShort ();
         //if (result == ACCEPTANCE) //commenting this since the entire packet should be decoded VRC
         {
-            transferSyntax = new PresentationSyntax();
-			try {
-				transferSyntax.decode(ndr, ndr.getBuffer());
-			} catch (NdrException ne) {
-			}
+            transferSyntax = new PresentationSyntax ();
+            try
+            {
+                transferSyntax.decode ( ndr, ndr.getBuffer () );
+            }
+            catch ( NdrException ne )
+            {
+            }
         }
     }
 
-    public void write(NetworkDataRepresentation ndr) {
-        ndr.getBuffer().align(4, (byte) 0);
-        ndr.writeUnsignedShort(result);
-        ndr.writeUnsignedShort(reason);
+    public void write ( NetworkDataRepresentation ndr )
+    {
+        ndr.getBuffer ().align ( 4, (byte)0 );
+        ndr.writeUnsignedShort ( result );
+        ndr.writeUnsignedShort ( reason );
         //if (result == ACCEPTANCE && transferSyntax != null)
-        if (transferSyntax != null) //commenting this since the entire packet should be written VRC
+        if ( transferSyntax != null ) //commenting this since the entire packet should be written VRC
         {
-			try {
-				transferSyntax.encode(ndr, ndr.getBuffer());
-			} catch (NdrException ne) {
-			}
+            try
+            {
+                transferSyntax.encode ( ndr, ndr.getBuffer () );
+            }
+            catch ( NdrException ne )
+            {
+            }
         }
     }
 

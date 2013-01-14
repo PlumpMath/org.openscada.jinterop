@@ -22,29 +22,31 @@ import org.jinterop.dcom.common.JISystem;
 
 /**
  * Class representing the unsigned c++ integer.
- *
+ * 
  * @since 1.15(b)
- *
  */
-public final class JIUnsignedInteger implements IJIUnsigned {
+public final class JIUnsignedInteger implements IJIUnsigned
+{
 
-	private final Long intValue;
+    private final Long intValue;
 
-	JIUnsignedInteger(Long intValue)
-	{
-		if (intValue == null || intValue.longValue() < 0)
-		{
-			throw new IllegalArgumentException(JISystem.getLocalizedMessage(JIErrorCodes.JI_UNSIGNED_NEGATIVE));
-		}
-		this.intValue = intValue;
-	}
+    JIUnsignedInteger ( Long intValue )
+    {
+        if ( intValue == null || intValue.longValue () < 0 )
+        {
+            throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_UNSIGNED_NEGATIVE ) );
+        }
+        this.intValue = intValue;
+    }
 
-	public int getType() {
-		return JIFlags.FLAG_REPRESENTATION_UNSIGNED_INT;
-	}
+    public int getType ()
+    {
+        return JIFlags.FLAG_REPRESENTATION_UNSIGNED_INT;
+    }
 
-	public Number getValue() {
-		return intValue;
-	}
+    public Number getValue ()
+    {
+        return intValue;
+    }
 
 }

@@ -16,28 +16,33 @@
  */
 package org.jinterop.dcom.common;
 
-/** Interface for setting user credentials.
+/**
+ * Interface for setting user credentials.
  * 
  * @since 1.0
  */
-public interface IJIAuthInfo {
+public interface IJIAuthInfo
+{
 
-	/** Returns username.
- 	 * 
-	 * @return
-	 */
-	public String getUserName() ;
-	
-	/** Returns password.
-	 * 
-	 * @return
-	 */
-	public String getPassword();
-	
-	/** Returns user's domain.
-	 * 
-	 * @return
-	 */
-	public String getDomain() ;
-	
+    /**
+     * Returns username.
+     * 
+     * @return
+     */
+    public String getUserName ();
+
+    /**
+     * Returns password.
+     * 
+     * @return
+     */
+    public String getPassword ();
+
+    /**
+     * Returns user's domain.
+     * 
+     * @return
+     */
+    public String getDomain ();
+
 }

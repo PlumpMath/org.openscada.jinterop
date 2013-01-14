@@ -29,74 +29,79 @@ import org.jinterop.dcom.common.JISystem;
 
 import rpc.core.UUID;
 
-/** Partially implements IOxidResolver interface, used only for ResolveOxid calls.
- *
- *
+/**
+ * Partially implements IOxidResolver interface, used only for ResolveOxid
+ * calls.
+ * 
  * @since 1.23
- *
  */
 final class JIOxidResolver extends NdrObject
 {
-	private final byte[] oxid;
+    private final byte[] oxid;
 
-	private JIDualStringArray oxidBindings = null;
-	private String ipid = null;
+    private JIDualStringArray oxidBindings = null;
 
-	JIOxidResolver(final byte[] oxid)
-	{
-		this.oxid = oxid;
-	}
+    private String ipid = null;
 
-	public int getOpnum() {
-		return 4;
-	}
+    JIOxidResolver ( final byte[] oxid )
+    {
+        this.oxid = oxid;
+    }
 
-	public void write(NetworkDataRepresentation ndr)
-	{
-		JIMarshalUnMarshalHelper.writeOctetArrayLE(ndr,oxid);
-		JIMarshalUnMarshalHelper.serialize(ndr, Short.class, new Short((short)1), new ArrayList(), JIFlags.FLAG_NULL);
-		JIMarshalUnMarshalHelper.serialize(ndr, JIArray.class, new JIArray(new Short[]{new Short((short)7)},true), new ArrayList(), JIFlags.FLAG_REPRESENTATION_ARRAY);
-	}
+    public int getOpnum ()
+    {
+        return 4;
+    }
 
-	public void read(NetworkDataRepresentation ndr)
-	{
-		ndr.readUnsignedLong(); //pointer
-		ndr.readUnsignedLong(); //some length component, irrelevant for us right now
-		oxidBindings = JIDualStringArray.decode(ndr);
-		try {
-			UUID ipid2 = new UUID();
-			ipid2.decode(ndr,ndr.getBuffer());
-			ipid = (ipid2.toString());
-		} catch (NdrException e) {
+    public void write ( NetworkDataRepresentation ndr )
+    {
+        JIMarshalUnMarshalHelper.writeOctetArrayLE ( ndr, oxid );
+        JIMarshalUnMarshalHelper.serialize ( ndr, Short.class, new Short ( (short)1 ), new ArrayList (), JIFlags.FLAG_NULL );
+        JIMarshalUnMarshalHelper.serialize ( ndr, JIArray.class, new JIArray ( new Short[] { new Short ( (short)7 ) }, true ), new ArrayList (), JIFlags.FLAG_REPRESENTATION_ARRAY );
+    }
 
-			JISystem.getLogger().throwing("JIRemActivation","read",e);
-		}
+    public void read ( NetworkDataRepresentation ndr )
+    {
+        ndr.readUnsignedLong (); //pointer
+        ndr.readUnsignedLong (); //some length component, irrelevant for us right now
+        oxidBindings = JIDualStringArray.decode ( ndr );
+        try
+        {
+            UUID ipid2 = new UUID ();
+            ipid2.decode ( ndr, ndr.getBuffer () );
+            ipid = ( ipid2.toString () );
+        }
+        catch ( NdrException e )
+        {
 
-		//read the auth hint
-		int authenticationHint = ndr.readUnsignedLong();
+            JISystem.getLogger ().throwing ( "JIRemActivation", "read", e );
+        }
 
-		JIComVersion comVersion = new JIComVersion();
-		comVersion.setMajorVersion(ndr.readUnsignedShort());
-		comVersion.setMinorVersion(ndr.readUnsignedShort());
+        //read the auth hint
+        int authenticationHint = ndr.readUnsignedLong ();
 
-		int hresult = ndr.readUnsignedLong();
+        JIComVersion comVersion = new JIComVersion ();
+        comVersion.setMajorVersion ( ndr.readUnsignedShort () );
+        comVersion.setMinorVersion ( ndr.readUnsignedShort () );
 
-		if (hresult != 0)
-		{
-			//System.out.println("EXCEPTION FROM SERVER ! --> " + "0x" + Long.toHexString(hresult).substring(8));
-			throw new JIRuntimeException(hresult);
-		}
+        int hresult = ndr.readUnsignedLong ();
 
-	}
+        if ( hresult != 0 )
+        {
+            //System.out.println("EXCEPTION FROM SERVER ! --> " + "0x" + Long.toHexString(hresult).substring(8));
+            throw new JIRuntimeException ( hresult );
+        }
 
-	JIDualStringArray getOxidBindings()
-	{
-		return oxidBindings;
-	}
+    }
 
-	String getIPID()
-	{
-		return ipid;
-	}
+    JIDualStringArray getOxidBindings ()
+    {
+        return oxidBindings;
+    }
+
+    String getIPID ()
+    {
+        return ipid;
+    }
 
 }

@@ -22,154 +22,156 @@ import java.util.ArrayList;
 
 import ndr.NetworkDataRepresentation;
 
-/** Represents array of network address and security bindings.
- *
+/**
+ * Represents array of network address and security bindings.
+ * 
  * @exclude
  * @since 1.0
  */
-final class JIDualStringArray implements Serializable {
+final class JIDualStringArray implements Serializable
+{
 
+    private static final long serialVersionUID = -3351948896808028565L;
 
-	private static final long serialVersionUID = -3351948896808028565L;
+    private JIDualStringArray ()
+    {
+    }
 
-	private JIDualStringArray(){}
+    //static boolean test = false;
+    //Will get called from Oxid Resolver
+    JIDualStringArray ( int port )
+    {
+        //create bindings here.
+        stringBinding = new JIStringBinding[2]; //only 1
+        stringBinding[0] = new JIStringBinding ( port, false );
 
-	 //static boolean test = false;
-	//Will get called from Oxid Resolver
-	JIDualStringArray(int port)
-	{
-		//create bindings here.
-		stringBinding = new JIStringBinding[2]; //only 1
-		stringBinding[0] = new JIStringBinding(port,false);
+        length = stringBinding[0].getLength ();
 
-		length = stringBinding[0].getLength();
+        stringBinding[1] = new JIStringBinding ( port, true );
 
-		stringBinding[1] = new JIStringBinding(port,true);
+        length = length + stringBinding[1].getLength () + 2; //null termination
 
-		length = length + stringBinding[1].getLength() + 2; //null termination
+        secOffset = length;
 
-		secOffset = length;
+        securityBinding = new JISecurityBinding[1]; //support only winnt NTLM
+        securityBinding[0] = new JISecurityBinding ( 0x0a, 0xffff, "" );
+        length = length + securityBinding[0].getLength ();
 
-		securityBinding = new JISecurityBinding[1]; //support only winnt NTLM
-		securityBinding[0] = new JISecurityBinding(0x0a,0xffff,"");
-		length = length + securityBinding[0].getLength();
+        length = length + 2 + 2 + 2; //null termination, 2 bytes for num entries and 2 bytes for sec offset.
+    }
 
-		length = length + 2 + 2 + 2; //null termination, 2 bytes for num entries and 2 bytes for sec offset.
-	}
+    private JIStringBinding[] stringBinding = null;
 
-	private JIStringBinding[] stringBinding = null;
-	private JISecurityBinding[] securityBinding = null;
-	private int length = 0;
-	private int secOffset = 0;
+    private JISecurityBinding[] securityBinding = null;
 
-	static JIDualStringArray decode(NetworkDataRepresentation ndr)
-	{
-		JIDualStringArray dualStringArray = new JIDualStringArray();
+    private int length = 0;
 
-		//first extract number of entries
-		int numEntries = ndr.readUnsignedShort();
+    private int secOffset = 0;
 
-		//return empty
-		if (numEntries == 0)
-			return dualStringArray;
+    static JIDualStringArray decode ( NetworkDataRepresentation ndr )
+    {
+        JIDualStringArray dualStringArray = new JIDualStringArray ();
 
-		//extract security offset
-		int securityOffset = ndr.readUnsignedShort();
+        //first extract number of entries
+        int numEntries = ndr.readUnsignedShort ();
 
-		ArrayList listOfStringBindings = new ArrayList();
-		ArrayList listOfSecurityBindings = new ArrayList();
+        //return empty
+        if ( numEntries == 0 )
+            return dualStringArray;
 
-		boolean stringbinding = true;
-		while (true)
-		{
-			if (stringbinding)
-			{
-				JIStringBinding s = JIStringBinding.decode(ndr);
-				if (s == null)
-				{
-					stringbinding = false;
-					//null termination
-					dualStringArray.length = dualStringArray.length + 2;
-					dualStringArray.secOffset = dualStringArray.length;
-					continue;
-				}
+        //extract security offset
+        int securityOffset = ndr.readUnsignedShort ();
 
-				listOfStringBindings.add(s);
-				dualStringArray.length = dualStringArray.length + s.getLength();
-			}
-			else
-			{
-				JISecurityBinding s = JISecurityBinding.decode(ndr);
-				if (s == null)
-				{
-					//null termination
-					dualStringArray.length = dualStringArray.length + 2;
-					break;
-				}
+        ArrayList listOfStringBindings = new ArrayList ();
+        ArrayList listOfSecurityBindings = new ArrayList ();
 
-				listOfSecurityBindings.add(s);
-				dualStringArray.length = dualStringArray.length + s.getLength();
-			}
+        boolean stringbinding = true;
+        while ( true )
+        {
+            if ( stringbinding )
+            {
+                JIStringBinding s = JIStringBinding.decode ( ndr );
+                if ( s == null )
+                {
+                    stringbinding = false;
+                    //null termination
+                    dualStringArray.length = dualStringArray.length + 2;
+                    dualStringArray.secOffset = dualStringArray.length;
+                    continue;
+                }
 
-		}
+                listOfStringBindings.add ( s );
+                dualStringArray.length = dualStringArray.length + s.getLength ();
+            }
+            else
+            {
+                JISecurityBinding s = JISecurityBinding.decode ( ndr );
+                if ( s == null )
+                {
+                    //null termination
+                    dualStringArray.length = dualStringArray.length + 2;
+                    break;
+                }
 
-		// 2 bytes for num entries and 2 bytes for sec offset.
-		dualStringArray.length = dualStringArray.length + 2 + 2;
+                listOfSecurityBindings.add ( s );
+                dualStringArray.length = dualStringArray.length + s.getLength ();
+            }
 
-		dualStringArray.stringBinding = (JIStringBinding[])listOfStringBindings.toArray(new JIStringBinding[listOfStringBindings.size()]);
-		dualStringArray.securityBinding = (JISecurityBinding[])listOfSecurityBindings.toArray(new JISecurityBinding[listOfSecurityBindings.size()]);
-		return dualStringArray;
-	}
+        }
 
-	public JIStringBinding[] getStringBindings()
-	{
-		return stringBinding;
-	}
+        // 2 bytes for num entries and 2 bytes for sec offset.
+        dualStringArray.length = dualStringArray.length + 2 + 2;
 
-	public JISecurityBinding[] getSecurityBindings()
-	{
-		return securityBinding;
-	}
+        dualStringArray.stringBinding = (JIStringBinding[])listOfStringBindings.toArray ( new JIStringBinding[listOfStringBindings.size ()] );
+        dualStringArray.securityBinding = (JISecurityBinding[])listOfSecurityBindings.toArray ( new JISecurityBinding[listOfSecurityBindings.size ()] );
+        return dualStringArray;
+    }
 
-	public int getLength()
-	{
-		return length;
-	}
+    public JIStringBinding[] getStringBindings ()
+    {
+        return stringBinding;
+    }
 
-	public void encode(NetworkDataRepresentation ndr)
-	{
-		//fill num entries
-		//this is total length/2. since they are all shorts
-		ndr.writeUnsignedShort((length - 4)/2);
-		ndr.writeUnsignedShort((secOffset)/2);
+    public JISecurityBinding[] getSecurityBindings ()
+    {
+        return securityBinding;
+    }
 
-		int i = 0;
-		if(stringBinding != null)
-		{
-			while (i < stringBinding.length)
-			{
-				stringBinding[i].encode(ndr);
-				i++;
-			}
-			ndr.writeUnsignedShort(0);
-		}
+    public int getLength ()
+    {
+        return length;
+    }
 
+    public void encode ( NetworkDataRepresentation ndr )
+    {
+        //fill num entries
+        //this is total length/2. since they are all shorts
+        ndr.writeUnsignedShort ( ( length - 4 ) / 2 );
+        ndr.writeUnsignedShort ( ( secOffset ) / 2 );
 
+        int i = 0;
+        if ( stringBinding != null )
+        {
+            while ( i < stringBinding.length )
+            {
+                stringBinding[i].encode ( ndr );
+                i++;
+            }
+            ndr.writeUnsignedShort ( 0 );
+        }
 
+        i = 0;
 
-		i = 0;
+        if ( securityBinding != null )
+        {
+            while ( i < securityBinding.length )
+            {
+                securityBinding[i].encode ( ndr );
+                i++;
+            }
+            ndr.writeUnsignedShort ( 0 );
+        }
 
-		if(securityBinding != null)
-		{
-			while (i < securityBinding.length)
-			{
-				securityBinding[i].encode(ndr);
-				i++;
-			}
-			ndr.writeUnsignedShort(0);
-		}
-
-	}
+    }
 
 }
-

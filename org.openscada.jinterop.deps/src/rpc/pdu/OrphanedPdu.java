@@ -15,16 +15,17 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
 package rpc.pdu;
 
 import rpc.ConnectionOrientedPdu;
 
-public class OrphanedPdu extends ConnectionOrientedPdu {
+public class OrphanedPdu extends ConnectionOrientedPdu
+{
 
     public static final int ORPHANED_TYPE = 0x13;
 
-    public int getType() {
+    public int getType ()
+    {
         return ORPHANED_TYPE;
     }
 

@@ -28,11 +28,13 @@ import ndr.NetworkDataRepresentation;
 import org.jinterop.dcom.common.JISystem;
 import org.jinterop.dcom.impls.automation.IJIDispatch;
 
-/**<p> Class representing a Marshalled Interface Pointer. You will never use the members of this
- * class directly, but always as an implementation of <code>IJIComObject</code> interface.
- * <br>
- * Sample Usage:-
- * <br><code>
+/**
+ * <p>
+ * Class representing a Marshalled Interface Pointer. You will never use the
+ * members of this class directly, but always as an implementation of
+ * <code>IJIComObject</code> interface. <br>
+ * Sample Usage:- <br>
+ * <code>
  * IJIComObject connectionPointContainer = (IJIComObject)ieObject.queryInterface("B196B284-BAB4-101A-B69C-00AA00341D07"); <br>
  * JICallBuilder object = new JICallBuilder(connectionPointContainer.getIpid(),true); <br>
  * object.setOpnum(1); <br>
@@ -43,85 +45,103 @@ import org.jinterop.dcom.impls.automation.IJIDispatch;
  * IJIComObject connectionPointer = JIObjectFactory.createCOMInstance(connectionPointContainer,connectionPtr); <br>
  * </code>
  * </p>
+ * 
  * @since 1.0
- *
  */
-final class JIInterfacePointer implements Serializable {
+final class JIInterfacePointer implements Serializable
+{
 
-//	static boolean inTest = true;
+    //	static boolean inTest = true;
 
-	private JIPointer member = null;
-	private static final long serialVersionUID = 2508592294719469453L;
-	static final byte[] OBJREF_SIGNATURE = {0x4d,0x45,0x4f,0x57};  // 'MEOW'
-	static final int  OBJREF_STANDARD = 0x1;  // standard marshaled objref
-    static final int OBJREF_HANDLER  = 0x2;  // handler marshaled objref
-    static final int OBJREF_CUSTOM   = 0x4;  // custom marshaled objref
+    private JIPointer member = null;
+
+    private static final long serialVersionUID = 2508592294719469453L;
+
+    static final byte[] OBJREF_SIGNATURE = { 0x4d, 0x45, 0x4f, 0x57 }; // 'MEOW'
+
+    static final int OBJREF_STANDARD = 0x1; // standard marshaled objref
+
+    static final int OBJREF_HANDLER = 0x2; // handler marshaled objref
+
+    static final int OBJREF_CUSTOM = 0x4; // custom marshaled objref
 
     // Flag values for a STDOBJREF (standard part of an OBJREF).
     // SORF_OXRES1 - SORF_OXRES8 are reserved for the object exporters
     // use only, object importers must ignore them and must not enforce MBZ.
-    static final int SORF_OXRES1     = 0x1;  // reserved for exporter
-    static final int SORF_OXRES2     = 0x20; // reserved for exporter
-    static final int SORF_OXRES3     = 0x40; // reserved for exporter
-    static final int SORF_OXRES4     = 0x80; // reserved for exporter
-    static final int SORF_OXRES5     = 0x100;// reserved for exporter
-    static final int SORF_OXRES6     = 0x200;// reserved for exporter
-    static final int SORF_OXRES7     = 0x400;// reserved for exporter
-    static final int SORF_OXRES8     = 0x800;// reserved for exporter
-    static final int SORF_NULL       = 0x0;   // convenient for initializing SORF
-    static final int SORF_NOPING     = 0x1000;// Pinging is not required
+    static final int SORF_OXRES1 = 0x1; // reserved for exporter
 
+    static final int SORF_OXRES2 = 0x20; // reserved for exporter
 
-    private JIInterfacePointer() {}
+    static final int SORF_OXRES3 = 0x40; // reserved for exporter
 
-    /** Called from Oxid Resolver master, the resolver address are put in here itself
-     *
+    static final int SORF_OXRES4 = 0x80; // reserved for exporter
+
+    static final int SORF_OXRES5 = 0x100;// reserved for exporter
+
+    static final int SORF_OXRES6 = 0x200;// reserved for exporter
+
+    static final int SORF_OXRES7 = 0x400;// reserved for exporter
+
+    static final int SORF_OXRES8 = 0x800;// reserved for exporter
+
+    static final int SORF_NULL = 0x0; // convenient for initializing SORF
+
+    static final int SORF_NOPING = 0x1000;// Pinging is not required
+
+    private JIInterfacePointer ()
+    {
+    }
+
+    /**
+     * Called from Oxid Resolver master, the resolver address are put in here
+     * itself
+     * 
      * @param iid
      * @param ipid
      * @param oxid
      * @param oid
      */
-    JIInterfacePointer(String iid,int port,JIStdObjRef objref)
+    JIInterfacePointer ( String iid, int port, JIStdObjRef objref )
     {
-    	member = new JIPointer(new JIInterfacePointerBody(iid,port,objref),false);
+        member = new JIPointer ( new JIInterfacePointerBody ( iid, port, objref ), false );
     }
 
-    JIInterfacePointer(String iid, JIInterfacePointer interfacePointer)
-	{
-    	member = new JIPointer(new JIInterfacePointerBody(iid,interfacePointer),false);
+    JIInterfacePointer ( String iid, JIInterfacePointer interfacePointer )
+    {
+        member = new JIPointer ( new JIInterfacePointerBody ( iid, interfacePointer ), false );
     }
 
-    void setDeffered(boolean deffered)
-	{
-    	member.setDeffered(true);
-	}
-
-	static JIInterfacePointer decode(NetworkDataRepresentation ndr,List defferedPointers, int FLAG,Map additionalData)
-	{
-		JIInterfacePointer ptr = new JIInterfacePointer();
-		if((FLAG & JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2) == JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2)
-		{
-			ptr.member = (JIPointer)JIMarshalUnMarshalHelper.deSerialize(ndr,new JIPointer(JIInterfacePointerBody.class,true),defferedPointers,FLAG,additionalData);
-		}
-		else
-		{
-			ptr.member = (JIPointer)JIMarshalUnMarshalHelper.deSerialize(ndr,new JIPointer(JIInterfacePointerBody.class),defferedPointers,FLAG,additionalData);
-		}
-		//the pointer is null, no point of it's wrapper being present, so return null from here as well
-		if (ptr.member.isNull())
-		{
-			ptr = null;
-		}
-		return ptr;
-	}
-
-	/**
-	 * @exclude
-	 * @return
-	 */
-    int getObjectType()
+    void setDeffered ( boolean deffered )
     {
-    	return ((JIInterfacePointerBody)(member.getReferent())).getObjectType();
+        member.setDeffered ( true );
+    }
+
+    static JIInterfacePointer decode ( NetworkDataRepresentation ndr, List defferedPointers, int FLAG, Map additionalData )
+    {
+        JIInterfacePointer ptr = new JIInterfacePointer ();
+        if ( ( FLAG & JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2 ) == JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2 )
+        {
+            ptr.member = (JIPointer)JIMarshalUnMarshalHelper.deSerialize ( ndr, new JIPointer ( JIInterfacePointerBody.class, true ), defferedPointers, FLAG, additionalData );
+        }
+        else
+        {
+            ptr.member = (JIPointer)JIMarshalUnMarshalHelper.deSerialize ( ndr, new JIPointer ( JIInterfacePointerBody.class ), defferedPointers, FLAG, additionalData );
+        }
+        //the pointer is null, no point of it's wrapper being present, so return null from here as well
+        if ( ptr.member.isNull () )
+        {
+            ptr = null;
+        }
+        return ptr;
+    }
+
+    /**
+     * @exclude
+     * @return
+     */
+    int getObjectType ()
+    {
+        return ( (JIInterfacePointerBody) ( member.getReferent () ) ).getObjectType ();
     }
 
     /**
@@ -129,139 +149,136 @@ final class JIInterfacePointer implements Serializable {
      * @param objectType
      * @return
      */
-    Object getObjectReference(int objectType)
+    Object getObjectReference ( int objectType )
     {
-    	return ((JIInterfacePointerBody)(member.getReferent())).getObjectReference(objectType);
+        return ( (JIInterfacePointerBody) ( member.getReferent () ) ).getObjectReference ( objectType );
     }
 
-    /**Returns the Interface Identifier for this MIP.
-     *
+    /**
+     * Returns the Interface Identifier for this MIP.
+     * 
      * @return String representation of 128 bit uuid.
      */
-    public String getIID()
+    public String getIID ()
     {
-    	return ((JIInterfacePointerBody)(member.getReferent())).getIID();
+        return ( (JIInterfacePointerBody) ( member.getReferent () ) ).getIID ();
     }
 
     /**
      * @exclude
      * @return
      */
-    public String getIPID()
+    public String getIPID ()
     {
-    	return ((JIInterfacePointerBody)(member.getReferent())).getIPID();
+        return ( (JIInterfacePointerBody) ( member.getReferent () ) ).getIPID ();
     }
 
     /**
      * @exclude
      * @return
      */
-    public byte[] getOID()
+    public byte[] getOID ()
     {
-    	return ((JIStdObjRef)((JIInterfacePointerBody)(member.getReferent())).getObjectReference(JIInterfacePointer.OBJREF_STANDARD)).getObjectId();
+        return ( (JIStdObjRef) ( (JIInterfacePointerBody) ( member.getReferent () ) ).getObjectReference ( JIInterfacePointer.OBJREF_STANDARD ) ).getObjectId ();
     }
 
     /**
      * @exclude
      * @return
      */
-    byte[] getOXID()
+    byte[] getOXID ()
     {
-    	return ((JIStdObjRef)((JIInterfacePointerBody)(member.getReferent())).getObjectReference(JIInterfacePointer.OBJREF_STANDARD)).getOxid();
+        return ( (JIStdObjRef) ( (JIInterfacePointerBody) ( member.getReferent () ) ).getObjectReference ( JIInterfacePointer.OBJREF_STANDARD ) ).getOxid ();
     }
 
     /**
      * @exclude
      * @return
      */
-    JIDualStringArray getStringBindings()
+    JIDualStringArray getStringBindings ()
     {
-    	return ((JIInterfacePointerBody)(member.getReferent())).getStringBindings();
+        return ( (JIInterfacePointerBody) ( member.getReferent () ) ).getStringBindings ();
     }
 
     /**
      * @exclude
      * @return
      */
-    int getLength()
+    int getLength ()
     {
-    	return ((JIInterfacePointerBody)(member.getReferent())).getLength();
+        return ( (JIInterfacePointerBody) ( member.getReferent () ) ).getLength ();
     }
 
-
-    void encode (NetworkDataRepresentation ndr,List defferedPointers, int FLAG)
+    void encode ( NetworkDataRepresentation ndr, List defferedPointers, int FLAG )
     {
 
-    	if ((FLAG & JIFlags.FLAG_REPRESENTATION_SET_JIINTERFACEPTR_NULL_FOR_VARIANT) == JIFlags.FLAG_REPRESENTATION_SET_JIINTERFACEPTR_NULL_FOR_VARIANT)
-		{
-    		//just encode a null.
-    		JIMarshalUnMarshalHelper.serialize(ndr,Integer.class,new Integer(0),defferedPointers,FLAG);
-    		return;
-		}
-    	JIMarshalUnMarshalHelper.serialize(ndr,member.getClass(),member,defferedPointers,FLAG);
+        if ( ( FLAG & JIFlags.FLAG_REPRESENTATION_SET_JIINTERFACEPTR_NULL_FOR_VARIANT ) == JIFlags.FLAG_REPRESENTATION_SET_JIINTERFACEPTR_NULL_FOR_VARIANT )
+        {
+            //just encode a null.
+            JIMarshalUnMarshalHelper.serialize ( ndr, Integer.class, new Integer ( 0 ), defferedPointers, FLAG );
+            return;
+        }
+        JIMarshalUnMarshalHelper.serialize ( ndr, member.getClass (), member, defferedPointers, FLAG );
     }
 
-
-
-    public String toString()
-	{
-		String retVal = "JIInterfacePointer[IID:" + getIID() + " , ObjRef: " + getObjectReference(JIInterfacePointer.OBJREF_STANDARD) + "]";
-		return retVal;
-	}
-
-    public static boolean isOxidEqual(JIInterfacePointer src, JIInterfacePointer target)
+    public String toString ()
     {
-    	if (src == null || target == null)
-    	{
-    		throw new NullPointerException();
-    	}
-
-    	return Arrays.equals(src.getOXID(), target.getOXID());
+        String retVal = "JIInterfacePointer[IID:" + getIID () + " , ObjRef: " + getObjectReference ( JIInterfacePointer.OBJREF_STANDARD ) + "]";
+        return retVal;
     }
 
-//    public static void main(String[] args) {
-//
-//
-//		byte[] buffer = new byte[183];
-//		FileInputStream inputStream;
-//		try {
-//			inputStream = new FileInputStream("F:/tmp/experiment/rawip2");
-//			inputStream.read(new byte[13],0,13);
-//			inputStream.read(buffer,0,183);
-//		} catch (Exception e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		NetworkDataRepresentation ndr = new NetworkDataRepresentation();
-//		NdrBuffer ndrBuffer = new NdrBuffer(buffer,0);
-//		ndr.setBuffer(ndrBuffer);
-//		ndrBuffer.length = 183;
-//
-//    	JIInterfacePointer ptr = JIInterfacePointer.decode(ndr, new ArrayList(), 0, new HashMap());
-//    	try {
-//    		JISystem.getLogger().setLevel(Level.FINEST);
-//			JISystem.setInBuiltLogHandler(false);
-//
-//		} catch (SecurityException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//
-//    	JISession session = JISession.createSession("deepspace9", "administrator", "enterprise");
-//    	session.useSessionSecurity(true);
-//    	try {
-//    		JIComServer comServer = new JIComServer(session,ptr,null);
-//			IJIComObject comObject = comServer.getInstance();
-//			comObject.queryInterface("87bc18dc-c8b3-11d5-ae96-00b0d0e93ca1");
-//		} catch (JIException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//	}
+    public static boolean isOxidEqual ( JIInterfacePointer src, JIInterfacePointer target )
+    {
+        if ( src == null || target == null )
+        {
+            throw new NullPointerException ();
+        }
 
+        return Arrays.equals ( src.getOXID (), target.getOXID () );
+    }
+
+    //    public static void main(String[] args) {
+    //
+    //
+    //		byte[] buffer = new byte[183];
+    //		FileInputStream inputStream;
+    //		try {
+    //			inputStream = new FileInputStream("F:/tmp/experiment/rawip2");
+    //			inputStream.read(new byte[13],0,13);
+    //			inputStream.read(buffer,0,183);
+    //		} catch (Exception e) {
+    //			// TODO Auto-generated catch block
+    //			e.printStackTrace();
+    //		}
+    //		NetworkDataRepresentation ndr = new NetworkDataRepresentation();
+    //		NdrBuffer ndrBuffer = new NdrBuffer(buffer,0);
+    //		ndr.setBuffer(ndrBuffer);
+    //		ndrBuffer.length = 183;
+    //
+    //    	JIInterfacePointer ptr = JIInterfacePointer.decode(ndr, new ArrayList(), 0, new HashMap());
+    //    	try {
+    //    		JISystem.getLogger().setLevel(Level.FINEST);
+    //			JISystem.setInBuiltLogHandler(false);
+    //
+    //		} catch (SecurityException e1) {
+    //			// TODO Auto-generated catch block
+    //			e1.printStackTrace();
+    //		} catch (IOException e1) {
+    //			// TODO Auto-generated catch block
+    //			e1.printStackTrace();
+    //		}
+    //
+    //    	JISession session = JISession.createSession("deepspace9", "administrator", "enterprise");
+    //    	session.useSessionSecurity(true);
+    //    	try {
+    //    		JIComServer comServer = new JIComServer(session,ptr,null);
+    //			IJIComObject comObject = comServer.getInstance();
+    //			comObject.queryInterface("87bc18dc-c8b3-11d5-ae96-00b0d0e93ca1");
+    //		} catch (JIException e) {
+    //			// TODO Auto-generated catch block
+    //			e.printStackTrace();
+    //		}
+    //	}
 
 }
 
@@ -270,243 +287,259 @@ final class JIInterfacePointer implements Serializable {
  */
 class JIInterfacePointerBody implements Serializable
 {
-		private static final long serialVersionUID = 2597456459096838320L;
-		private String iid = null;
-	    private int objectType = -1;
-	    private JIStdObjRef stdObjRef = null;
-	    private int length = -1;
-	    private JIDualStringArray resolverAddr = null;
-	    private int port = -1; //to be used when doing local resolution.
+    private static final long serialVersionUID = 2597456459096838320L;
 
-	    private JIInterfacePointerBody() {}
+    private String iid = null;
 
-	    /** Called from Oxid Resolver master, the resolver address are put in here itself
-	     *
-	     * @param iid
-	     * @param ipid
-	     * @param oxid
-	     * @param oid
-	     */
-	    JIInterfacePointerBody(String iid,int port,JIStdObjRef objref)
-	    {
-	    	this.iid = iid;
-	    	this.stdObjRef = objref;
-	    	this.port = port;
-	    	resolverAddr = new JIDualStringArray(port);
-	    	length = 40 + 4 + 4 + 16 + resolverAddr.getLength();
-	    }
+    private int objectType = -1;
 
-	    JIInterfacePointerBody(String iid, JIInterfacePointer interfacePointer)
-		{
-			this.iid = iid;
-			stdObjRef = (JIStdObjRef)interfacePointer.getObjectReference(JIInterfacePointer.OBJREF_STANDARD);
-			resolverAddr = interfacePointer.getStringBindings();
-			length = 40 + 4 + 4 + 16 + resolverAddr.getLength();
-		}
+    private JIStdObjRef stdObjRef = null;
 
-		static JIInterfacePointerBody decode(NetworkDataRepresentation ndr, int Flags)
-		{
-			if((Flags & JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2) == JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2)
-			{
-				return decode2(ndr);
-			}
-			int length = ndr.readUnsignedLong();
-			ndr.readUnsignedLong();//length
+    private int length = -1;
 
-			JIInterfacePointerBody ptr = new JIInterfacePointerBody();
-			ptr.length = length;
-			//check for MEOW
-			byte b[] = new byte[4];
-			ndr.readOctetArray(b,0,4);
+    private JIDualStringArray resolverAddr = null;
 
-			int i = 0;
-			while (i != 4)
-			{
-				//not MEOW then what ?
-				if (b[i] != JIInterfacePointer.OBJREF_SIGNATURE[i])
-				{
-					return null;
-				}
-				i++;
-			}
+    private int port = -1; //to be used when doing local resolution.
 
-			//TODO only STDOBJREF supported for now
+    private JIInterfacePointerBody ()
+    {
+    }
 
-			if ((ptr.objectType = ndr.readUnsignedLong()) != JIInterfacePointer.OBJREF_STANDARD)
-			{
-				return null;
-			}
+    /**
+     * Called from Oxid Resolver master, the resolver address are put in here
+     * itself
+     * 
+     * @param iid
+     * @param ipid
+     * @param oxid
+     * @param oid
+     */
+    JIInterfacePointerBody ( String iid, int port, JIStdObjRef objref )
+    {
+        this.iid = iid;
+        this.stdObjRef = objref;
+        this.port = port;
+        resolverAddr = new JIDualStringArray ( port );
+        length = 40 + 4 + 4 + 16 + resolverAddr.getLength ();
+    }
 
-			try {
-				rpc.core.UUID ipid2 = new rpc.core.UUID();
-				ipid2.decode(ndr,ndr.getBuffer());
-				ptr.iid = ipid2.toString();
-			} catch (NdrException e) {
-				JISystem.getLogger().throwing("JIInterfacePointer","decode",e);
-			}
+    JIInterfacePointerBody ( String iid, JIInterfacePointer interfacePointer )
+    {
+        this.iid = iid;
+        stdObjRef = (JIStdObjRef)interfacePointer.getObjectReference ( JIInterfacePointer.OBJREF_STANDARD );
+        resolverAddr = interfacePointer.getStringBindings ();
+        length = 40 + 4 + 4 + 16 + resolverAddr.getLength ();
+    }
 
-			ptr.stdObjRef = JIStdObjRef.decode(ndr);
+    static JIInterfacePointerBody decode ( NetworkDataRepresentation ndr, int Flags )
+    {
+        if ( ( Flags & JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2 ) == JIFlags.FLAG_REPRESENTATION_INTERFACEPTR_DECODE2 )
+        {
+            return decode2 ( ndr );
+        }
+        int length = ndr.readUnsignedLong ();
+        ndr.readUnsignedLong ();//length
 
-			ptr.resolverAddr = JIDualStringArray.decode(ndr);
+        JIInterfacePointerBody ptr = new JIInterfacePointerBody ();
+        ptr.length = length;
+        //check for MEOW
+        byte b[] = new byte[4];
+        ndr.readOctetArray ( b, 0, 4 );
 
-			return ptr;
-		}
+        int i = 0;
+        while ( i != 4 )
+        {
+            //not MEOW then what ?
+            if ( b[i] != JIInterfacePointer.OBJREF_SIGNATURE[i] )
+            {
+                return null;
+            }
+            i++;
+        }
 
-		static JIInterfacePointerBody decode2(NetworkDataRepresentation ndr)
-		{
+        //TODO only STDOBJREF supported for now
 
+        if ( ( ptr.objectType = ndr.readUnsignedLong () ) != JIInterfacePointer.OBJREF_STANDARD )
+        {
+            return null;
+        }
 
-			JIInterfacePointerBody ptr = new JIInterfacePointerBody();
+        try
+        {
+            rpc.core.UUID ipid2 = new rpc.core.UUID ();
+            ipid2.decode ( ndr, ndr.getBuffer () );
+            ptr.iid = ipid2.toString ();
+        }
+        catch ( NdrException e )
+        {
+            JISystem.getLogger ().throwing ( "JIInterfacePointer", "decode", e );
+        }
 
-			//check for MEOW
-			byte b[] = new byte[4];
-			ndr.readOctetArray(b,0,4);
+        ptr.stdObjRef = JIStdObjRef.decode ( ndr );
 
-			int i = 0;
-			while (i != 4)
-			{
-				//not MEOW then what ?
-				if (b[i] != JIInterfacePointer.OBJREF_SIGNATURE[i])
-				{
-					return null;
-				}
-				i++;
-			}
+        ptr.resolverAddr = JIDualStringArray.decode ( ndr );
 
-			//TODO only STDOBJREF supported for now
+        return ptr;
+    }
 
-			if ((ptr.objectType = ndr.readUnsignedLong()) != JIInterfacePointer.OBJREF_STANDARD)
-			{
-				return null;
-			}
+    static JIInterfacePointerBody decode2 ( NetworkDataRepresentation ndr )
+    {
 
-			try {
-				rpc.core.UUID ipid2 = new rpc.core.UUID();
-				ipid2.decode(ndr,ndr.getBuffer());
-				ptr.iid = ipid2.toString();
-			} catch (NdrException e) {
-				JISystem.getLogger().throwing("JIInterfacePointer","decode",e);
-			}
+        JIInterfacePointerBody ptr = new JIInterfacePointerBody ();
 
-			ptr.stdObjRef = JIStdObjRef.decode(ndr);
+        //check for MEOW
+        byte b[] = new byte[4];
+        ndr.readOctetArray ( b, 0, 4 );
 
-			ptr.resolverAddr = JIDualStringArray.decode(ndr);
+        int i = 0;
+        while ( i != 4 )
+        {
+            //not MEOW then what ?
+            if ( b[i] != JIInterfacePointer.OBJREF_SIGNATURE[i] )
+            {
+                return null;
+            }
+            i++;
+        }
 
-			return ptr;
-		}
+        //TODO only STDOBJREF supported for now
 
-		/**
-		 * @exclude
-		 * @return
-		 */
-	    int getObjectType()
-	    {
-	    	return objectType;
-	    }
+        if ( ( ptr.objectType = ndr.readUnsignedLong () ) != JIInterfacePointer.OBJREF_STANDARD )
+        {
+            return null;
+        }
 
-	    /**
-	     * @exclude
-	     * @param objectType
-	     * @return
-	     */
-	    Object getObjectReference(int objectType)
-	    {
-	    	if (objectType == JIInterfacePointer.OBJREF_STANDARD)
-	    	{
-	    		return stdObjRef;
-	    	}
-	    	else
-	    	{
-	    		return null;
-	    	}
-	    }
+        try
+        {
+            rpc.core.UUID ipid2 = new rpc.core.UUID ();
+            ipid2.decode ( ndr, ndr.getBuffer () );
+            ptr.iid = ipid2.toString ();
+        }
+        catch ( NdrException e )
+        {
+            JISystem.getLogger ().throwing ( "JIInterfacePointer", "decode", e );
+        }
 
-	    /**Returns the Interface Identifier for this MIP.
-	     *
-	     * @return String representation of 128 bit uuid.
-	     */
-	    String getIID()
-	    {
-	    	return iid;
-	    }
+        ptr.stdObjRef = JIStdObjRef.decode ( ndr );
 
-	    /**
-	     * @exclude
-	     * @return
-	     */
-	    String getIPID()
-	    {
-	    	return stdObjRef.getIpid();
-	    }
+        ptr.resolverAddr = JIDualStringArray.decode ( ndr );
 
-	    /**
-	     * @exclude
-	     * @return
-	     */
-	    byte[] getOID()
-	    {
-	    	return stdObjRef.getObjectId();
-	    }
+        return ptr;
+    }
 
-	    /**
-	     * @exclude
-	     * @return
-	     */
-	    JIDualStringArray getStringBindings()
-	    {
-	    	return resolverAddr;
-	    }
+    /**
+     * @exclude
+     * @return
+     */
+    int getObjectType ()
+    {
+        return objectType;
+    }
 
-	    /**
-	     * @exclude
-	     * @return
-	     */
-	    int getLength()
-	    {
-	    	return length;
-	    }
+    /**
+     * @exclude
+     * @param objectType
+     * @return
+     */
+    Object getObjectReference ( int objectType )
+    {
+        if ( objectType == JIInterfacePointer.OBJREF_STANDARD )
+        {
+            return stdObjRef;
+        }
+        else
+        {
+            return null;
+        }
+    }
 
+    /**
+     * Returns the Interface Identifier for this MIP.
+     * 
+     * @return String representation of 128 bit uuid.
+     */
+    String getIID ()
+    {
+        return iid;
+    }
 
-	    void encode(NetworkDataRepresentation ndr, int FLAGS)
-	    {
+    /**
+     * @exclude
+     * @return
+     */
+    String getIPID ()
+    {
+        return stdObjRef.getIpid ();
+    }
 
-	    	//now for length
-	    	//the length for STDOBJREF is fixed 40 bytes : 4,4,8,8,16.
-	    	//Dual string array has to be computed, since that can vary. MEOW = 4., flag stdobjref = 4
-	    	// + 16 bytes of ipid
-	    	int length = 40 + 4 + 4 + 16 + resolverAddr.getLength();
+    /**
+     * @exclude
+     * @return
+     */
+    byte[] getOID ()
+    {
+        return stdObjRef.getObjectId ();
+    }
 
-	    	ndr.writeUnsignedLong(length);
-	    	ndr.writeUnsignedLong(length);
+    /**
+     * @exclude
+     * @return
+     */
+    JIDualStringArray getStringBindings ()
+    {
+        return resolverAddr;
+    }
 
-	    	ndr.writeOctetArray(JIInterfacePointer.OBJREF_SIGNATURE,0,4);
-	    	//std ref
-	    	ndr.writeUnsignedLong(JIInterfacePointer.SORF_OXRES1);
+    /**
+     * @exclude
+     * @return
+     */
+    int getLength ()
+    {
+        return length;
+    }
 
-	    	try {
-				rpc.core.UUID ipid2 = new rpc.core.UUID(iid);
+    void encode ( NetworkDataRepresentation ndr, int FLAGS )
+    {
 
-				if ((FLAGS & JIFlags.FLAG_REPRESENTATION_USE_IUNKNOWN_IID) == JIFlags.FLAG_REPRESENTATION_USE_IUNKNOWN_IID )
-				{
-					ipid2 = new rpc.core.UUID(IJIComObject.IID);
-				}
-				else if ((FLAGS & JIFlags.FLAG_REPRESENTATION_USE_IDISPATCH_IID) == JIFlags.FLAG_REPRESENTATION_USE_IDISPATCH_IID)
-				{
-					ipid2 = new rpc.core.UUID(IJIDispatch.IID);
-				}
+        //now for length
+        //the length for STDOBJREF is fixed 40 bytes : 4,4,8,8,16.
+        //Dual string array has to be computed, since that can vary. MEOW = 4., flag stdobjref = 4
+        // + 16 bytes of ipid
+        int length = 40 + 4 + 4 + 16 + resolverAddr.getLength ();
 
-				ipid2.encode(ndr,ndr.getBuffer());
-			} catch (NdrException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        ndr.writeUnsignedLong ( length );
+        ndr.writeUnsignedLong ( length );
 
-			stdObjRef.encode(ndr);
+        ndr.writeOctetArray ( JIInterfacePointer.OBJREF_SIGNATURE, 0, 4 );
+        //std ref
+        ndr.writeUnsignedLong ( JIInterfacePointer.SORF_OXRES1 );
 
-			resolverAddr.encode(ndr);
+        try
+        {
+            rpc.core.UUID ipid2 = new rpc.core.UUID ( iid );
 
+            if ( ( FLAGS & JIFlags.FLAG_REPRESENTATION_USE_IUNKNOWN_IID ) == JIFlags.FLAG_REPRESENTATION_USE_IUNKNOWN_IID )
+            {
+                ipid2 = new rpc.core.UUID ( IJIComObject.IID );
+            }
+            else if ( ( FLAGS & JIFlags.FLAG_REPRESENTATION_USE_IDISPATCH_IID ) == JIFlags.FLAG_REPRESENTATION_USE_IDISPATCH_IID )
+            {
+                ipid2 = new rpc.core.UUID ( IJIDispatch.IID );
+            }
 
-	    }
+            ipid2.encode ( ndr, ndr.getBuffer () );
+        }
+        catch ( NdrException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace ();
+        }
 
+        stdObjRef.encode ( ndr );
+
+        resolverAddr.encode ( ndr );
+
+    }
 
 }

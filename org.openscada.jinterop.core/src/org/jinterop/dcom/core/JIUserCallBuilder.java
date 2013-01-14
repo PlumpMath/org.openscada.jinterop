@@ -21,33 +21,36 @@ import ndr.NetworkDataRepresentation;
 
 //Users can implement this object to provide for custom handling of there objects
 /**
- * Users can implement this class to provide for custom handling of there objects
- *
+ * Users can implement this class to provide for custom handling of there
+ * objects
+ * 
  * @since 2.0 (formerly JIUserCallObject)
  */
-public abstract class JIUserCallBuilder extends JICallBuilder {
+public abstract class JIUserCallBuilder extends JICallBuilder
+{
 
-	public abstract void writeObject(NetworkDataRepresentation ndr);
-	public abstract void readObject(NetworkDataRepresentation ndr);
+    public abstract void writeObject ( NetworkDataRepresentation ndr );
 
-	public JIUserCallBuilder(boolean dispatchNotSupported)
-	{
-		super(dispatchNotSupported);
-	}
+    public abstract void readObject ( NetworkDataRepresentation ndr );
 
-	public JIUserCallBuilder()
-	{
-		super();
-	}
+    public JIUserCallBuilder ( boolean dispatchNotSupported )
+    {
+        super ( dispatchNotSupported );
+    }
 
-	public void write(NetworkDataRepresentation ndr)
-	{
-		writeObject(ndr);
-	}
+    public JIUserCallBuilder ()
+    {
+        super ();
+    }
 
-	public void read(NetworkDataRepresentation ndr)
-	{
-		readObject(ndr);
-	}
+    public void write ( NetworkDataRepresentation ndr )
+    {
+        writeObject ( ndr );
+    }
+
+    public void read ( NetworkDataRepresentation ndr )
+    {
+        readObject ( ndr );
+    }
 
 }

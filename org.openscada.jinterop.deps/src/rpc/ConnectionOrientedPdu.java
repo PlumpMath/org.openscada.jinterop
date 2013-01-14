@@ -22,7 +22,8 @@ import ndr.NdrBuffer;
 import ndr.NdrObject;
 import ndr.NetworkDataRepresentation;
 
-public abstract class ConnectionOrientedPdu extends NdrObject implements ProtocolDataUnit {
+public abstract class ConnectionOrientedPdu extends NdrObject implements ProtocolDataUnit
+{
 
     public static final int CONNECTION_ORIENTED_MAJOR_VERSION = 5;
 
@@ -63,7 +64,7 @@ public abstract class ConnectionOrientedPdu extends NdrObject implements Protoco
 
     /**
      * Flag indicating a valid object UUID was specified and is present
-     * in the optional object field.  If not set, the object field is
+     * in the optional object field. If not set, the object field is
      * omitted.
      */
     public static final int PFC_OBJECT_UUID = 0x80;
@@ -102,131 +103,157 @@ public abstract class ConnectionOrientedPdu extends NdrObject implements Protoco
 
     private Format format;
 
-    public int getMajorVersion() {
+    public int getMajorVersion ()
+    {
         return CONNECTION_ORIENTED_MAJOR_VERSION;
     }
 
-    public int getMinorVersion() {
+    public int getMinorVersion ()
+    {
         return minorVersion;
     }
 
-    public void setMinorVersion(int minorVersion) {
+    public void setMinorVersion ( int minorVersion )
+    {
         this.minorVersion = minorVersion;
     }
 
-    public Format getFormat() {
-        return (format != null) ? format : (format = Format.DEFAULT_FORMAT);
+    public Format getFormat ()
+    {
+        return ( format != null ) ? format : ( format = Format.DEFAULT_FORMAT );
     }
 
-    public void setFormat(Format format) {
+    public void setFormat ( Format format )
+    {
         this.format = format;
     }
 
-    public int getFlags() {
+    public int getFlags ()
+    {
         return flags;
     }
 
-    public void setFlags(int flags) {
+    public void setFlags ( int flags )
+    {
         this.flags = flags;
     }
 
-    public boolean getFlag(int flag) {
-        return (getFlags() & flag) != 0;
+    public boolean getFlag ( int flag )
+    {
+        return ( getFlags () & flag ) != 0;
     }
 
-    public void setFlag(int flag, boolean value) {
-        setFlags(value ? (getFlags() | flag) :
-                (getFlags() & ~flag));
+    public void setFlag ( int flag, boolean value )
+    {
+        setFlags ( value ? ( getFlags () | flag ) : ( getFlags () & ~flag ) );
     }
 
-    public int getCallId() {
+    public int getCallId ()
+    {
         return callId;
     }
 
-    public void setCallId(int callId) {
-    	useCallIdCounter = false;
+    public void setCallId ( int callId )
+    {
+        useCallIdCounter = false;
         this.callId = callId;
     }
 
-    public int getFragmentLength() {
+    public int getFragmentLength ()
+    {
         return fragLength;
     }
 
-    protected void setFragmentLength(int fragLength) {
+    protected void setFragmentLength ( int fragLength )
+    {
         this.fragLength = fragLength;
     }
 
-    public int getAuthenticatorLength() {
+    public int getAuthenticatorLength ()
+    {
         return authLength;
     }
 
-    protected void setAuthenticatorLength(int authLength) {
+    protected void setAuthenticatorLength ( int authLength )
+    {
         this.authLength = authLength;
     }
 
-    public void decode(NetworkDataRepresentation ndr, NdrBuffer src) {
-        ndr.setBuffer(src);
-        readPdu(ndr);
+    public void decode ( NetworkDataRepresentation ndr, NdrBuffer src )
+    {
+        ndr.setBuffer ( src );
+        readPdu ( ndr );
     }
 
-    public void encode(NetworkDataRepresentation ndr, NdrBuffer dst) {
-        ndr.setBuffer(dst);
-        ndr.setFormat(getFormat());
-        writePdu(ndr);
-        NdrBuffer buffer = ndr.getBuffer();
-        int length = buffer.getLength();
-        setFragmentLength(length);
+    public void encode ( NetworkDataRepresentation ndr, NdrBuffer dst )
+    {
+        ndr.setBuffer ( dst );
+        ndr.setFormat ( getFormat () );
+        writePdu ( ndr );
+        NdrBuffer buffer = ndr.getBuffer ();
+        int length = buffer.getLength ();
+        setFragmentLength ( length );
         // write the header lengths, now that we know them.
-        buffer.setIndex(FRAG_LENGTH_OFFSET);
-        ndr.writeUnsignedShort(length);
-        ndr.writeUnsignedShort(getAuthenticatorLength());
-        buffer.setIndex(length);
+        buffer.setIndex ( FRAG_LENGTH_OFFSET );
+        ndr.writeUnsignedShort ( length );
+        ndr.writeUnsignedShort ( getAuthenticatorLength () );
+        buffer.setIndex ( length );
     }
 
-    protected void readPdu(NetworkDataRepresentation ndr) {
-        readHeader(ndr);
-        readBody(ndr);
+    protected void readPdu ( NetworkDataRepresentation ndr )
+    {
+        readHeader ( ndr );
+        readBody ( ndr );
     }
 
-    protected void writePdu(NetworkDataRepresentation ndr) {
-        writeHeader(ndr);
-        writeBody(ndr);
+    protected void writePdu ( NetworkDataRepresentation ndr )
+    {
+        writeHeader ( ndr );
+        writeBody ( ndr );
     }
 
-    protected void readHeader(NetworkDataRepresentation ndr) {
-        if (ndr.readUnsignedSmall() != CONNECTION_ORIENTED_MAJOR_VERSION) {
-            throw new IllegalStateException("Version mismatch.");
+    protected void readHeader ( NetworkDataRepresentation ndr )
+    {
+        if ( ndr.readUnsignedSmall () != CONNECTION_ORIENTED_MAJOR_VERSION )
+        {
+            throw new IllegalStateException ( "Version mismatch." );
         }
         // read minor version
-        setMinorVersion(ndr.readUnsignedSmall());
-        if (getType() != ndr.readUnsignedSmall()) {
-            throw new IllegalArgumentException("Incorrect PDU type.");
+        setMinorVersion ( ndr.readUnsignedSmall () );
+        if ( getType () != ndr.readUnsignedSmall () )
+        {
+            throw new IllegalArgumentException ( "Incorrect PDU type." );
         }
-        setFlags(ndr.readUnsignedSmall());
-        Format format = ndr.readFormat(false);
-        setFormat(format);
-        ndr.setFormat(format);
-        setFragmentLength(ndr.readUnsignedShort());
-        setAuthenticatorLength(ndr.readUnsignedShort());
-        this.callId = ((int) ndr.readUnsignedLong());
+        setFlags ( ndr.readUnsignedSmall () );
+        Format format = ndr.readFormat ( false );
+        setFormat ( format );
+        ndr.setFormat ( format );
+        setFragmentLength ( ndr.readUnsignedShort () );
+        setAuthenticatorLength ( ndr.readUnsignedShort () );
+        this.callId = ( (int)ndr.readUnsignedLong () );
     }
 
-    protected void writeHeader(NetworkDataRepresentation ndr) {
-        ndr.writeUnsignedSmall((short) getMajorVersion());
-        ndr.writeUnsignedSmall((short) getMinorVersion());
-        ndr.writeUnsignedSmall((short) getType());
-        ndr.writeUnsignedSmall((short) getFlags());
-        ndr.writeFormat(false);
+    protected void writeHeader ( NetworkDataRepresentation ndr )
+    {
+        ndr.writeUnsignedSmall ( (short)getMajorVersion () );
+        ndr.writeUnsignedSmall ( (short)getMinorVersion () );
+        ndr.writeUnsignedSmall ( (short)getType () );
+        ndr.writeUnsignedSmall ( (short)getFlags () );
+        ndr.writeFormat ( false );
         // skip the fragment and auth lengths, since we don't have them yet.
-        ndr.writeUnsignedShort(0);
-        ndr.writeUnsignedShort(0);
-        ndr.writeUnsignedLong(useCallIdCounter ? callIdCounter++ : callId);
+        ndr.writeUnsignedShort ( 0 );
+        ndr.writeUnsignedShort ( 0 );
+        ndr.writeUnsignedLong ( useCallIdCounter ? callIdCounter++ : callId );
     }
 
-    protected void readBody(NetworkDataRepresentation ndr) { }
+    protected void readBody ( NetworkDataRepresentation ndr )
+    {
+    }
 
-    protected void writeBody(NetworkDataRepresentation ndr) { }
+    protected void writeBody ( NetworkDataRepresentation ndr )
+    {
+    }
 
-    public abstract int getType();
+    public abstract int getType ();
 
 }

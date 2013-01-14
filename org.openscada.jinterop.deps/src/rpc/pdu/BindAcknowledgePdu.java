@@ -15,8 +15,6 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc.pdu;
 
 import ndr.NetworkDataRepresentation;
@@ -24,7 +22,8 @@ import rpc.ConnectionOrientedPdu;
 import rpc.core.Port;
 import rpc.core.PresentationResult;
 
-public class BindAcknowledgePdu extends ConnectionOrientedPdu {
+public class BindAcknowledgePdu extends ConnectionOrientedPdu
+{
 
     public static final int BIND_ACKNOWLEDGE_TYPE = 0x0c;
 
@@ -38,80 +37,96 @@ public class BindAcknowledgePdu extends ConnectionOrientedPdu {
 
     private Port secondaryAddress;
 
-    public int getType() {
+    public int getType ()
+    {
         return BIND_ACKNOWLEDGE_TYPE;
     }
 
-    public int getMaxTransmitFragment() {
+    public int getMaxTransmitFragment ()
+    {
         return maxTransmitFragment;
     }
 
-    public void setMaxTransmitFragment(int maxTransmitFragment) {
+    public void setMaxTransmitFragment ( int maxTransmitFragment )
+    {
         this.maxTransmitFragment = maxTransmitFragment;
     }
 
-    public int getMaxReceiveFragment() {
+    public int getMaxReceiveFragment ()
+    {
         return maxReceiveFragment;
     }
 
-    public void setMaxReceiveFragment(int maxReceiveFragment) {
+    public void setMaxReceiveFragment ( int maxReceiveFragment )
+    {
         this.maxReceiveFragment = maxReceiveFragment;
     }
 
-    public int getAssociationGroupId() {
+    public int getAssociationGroupId ()
+    {
         return associationGroupId;
     }
 
-    public void setAssociationGroupId(int associationGroupId) {
+    public void setAssociationGroupId ( int associationGroupId )
+    {
         this.associationGroupId = associationGroupId;
     }
 
-    public Port getSecondaryAddress() {
+    public Port getSecondaryAddress ()
+    {
         return secondaryAddress;
     }
 
-    public void setSecondaryAddress(Port secondaryAddress) {
+    public void setSecondaryAddress ( Port secondaryAddress )
+    {
         this.secondaryAddress = secondaryAddress;
     }
 
-    public PresentationResult[] getResultList() {
+    public PresentationResult[] getResultList ()
+    {
         return resultList;
     }
 
-    public void setResultList(PresentationResult[] resultList) {
+    public void setResultList ( PresentationResult[] resultList )
+    {
         this.resultList = resultList;
     }
 
-    protected void readBody(NetworkDataRepresentation ndr) {
-        setMaxTransmitFragment(ndr.readUnsignedShort());
-        setMaxReceiveFragment(ndr.readUnsignedShort());
-        setAssociationGroupId((int) ndr.readUnsignedLong());
-        Port secondaryAddress = new Port();
-        secondaryAddress.read(ndr);
-        setSecondaryAddress(secondaryAddress);
-        ndr.getBuffer().align(4);
-        int count = ndr.readUnsignedSmall();
+    protected void readBody ( NetworkDataRepresentation ndr )
+    {
+        setMaxTransmitFragment ( ndr.readUnsignedShort () );
+        setMaxReceiveFragment ( ndr.readUnsignedShort () );
+        setAssociationGroupId ( (int)ndr.readUnsignedLong () );
+        Port secondaryAddress = new Port ();
+        secondaryAddress.read ( ndr );
+        setSecondaryAddress ( secondaryAddress );
+        ndr.getBuffer ().align ( 4 );
+        int count = ndr.readUnsignedSmall ();
         PresentationResult[] resultList = new PresentationResult[count];
-        for (int i = 0; i < count; i++) {
-            resultList[i] = new PresentationResult();
-            resultList[i].read(ndr);
+        for ( int i = 0; i < count; i++ )
+        {
+            resultList[i] = new PresentationResult ();
+            resultList[i].read ( ndr );
         }
-        setResultList(resultList);
+        setResultList ( resultList );
     }
 
-    protected void writeBody(NetworkDataRepresentation ndr) {
-        ndr.writeUnsignedShort(getMaxTransmitFragment());
-        ndr.writeUnsignedShort(getMaxReceiveFragment());
-        ndr.writeUnsignedLong(getAssociationGroupId());
-        Port secondaryAddress = getSecondaryAddress();
-        if (secondaryAddress == null) secondaryAddress = new Port();
-        secondaryAddress.write(ndr);
-        ndr.getBuffer().align(4);
-        PresentationResult[] resultList = getResultList();
+    protected void writeBody ( NetworkDataRepresentation ndr )
+    {
+        ndr.writeUnsignedShort ( getMaxTransmitFragment () );
+        ndr.writeUnsignedShort ( getMaxReceiveFragment () );
+        ndr.writeUnsignedLong ( getAssociationGroupId () );
+        Port secondaryAddress = getSecondaryAddress ();
+        if ( secondaryAddress == null )
+            secondaryAddress = new Port ();
+        secondaryAddress.write ( ndr );
+        ndr.getBuffer ().align ( 4 );
+        PresentationResult[] resultList = getResultList ();
         int count = resultList.length;
-        ndr.writeUnsignedSmall((short) count);
-        for (int i = 0; i < count; i++) {
-            resultList[i].write(ndr);
+        ndr.writeUnsignedSmall ( (short)count );
+        for ( int i = 0; i < count; i++ )
+        {
+            resultList[i].write ( ndr );
         }
     }
 

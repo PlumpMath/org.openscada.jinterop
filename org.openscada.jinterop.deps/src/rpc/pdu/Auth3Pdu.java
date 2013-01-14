@@ -15,27 +15,29 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc.pdu;
 
 import ndr.NetworkDataRepresentation;
 import rpc.ConnectionOrientedPdu;
 
-public class Auth3Pdu extends ConnectionOrientedPdu {
+public class Auth3Pdu extends ConnectionOrientedPdu
+{
 
     public static final int AUTH3_TYPE = 0x10;
 
-    public Auth3Pdu()
+    public Auth3Pdu ()
     {
-    	//Really useless value
-    	setCallId(0);
+        //Really useless value
+        setCallId ( 0 );
     }
-    public int getType() {
+
+    public int getType ()
+    {
         return AUTH3_TYPE;
     }
 
-    protected void writeBody(NetworkDataRepresentation ndr) {
-    	ndr.writeUnsignedLong(0);
+    protected void writeBody ( NetworkDataRepresentation ndr )
+    {
+        ndr.writeUnsignedLong ( 0 );
     }
 }

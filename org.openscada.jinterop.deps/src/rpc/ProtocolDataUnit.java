@@ -15,20 +15,19 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc;
 
 import ndr.Format;
 
-public interface ProtocolDataUnit {
+public interface ProtocolDataUnit
+{
 
-    public int getMajorVersion();
+    public int getMajorVersion ();
 
-    public int getType();
+    public int getType ();
 
-    public Format getFormat();
+    public Format getFormat ();
 
-    public void setFormat(Format format);
+    public void setFormat ( Format format );
 
 }

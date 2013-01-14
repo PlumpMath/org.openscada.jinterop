@@ -15,19 +15,18 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc;
 
 import java.io.IOException;
 import java.util.Iterator;
 
-public interface Fragmentable extends Cloneable {
+public interface Fragmentable extends Cloneable
+{
 
-    public Iterator fragment(int size);
+    public Iterator fragment ( int size );
 
-    public Fragmentable assemble(Iterator fragments) throws IOException;
+    public Fragmentable assemble ( Iterator fragments ) throws IOException;
 
-    public Object clone();
+    public Object clone ();
 
 }

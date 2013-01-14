@@ -17,26 +17,29 @@
 
 package org.jinterop.winreg;
 
-/** Policy handle for each key.
- *
+/**
+ * Policy handle for each key.
+ * 
  * @since 1.0
- *
  */
-public class JIPolicyHandle {
-	/**
-	 * Handle to the Key
-	 */
-	public final byte handle[] = new byte[20];
-	/**
-	 * True, if the key was newly created.
-	 */
-	public final boolean newlyCreated;
-	/**
-	 * @exclude
-	 * @param newlyCreated
-	 */
-	public JIPolicyHandle(boolean newlyCreated)
-	{
-		this.newlyCreated = newlyCreated;
-	}
+public class JIPolicyHandle
+{
+    /**
+     * Handle to the Key
+     */
+    public final byte handle[] = new byte[20];
+
+    /**
+     * True, if the key was newly created.
+     */
+    public final boolean newlyCreated;
+
+    /**
+     * @exclude
+     * @param newlyCreated
+     */
+    public JIPolicyHandle ( boolean newlyCreated )
+    {
+        this.newlyCreated = newlyCreated;
+    }
 }

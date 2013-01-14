@@ -20,40 +20,43 @@ package org.jinterop.dcom.core;
 import java.io.Serializable;
 import java.util.Arrays;
 
-final class JIOxid implements Serializable{
+final class JIOxid implements Serializable
+{
 
-	private static final long serialVersionUID = 3456725801334190150L;
-	byte[] oxid = null;
+    private static final long serialVersionUID = 3456725801334190150L;
 
-	JIOxid(byte[] oxid)
-	{
-		this.oxid = oxid;
-	}
+    byte[] oxid = null;
 
-	byte[] getOXID()
-	{
-		return oxid;
-	}
+    JIOxid ( byte[] oxid )
+    {
+        this.oxid = oxid;
+    }
 
-	public int hashCode()
-	{
-		int result = 1;
+    byte[] getOXID ()
+    {
+        return oxid;
+    }
+
+    public int hashCode ()
+    {
+        int result = 1;
         //from SUN
-        for (int i = 0;i< oxid.length;i++)
+        for ( int i = 0; i < oxid.length; i++ )
         {
             result = 31 * result + oxid[i];
         }
         return result;
-		//return Arrays.hashCode(oxid);
-	}
+        //return Arrays.hashCode(oxid);
+    }
 
-	 public boolean equals(Object obj)
-	 {
-		 if (!(obj instanceof JIOxid)) {
-			return false;
-		 }
+    public boolean equals ( Object obj )
+    {
+        if ( ! ( obj instanceof JIOxid ) )
+        {
+            return false;
+        }
 
-		 return Arrays.equals(oxid,((JIOxid)obj).getOXID());
-	 }
+        return Arrays.equals ( oxid, ( (JIOxid)obj ).getOXID () );
+    }
 
 }

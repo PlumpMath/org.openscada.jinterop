@@ -46,293 +46,355 @@ package gnu.crypto;
 /**
  * A placeholder for <i>names</i> and <i>literals</i> used throughout this
  * library.
- *
+ * 
  * @version $Revision: 1.24 $
  */
-public interface Registry {
+public interface Registry
+{
 
-   // Constants
-   // -------------------------------------------------------------------------
+    // Constants
+    // -------------------------------------------------------------------------
 
-   /** The name of our Provider. */
-   String GNU_CRYPTO = "GNU-CRYPTO";
+    /** The name of our Provider. */
+    String GNU_CRYPTO = "GNU-CRYPTO";
 
-   // Names of properties to use in Maps when initialising primitives .........
+    // Names of properties to use in Maps when initialising primitives .........
 
-   // Symmetric block cipher algorithms and synonyms...........................
+    // Symmetric block cipher algorithms and synonyms...........................
 
-   String ANUBIS_CIPHER =    "anubis";
-   String BLOWFISH_CIPHER =  "blowfish";
-   String DES_CIPHER =       "des";
-   String KHAZAD_CIPHER =    "khazad";
-   String RIJNDAEL_CIPHER =  "rijndael";
-   String SERPENT_CIPHER =   "serpent";
-   String SQUARE_CIPHER =    "square";
-   String TRIPLEDES_CIPHER = "tripledes";
-   String TWOFISH_CIPHER =   "twofish";
-   String CAST5_CIPHER =     "cast5";
-   String NULL_CIPHER =      "null";
+    String ANUBIS_CIPHER = "anubis";
 
-   /** AES is synonymous to Rijndael for 128-bit block size only. */
-   String AES_CIPHER = "aes";
+    String BLOWFISH_CIPHER = "blowfish";
 
-   /** TripleDES is also known as DESede. */
-   String DESEDE_CIPHER = "desede";
+    String DES_CIPHER = "des";
 
-   /** CAST5 is also known as CAST-128. */
-   String CAST128_CIPHER =  "cast128";
-   String CAST_128_CIPHER = "cast-128";
+    String KHAZAD_CIPHER = "khazad";
 
-   // Message digest algorithms and synonyms...................................
+    String RIJNDAEL_CIPHER = "rijndael";
 
-   String WHIRLPOOL_HASH = "whirlpool";
-   String RIPEMD128_HASH = "ripemd128";
-   String RIPEMD160_HASH = "ripemd160";
-   String SHA160_HASH =    "sha-160";
-   String SHA256_HASH =    "sha-256";
-   String SHA384_HASH =    "sha-384";
-   String SHA512_HASH =    "sha-512";
-   String TIGER_HASH =     "tiger";
-   String HAVAL_HASH =     "haval";
-   String MD5_HASH =       "md5";
-   String MD4_HASH =       "md4";
-   String MD2_HASH =       "md2";
+    String SERPENT_CIPHER = "serpent";
 
-   /** RIPEMD-128 is synonymous to RIPEMD128. */
-   String RIPEMD_128_HASH = "ripemd-128";
+    String SQUARE_CIPHER = "square";
 
-   /** RIPEMD-160 is synonymous to RIPEMD160. */
-   String RIPEMD_160_HASH = "ripemd-160";
+    String TRIPLEDES_CIPHER = "tripledes";
 
-   /** SHA-1 is synonymous to SHA-160. */
-   String SHA_1_HASH = "sha-1";
+    String TWOFISH_CIPHER = "twofish";
 
-   /** SHA1 is synonymous to SHA-160. */
-   String SHA1_HASH = "sha1";
+    String CAST5_CIPHER = "cast5";
 
-   /** SHA is synonymous to SHA-160. */
-   String SHA_HASH = "sha";
+    String NULL_CIPHER = "null";
 
-   // Symmetric block cipher modes of operations...............................
+    /** AES is synonymous to Rijndael for 128-bit block size only. */
+    String AES_CIPHER = "aes";
 
-   /** Electronic CodeBook mode. */
-   String ECB_MODE = "ecb";
+    /** TripleDES is also known as DESede. */
+    String DESEDE_CIPHER = "desede";
 
-   /** Counter (NIST) mode. */
-   String CTR_MODE = "ctr";
+    /** CAST5 is also known as CAST-128. */
+    String CAST128_CIPHER = "cast128";
 
-   /** Integer Counter Mode (David McGrew). */
-   String ICM_MODE = "icm";
+    String CAST_128_CIPHER = "cast-128";
 
-   /** Output Feedback Mode (NIST). */
-   String OFB_MODE = "ofb";
+    // Message digest algorithms and synonyms...................................
 
-   /** Cipher block chaining mode (NIST). */
-   String CBC_MODE = "cbc";
+    String WHIRLPOOL_HASH = "whirlpool";
 
-   /** Cipher feedback mode (NIST). */
-   String CFB_MODE = "cfb";
+    String RIPEMD128_HASH = "ripemd128";
 
-   // Padding scheme names and synonyms........................................
+    String RIPEMD160_HASH = "ripemd160";
 
-   /** PKCS#7 padding scheme. */
-   String PKCS7_PAD = "pkcs7";
+    String SHA160_HASH = "sha-160";
 
-   /** Trailing Bit Complement padding scheme. */
-   String TBC_PAD = "tbc";
+    String SHA256_HASH = "sha-256";
 
-   /** EME-PKCS1-v1_5 padding as described in section 7.2 in RFC-3447. */
-   String EME_PKCS1_V1_5_PAD = "eme-pkcs1-v1.5";
+    String SHA384_HASH = "sha-384";
 
-   // Pseudo-random number generators..........................................
+    String SHA512_HASH = "sha-512";
 
-   /** (Apparently) RC4 keystream PRNG. */
-   String ARCFOUR_PRNG = "arcfour";
+    String TIGER_HASH = "tiger";
 
-   /** We use "rc4" as an alias for "arcfour". */
-   String RC4_PRNG = "rc4";
+    String HAVAL_HASH = "haval";
 
-   /** PRNG based on David McGrew's Integer Counter Mode. */
-   String ICM_PRNG = "icm";
+    String MD5_HASH = "md5";
 
-   /** PRNG based on a designated hash function. */
-   String MD_PRNG = "md";
+    String MD4_HASH = "md4";
 
-   /** PRNG based on UMAC's Key Derivation Function. */
-   String UMAC_PRNG = "umac-kdf";
+    String MD2_HASH = "md2";
 
-   /**
-    * PRNG based on PBKDF2 from PKCS #5 v.2. This is suffixed with the name
-    * of a MAC to be used as a PRF.
-    */
-   String PBKDF2_PRNG_PREFIX = "pbkdf2-";
+    /** RIPEMD-128 is synonymous to RIPEMD128. */
+    String RIPEMD_128_HASH = "ripemd-128";
 
-   // Asymmetric keypair generators............................................
+    /** RIPEMD-160 is synonymous to RIPEMD160. */
+    String RIPEMD_160_HASH = "ripemd-160";
 
-   String DSS_KPG =  "dss";
-   String RSA_KPG =  "rsa";
-   String DH_KPG =   "dh";
-   String SRP_KPG =  "srp";
+    /** SHA-1 is synonymous to SHA-160. */
+    String SHA_1_HASH = "sha-1";
 
-   /** DSA is synonymous to DSS. */
-   String DSA_KPG = "dsa";
+    /** SHA1 is synonymous to SHA-160. */
+    String SHA1_HASH = "sha1";
 
-   // Signature-with-appendix schemes..........................................
+    /** SHA is synonymous to SHA-160. */
+    String SHA_HASH = "sha";
 
-   String DSS_SIG =            "dss";
-   String RSA_PSS_SIG =        "rsa-pss";
-   String RSA_PKCS1_V1_5_SIG = "rsa-pkcs1-v1.5";
+    // Symmetric block cipher modes of operations...............................
 
-   /** DSA is synonymous to DSS. */
-   String DSA_SIG = "dsa";
+    /** Electronic CodeBook mode. */
+    String ECB_MODE = "ecb";
 
-   // Key agreement protocols .................................................
+    /** Counter (NIST) mode. */
+    String CTR_MODE = "ctr";
 
-   String DH_KA =       "dh";
-   String ELGAMAL_KA =  "elgamal";
-   String SRP6_KA =     "srp6";
-   String SRP_SASL_KA = "srp-sasl";
-   String SRP_TLS_KA =  "srp-tls";
+    /** Integer Counter Mode (David McGrew). */
+    String ICM_MODE = "icm";
 
-   // Keyed-Hash Message Authentication Code ..................................
+    /** Output Feedback Mode (NIST). */
+    String OFB_MODE = "ofb";
 
-   /** Name prefix of every HMAC implementation. */
-   String HMAC_NAME_PREFIX = "hmac-";
+    /** Cipher block chaining mode (NIST). */
+    String CBC_MODE = "cbc";
 
-   // Other MAC algorithms ....................................................
+    /** Cipher feedback mode (NIST). */
+    String CFB_MODE = "cfb";
 
-   /** Message Authentication Code using Universal Hashing (Ted Krovetz). */
-   String UHASH32 = "uhash32";
-   String UMAC32 = "umac32";
-   /** The Truncated Multi-Modular Hash Function -v1 (David McGrew). */
-   String TMMH16 = "tmmh16";
-//   String TMMH32 = "tmmh32";
+    // Padding scheme names and synonyms........................................
 
-   // Format IDs used to identify how we externalise asymmetric keys ..........
-   String RAW_ENCODING = "gnu.crypto.raw.format";
-   int RAW_ENCODING_ID = 1;
+    /** PKCS#7 padding scheme. */
+    String PKCS7_PAD = "pkcs7";
 
-   // Magic bytes we generate/expect in externalised asymmetric keys ..........
-   // the four bytes represent G (0x47) for GNU, 1 (0x01) for Raw format,
-   // D (0x44) for DSS, R (0x52) for RSA, H (0x48) for Diffie-Hellman, or S
-   // (0x53) for SRP-6, and finally P (0x50) for Public, p (0x70) for private,
-   // or S (0x53) for signature.
-   byte[] MAGIC_RAW_DSS_PUBLIC_KEY =    new byte[] {0x47, RAW_ENCODING_ID, 0x44, 0x50};
-   byte[] MAGIC_RAW_DSS_PRIVATE_KEY =   new byte[] {0x47, RAW_ENCODING_ID, 0x44, 0x70};
-   byte[] MAGIC_RAW_DSS_SIGNATURE =     new byte[] {0x47, RAW_ENCODING_ID, 0x44, 0x53};
-   byte[] MAGIC_RAW_RSA_PUBLIC_KEY =    new byte[] {0x47, RAW_ENCODING_ID, 0x52, 0x50};
-   byte[] MAGIC_RAW_RSA_PRIVATE_KEY =   new byte[] {0x47, RAW_ENCODING_ID, 0x52, 0x70};
-   byte[] MAGIC_RAW_RSA_PSS_SIGNATURE = new byte[] {0x47, RAW_ENCODING_ID, 0x52, 0x53};
+    /** Trailing Bit Complement padding scheme. */
+    String TBC_PAD = "tbc";
 
-   byte[] MAGIC_RAW_DH_PUBLIC_KEY =     new byte[] {0x47, RAW_ENCODING_ID, 0x48, 0x50};
-   byte[] MAGIC_RAW_DH_PRIVATE_KEY =    new byte[] {0x47, RAW_ENCODING_ID, 0x48, 0x70};
+    /** EME-PKCS1-v1_5 padding as described in section 7.2 in RFC-3447. */
+    String EME_PKCS1_V1_5_PAD = "eme-pkcs1-v1.5";
 
-   byte[] MAGIC_RAW_SRP_PUBLIC_KEY =    new byte[] {0x47, RAW_ENCODING_ID, 0x53, 0x50};
-   byte[] MAGIC_RAW_SRP_PRIVATE_KEY =   new byte[] {0x47, RAW_ENCODING_ID, 0x53, 0x70};
+    // Pseudo-random number generators..........................................
 
-   // SASL Property names .....................................................
+    /** (Apparently) RC4 keystream PRNG. */
+    String ARCFOUR_PRNG = "arcfour";
 
-   String SASL_PREFIX = "gnu.crypto.sasl";
+    /** We use "rc4" as an alias for "arcfour". */
+    String RC4_PRNG = "rc4";
 
-   /** Name of username property. */
-   String SASL_USERNAME = SASL_PREFIX + ".username";
+    /** PRNG based on David McGrew's Integer Counter Mode. */
+    String ICM_PRNG = "icm";
 
-   /** Name of password property. */
-   String SASL_PASSWORD = SASL_PREFIX + ".password";
+    /** PRNG based on a designated hash function. */
+    String MD_PRNG = "md";
 
-   /** Name of authentication information provider packages. */
-   String SASL_AUTH_INFO_PROVIDER_PKGS = SASL_PREFIX + ".auth.info.provider.pkgs";
+    /** PRNG based on UMAC's Key Derivation Function. */
+    String UMAC_PRNG = "umac-kdf";
 
-   /** SASL authorization ID. */
-   String SASL_AUTHORISATION_ID = SASL_PREFIX + ".authorisation.ID";
+    /**
+     * PRNG based on PBKDF2 from PKCS #5 v.2. This is suffixed with the name
+     * of a MAC to be used as a PRF.
+     */
+    String PBKDF2_PRNG_PREFIX = "pbkdf2-";
 
-   /** SASL protocol. */
-   String SASL_PROTOCOL = SASL_PREFIX + ".protocol";
+    // Asymmetric keypair generators............................................
 
-   /** SASL Server name. */
-   String SASL_SERVER_NAME = SASL_PREFIX + ".server.name";
+    String DSS_KPG = "dss";
 
-   /** SASL Callback handler. */
-   String SASL_CALLBACK_HANDLER = SASL_PREFIX + ".callback.handler";
+    String RSA_KPG = "rsa";
 
-   /** SASL channel binding. */
-   String SASL_CHANNEL_BINDING = SASL_PREFIX + ".channel.binding";
+    String DH_KPG = "dh";
 
-   // SASL data element size limits ...........................................
+    String SRP_KPG = "srp";
 
-   /** The size limit, in bytes, of a SASL OS (Octet Sequence) element. */
-   int SASL_ONE_BYTE_MAX_LIMIT = 255;
+    /** DSA is synonymous to DSS. */
+    String DSA_KPG = "dsa";
 
-   /**
-    * The size limit, in bytes, of both a SASL MPI (Multi-Precision Integer)
-    * element and a SASL Text element.
-    */
-   int SASL_TWO_BYTE_MAX_LIMIT = 65535;
+    // Signature-with-appendix schemes..........................................
 
-   /** The size limit, in bytes, of a SASL EOS (Extended Octet Sequence) element. */
-   int SASL_FOUR_BYTE_MAX_LIMIT = 2147483383;
+    String DSS_SIG = "dss";
 
-   /** The size limit, in bytes, of a SASL Buffer. */
-   int SASL_BUFFER_MAX_LIMIT = 2147483643;
+    String RSA_PSS_SIG = "rsa-pss";
 
-   // Canonical names of SASL mechanisms ......................................
+    String RSA_PKCS1_V1_5_SIG = "rsa-pkcs1-v1.5";
 
-   String SASL_ANONYMOUS_MECHANISM = "ANONYMOUS";
-   String SASL_CRAM_MD5_MECHANISM = "CRAM-MD5";
-   String SASL_PLAIN_MECHANISM = "PLAIN";
-   String SASL_SRP_MECHANISM = "SRP";
+    /** DSA is synonymous to DSS. */
+    String DSA_SIG = "dsa";
 
-   // Canonical names of Integrity Protection algorithms ......................
+    // Key agreement protocols .................................................
 
-   String SASL_HMAC_MD5_IALG = "HMACwithMD5";
-   String SASL_HMAC_SHA_IALG = "HMACwithSHA";
+    String DH_KA = "dh";
 
-   // Quality Of Protection string representations ............................
+    String ELGAMAL_KA = "elgamal";
 
-   /** authentication only. */
-   String QOP_AUTH = "auth";
-   /** authentication plus integrity protection. */
-   String QOP_AUTH_INT = "auth-int";
-   /** authentication plus integrity and confidentiality protection. */
-   String QOP_AUTH_CONF = "auth-conf";
+    String SRP6_KA = "srp6";
 
-   // SASL mechanism strength string representation ...........................
+    String SRP_SASL_KA = "srp-sasl";
 
-   String STRENGTH_HIGH = "high";
-   String STRENGTH_MEDIUM = "medium";
-   String STRENGTH_LOW = "low";
+    String SRP_TLS_KA = "srp-tls";
 
-   // SASL Server Authentication requirement ..................................
+    // Keyed-Hash Message Authentication Code ..................................
 
-   /** Server must authenticate to the client. */
-   String SERVER_AUTH_TRUE = "true";
-   /** Server does not need to, or cannot, authenticate to the client. */
-   String SERVER_AUTH_FALSE = "false";
+    /** Name prefix of every HMAC implementation. */
+    String HMAC_NAME_PREFIX = "hmac-";
 
-   // SASL mechanism reuse capability .........................................
+    // Other MAC algorithms ....................................................
 
-   String REUSE_TRUE = "true";
-   String REUSE_FALSE = "false";
+    /** Message Authentication Code using Universal Hashing (Ted Krovetz). */
+    String UHASH32 = "uhash32";
 
-   // Keyrings  ...............................................................
+    String UMAC32 = "umac32";
 
-   byte[] GKR_MAGIC = new byte[] { 0x47, 0x4b, 0x52, 0x01 };
+    /** The Truncated Multi-Modular Hash Function -v1 (David McGrew). */
+    String TMMH16 = "tmmh16";
 
-   // Ring usage fields.
-   int GKR_PRIVATE_KEYS       = 0;
-   int GKR_PUBLIC_CREDENTIALS = 1;
-   int GKR_CERTIFICATES       = 3;
+    //   String TMMH32 = "tmmh32";
 
-   // HMac types.
-   int GKR_HMAC_MD5_128 = 0;
-   int GKR_HMAC_SHA_160 = 1;
-   int GKR_HMAC_MD5_96  = 2;
-   int GKR_HMAC_SHA_96  = 3;
+    // Format IDs used to identify how we externalise asymmetric keys ..........
+    String RAW_ENCODING = "gnu.crypto.raw.format";
 
-   // Cipher types.
-   int GKR_CIPHER_AES_128_OFB = 0;
-   int GKR_CIPHER_AES_128_CBC = 1;
+    int RAW_ENCODING_ID = 1;
 
-   // Methods
-   // -------------------------------------------------------------------------
+    // Magic bytes we generate/expect in externalised asymmetric keys ..........
+    // the four bytes represent G (0x47) for GNU, 1 (0x01) for Raw format,
+    // D (0x44) for DSS, R (0x52) for RSA, H (0x48) for Diffie-Hellman, or S
+    // (0x53) for SRP-6, and finally P (0x50) for Public, p (0x70) for private,
+    // or S (0x53) for signature.
+    byte[] MAGIC_RAW_DSS_PUBLIC_KEY = new byte[] { 0x47, RAW_ENCODING_ID, 0x44, 0x50 };
+
+    byte[] MAGIC_RAW_DSS_PRIVATE_KEY = new byte[] { 0x47, RAW_ENCODING_ID, 0x44, 0x70 };
+
+    byte[] MAGIC_RAW_DSS_SIGNATURE = new byte[] { 0x47, RAW_ENCODING_ID, 0x44, 0x53 };
+
+    byte[] MAGIC_RAW_RSA_PUBLIC_KEY = new byte[] { 0x47, RAW_ENCODING_ID, 0x52, 0x50 };
+
+    byte[] MAGIC_RAW_RSA_PRIVATE_KEY = new byte[] { 0x47, RAW_ENCODING_ID, 0x52, 0x70 };
+
+    byte[] MAGIC_RAW_RSA_PSS_SIGNATURE = new byte[] { 0x47, RAW_ENCODING_ID, 0x52, 0x53 };
+
+    byte[] MAGIC_RAW_DH_PUBLIC_KEY = new byte[] { 0x47, RAW_ENCODING_ID, 0x48, 0x50 };
+
+    byte[] MAGIC_RAW_DH_PRIVATE_KEY = new byte[] { 0x47, RAW_ENCODING_ID, 0x48, 0x70 };
+
+    byte[] MAGIC_RAW_SRP_PUBLIC_KEY = new byte[] { 0x47, RAW_ENCODING_ID, 0x53, 0x50 };
+
+    byte[] MAGIC_RAW_SRP_PRIVATE_KEY = new byte[] { 0x47, RAW_ENCODING_ID, 0x53, 0x70 };
+
+    // SASL Property names .....................................................
+
+    String SASL_PREFIX = "gnu.crypto.sasl";
+
+    /** Name of username property. */
+    String SASL_USERNAME = SASL_PREFIX + ".username";
+
+    /** Name of password property. */
+    String SASL_PASSWORD = SASL_PREFIX + ".password";
+
+    /** Name of authentication information provider packages. */
+    String SASL_AUTH_INFO_PROVIDER_PKGS = SASL_PREFIX + ".auth.info.provider.pkgs";
+
+    /** SASL authorization ID. */
+    String SASL_AUTHORISATION_ID = SASL_PREFIX + ".authorisation.ID";
+
+    /** SASL protocol. */
+    String SASL_PROTOCOL = SASL_PREFIX + ".protocol";
+
+    /** SASL Server name. */
+    String SASL_SERVER_NAME = SASL_PREFIX + ".server.name";
+
+    /** SASL Callback handler. */
+    String SASL_CALLBACK_HANDLER = SASL_PREFIX + ".callback.handler";
+
+    /** SASL channel binding. */
+    String SASL_CHANNEL_BINDING = SASL_PREFIX + ".channel.binding";
+
+    // SASL data element size limits ...........................................
+
+    /** The size limit, in bytes, of a SASL OS (Octet Sequence) element. */
+    int SASL_ONE_BYTE_MAX_LIMIT = 255;
+
+    /**
+     * The size limit, in bytes, of both a SASL MPI (Multi-Precision Integer)
+     * element and a SASL Text element.
+     */
+    int SASL_TWO_BYTE_MAX_LIMIT = 65535;
+
+    /**
+     * The size limit, in bytes, of a SASL EOS (Extended Octet Sequence)
+     * element.
+     */
+    int SASL_FOUR_BYTE_MAX_LIMIT = 2147483383;
+
+    /** The size limit, in bytes, of a SASL Buffer. */
+    int SASL_BUFFER_MAX_LIMIT = 2147483643;
+
+    // Canonical names of SASL mechanisms ......................................
+
+    String SASL_ANONYMOUS_MECHANISM = "ANONYMOUS";
+
+    String SASL_CRAM_MD5_MECHANISM = "CRAM-MD5";
+
+    String SASL_PLAIN_MECHANISM = "PLAIN";
+
+    String SASL_SRP_MECHANISM = "SRP";
+
+    // Canonical names of Integrity Protection algorithms ......................
+
+    String SASL_HMAC_MD5_IALG = "HMACwithMD5";
+
+    String SASL_HMAC_SHA_IALG = "HMACwithSHA";
+
+    // Quality Of Protection string representations ............................
+
+    /** authentication only. */
+    String QOP_AUTH = "auth";
+
+    /** authentication plus integrity protection. */
+    String QOP_AUTH_INT = "auth-int";
+
+    /** authentication plus integrity and confidentiality protection. */
+    String QOP_AUTH_CONF = "auth-conf";
+
+    // SASL mechanism strength string representation ...........................
+
+    String STRENGTH_HIGH = "high";
+
+    String STRENGTH_MEDIUM = "medium";
+
+    String STRENGTH_LOW = "low";
+
+    // SASL Server Authentication requirement ..................................
+
+    /** Server must authenticate to the client. */
+    String SERVER_AUTH_TRUE = "true";
+
+    /** Server does not need to, or cannot, authenticate to the client. */
+    String SERVER_AUTH_FALSE = "false";
+
+    // SASL mechanism reuse capability .........................................
+
+    String REUSE_TRUE = "true";
+
+    String REUSE_FALSE = "false";
+
+    // Keyrings  ...............................................................
+
+    byte[] GKR_MAGIC = new byte[] { 0x47, 0x4b, 0x52, 0x01 };
+
+    // Ring usage fields.
+    int GKR_PRIVATE_KEYS = 0;
+
+    int GKR_PUBLIC_CREDENTIALS = 1;
+
+    int GKR_CERTIFICATES = 3;
+
+    // HMac types.
+    int GKR_HMAC_MD5_128 = 0;
+
+    int GKR_HMAC_SHA_160 = 1;
+
+    int GKR_HMAC_MD5_96 = 2;
+
+    int GKR_HMAC_SHA_96 = 3;
+
+    // Cipher types.
+    int GKR_CIPHER_AES_128_OFB = 0;
+
+    int GKR_CIPHER_AES_128_CBC = 1;
+
+    // Methods
+    // -------------------------------------------------------------------------
 }

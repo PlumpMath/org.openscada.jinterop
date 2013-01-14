@@ -15,15 +15,14 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc.pdu;
 
 import ndr.NetworkDataRepresentation;
 import rpc.ConnectionOrientedPdu;
 import rpc.core.ProtocolVersion;
 
-public class BindNoAcknowledgePdu extends ConnectionOrientedPdu {
+public class BindNoAcknowledgePdu extends ConnectionOrientedPdu
+{
 
     public static final int BIND_NO_ACKNOWLEDGE_TYPE = 0x0d;
 
@@ -47,49 +46,60 @@ public class BindNoAcknowledgePdu extends ConnectionOrientedPdu {
 
     private int rejectReason = REASON_NOT_SPECIFIED;
 
-    public int getType() {
+    public int getType ()
+    {
         return BIND_NO_ACKNOWLEDGE_TYPE;
     }
 
-    public int getRejectReason() {
+    public int getRejectReason ()
+    {
         return rejectReason;
     }
 
-    public void setRejectReason(int rejectReason) {
+    public void setRejectReason ( int rejectReason )
+    {
         this.rejectReason = rejectReason;
     }
 
-    public ProtocolVersion[] getVersionList() {
+    public ProtocolVersion[] getVersionList ()
+    {
         return versionList;
     }
 
-    public void setVersionList(ProtocolVersion[] versionList) {
+    public void setVersionList ( ProtocolVersion[] versionList )
+    {
         this.versionList = versionList;
     }
 
-    protected void readBody(NetworkDataRepresentation ndr) {
-        int reason = ndr.readUnsignedSmall();
-        setRejectReason(reason);
+    protected void readBody ( NetworkDataRepresentation ndr )
+    {
+        int reason = ndr.readUnsignedSmall ();
+        setRejectReason ( reason );
         ProtocolVersion[] versionList = null;
-        if (reason == PROTOCOL_VERSION_NOT_SUPPORTED) {
-            int count = ndr.readUnsignedSmall();
+        if ( reason == PROTOCOL_VERSION_NOT_SUPPORTED )
+        {
+            int count = ndr.readUnsignedSmall ();
             versionList = new ProtocolVersion[count];
-            for (int i = 0; i < count; i++) {
-                versionList[i] = new ProtocolVersion();
-                versionList[i].read(ndr);
+            for ( int i = 0; i < count; i++ )
+            {
+                versionList[i] = new ProtocolVersion ();
+                versionList[i].read ( ndr );
             }
         }
-        setVersionList(versionList);
+        setVersionList ( versionList );
     }
 
-    protected void writeBody(NetworkDataRepresentation ndr) {
-        int reason = getRejectReason();
-        ndr.writeUnsignedSmall((short) reason);
-        if (reason != PROTOCOL_VERSION_NOT_SUPPORTED) return;
-        ProtocolVersion[] versionList = getVersionList();
-        int count = (versionList != null) ? versionList.length : 0;
-        for (int i = 0; i < count; i++) {
-            versionList[i].write(ndr);
+    protected void writeBody ( NetworkDataRepresentation ndr )
+    {
+        int reason = getRejectReason ();
+        ndr.writeUnsignedSmall ( (short)reason );
+        if ( reason != PROTOCOL_VERSION_NOT_SUPPORTED )
+            return;
+        ProtocolVersion[] versionList = getVersionList ();
+        int count = ( versionList != null ) ? versionList.length : 0;
+        for ( int i = 0; i < count; i++ )
+        {
+            versionList[i].write ( ndr );
         }
     }
 
