@@ -707,11 +707,19 @@ public final class JISession
     private static void postDestroy ( final JISession session ) throws JIException
     {
         //now destroy all linked sessions
-        logger.info ( "About to destroy links for Session: {} , size of which is {}", session.getSessionIdentifier (), session.links.size () );
+        logger.info ( "About to destroy {} sessesion which are linked to this session: {}", session.links.size (), session.getSessionIdentifier () );
 
         for ( int i = 0; i < session.links.size (); i++ )
         {
-            JISession.destroySession ( (JISession)session.links.get ( i ) );
+            final JISession linkedSession = (JISession)session.links.get ( i );
+            try
+            {
+                JISession.destroySession ( linkedSession );
+            }
+            catch ( final Exception e )
+            {
+                logger.warn ( "Failed to destroy linked session" + linkedSession.getSessionIdentifier () + ". Passing on to next one.", e );
+            }
         }
 
         session.links.clear ();
