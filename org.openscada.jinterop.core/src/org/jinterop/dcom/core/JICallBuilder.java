@@ -1192,7 +1192,7 @@ public class JICallBuilder extends NdrObject implements Serializable
 
         this.outparams = this.outParams.toArray ();
 
-        if ( logger.isDebugEnabled () )
+        if ( logger.isTraceEnabled () )
         {
             final StringBuilder str = new StringBuilder ();
             for ( int i = 0; i < this.outparams.length; i++ )
@@ -1200,7 +1200,7 @@ public class JICallBuilder extends NdrObject implements Serializable
                 str.append ( "Out Param:[" + i + "]" + this.outparams[i] + "\n" );
             }
 
-            logger.debug ( str.toString () );
+            logger.trace ( str.toString () );
         }
 
         final ArrayList comObjects = new ArrayList ();
