@@ -1,8 +1,11 @@
 <project name="Build specific targets and properties" default="noDefault">
 
 	<property name="build.root" location=".."/>
-			
+	
+	<property file="${build.root}/sonar.properties"/>
+	
 	<import file="${build.root}/global/lib.xml"/>
+	
 	
 	<!-- ===================================================================== -->
 	<!-- Run a given ${target} on all elements being built -->
@@ -69,7 +72,7 @@
 			</fileset>
 		</unzip>
 	</target>
-
+	
 	<target name="preProcessRepos">	
 		<openscada.importAllRepositories/>
   	</target>
@@ -79,17 +82,14 @@
          - - - - - - - - - - - - - - - - - -->
     <target name="postProcessRepos">
     </target>
-
-	
+		
   <!-- ===================================================================== -->
   <!-- Steps to do before setup -->
   <!-- ===================================================================== -->
   <target name="preSetup">
-  	<echo message="Build Root: ${build.root}" />
   	<echo message="Building in: ${buildDirectory}"/>
   	<echo message="SkipMaps: ${skipMaps}"/>
   	<echo message="SkipFetch: ${skipFetch}"/>
-  	<echo message="Version: ${buildType}/${buildId}" />
   </target>
 
   <!-- ===================================================================== -->
@@ -98,35 +98,11 @@
   <target name="postSetup">
     <antcall target="getBaseComponents" />
   	
-  	<!-- copy all builder/lib jars -->
-  	<copy todir="${builder}/build/plugins">
-  		<fileset dir="${builder}/lib">
-  			<include name="**/*.jar"/>
-  		</fileset>
-  		<mapper type="flatten"/>
-	</copy>
+  	<openscada.builder.copyFeature id="org.openscada.jinterop" />
+  	<openscada.builder.copyFeature id="org.openscada.jinterop.sdk" />
   	
-  	<openscada.builder.copyFeature id="org.openscada.external.sdk" />
-  	
-	<openscada.builder.copyFeature id="org.openscada.external" />
-  	<openscada.builder.copyFeature id="org.openscada.external.optional" />
-		
-  	<openscada.builder.copyFeature id="org.openscada.external.slf4j" />
-  	<openscada.builder.copyFeature id="org.openscada.external.spring" />
-  	<openscada.builder.copyFeature id="org.openscada.external.com.google.gson"/>
-  	
-  	<openscada.builder.copyPlugin id="org.openscada.external.jcifs" />
-  	
-  	<openscada.builder.copyPlugin id="org.openscada.external.jbzip2" />
-  	
-  	<openscada.builder.copyPlugin id="org.openscada.external.apache.poi" />
-  	
-  	<openscada.builder.copyPlugin id="org.openscada.external.logback.default" />
-  	
-  	<openscada.builder.copyPlugin id="org.openscada.external.odfdom" />
-  	
-  	<openscada.builder.copyPlugin id="org.openscada.external.osgi.enterprise"/>
-  	<openscada.builder.copyPlugin id="org.openscada.external.postgresql"/>
+  	<openscada.builder.copyPlugin id="org.openscada.jinterop.core" />
+  	<openscada.builder.copyPlugin id="org.openscada.jinterop.deps" />
   	
   </target>
 
@@ -160,8 +136,8 @@
   <!-- ===================================================================== -->
   <target name="preProcess">
 	<property file="${buildDirectory}/finalFeaturesVersions.properties"/>
-  	<echo message="Setting about versions: ${org.openscada.external}"/>
-  	<replace dir="${buildDirectory}/plugins" value="${org.openscada.external}">
+  	<echo message="Setting about versions: ${org.openscada.jinterop}"/>
+  	<replace dir="${buildDirectory}/plugins" value="${org.openscada.jinterop}">
   		<include name="**/about.mappings"/>
   		<replacetoken>@@VERSION@@</replacetoken>
   	</replace>
@@ -194,7 +170,7 @@
   <!-- ===================================================================== -->
   <!-- Steps to do after  running package. -->
   <!-- ===================================================================== -->
-  <target name="postPackage">
+  <target name="postPackage" depends="doSonar">
   </target>
 
   <!-- ===================================================================== -->
@@ -202,7 +178,7 @@
   <!-- ===================================================================== -->
   <target name="postBuild">
     <antcall target="gatherLogs" />
-	<openscada.deploy.repository name="org.openscada.external.sdk"/>
+  	<openscada.deploy.repository name="org.openscada.jinterop.sdk"/>
   </target>
 
   <!-- ===================================================================== -->
