@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: openSCADA j-Interop Core
 Bundle-SymbolicName: org.openscada.jinterop.core
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 2.0.8.qualifier
 Bundle-Vendor: openSCADA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.iwombat.foundation,
