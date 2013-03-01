@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.openscada.jinterop"
-      label="openSCADA j-Interop"
+      label="%featureName"
       version="1.0.0.qualifier"
       provider-name="openSCADA"
       plugin="org.openscada.jinterop.core">
