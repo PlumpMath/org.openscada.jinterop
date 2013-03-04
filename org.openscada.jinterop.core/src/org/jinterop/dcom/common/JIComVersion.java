@@ -19,42 +19,52 @@ package org.jinterop.dcom.common;
 
 import java.io.Serializable;
 
-/**<p> Framework Internal.
- * This class represents the <code>COM</code> version of the currently 
- * supported COM protocol. Default version is 5.2.
+/**
+ * <p>
+ * Framework Internal. This class represents the <code>COM</code> version of the
+ * currently supported COM protocol. Default version is 5.2.
  * </p>
+ * 
  * @exclude
  * @since 1.0
  */
-public final class JIComVersion implements Serializable {
+public final class JIComVersion implements Serializable
+{
 
-	
-	private static final long serialVersionUID = -1252228963385487909L;
-	private int majorVersion = 5;
-	private int minorVersion = 2;
-	
-	public JIComVersion() {}
-	
-	public JIComVersion(int majorVersion, int minorVersion)
-	{
-		this.majorVersion = majorVersion;
-		this.minorVersion = minorVersion;
-	}
-	
-	public void setMajorVersion(int majorVersion) {
-		this.majorVersion = majorVersion;
-	}
-	
-	public int getMajorVersion() {
-		return majorVersion;
-	}
+    private static final long serialVersionUID = -1252228963385487909L;
 
-	public void setMinorVersion(int minorVersion) {
-		this.minorVersion = minorVersion;
-	}
+    private int majorVersion = 5;
 
-	public int getMinorVersion() {
-		return minorVersion;
-	}
-	
+    private int minorVersion = 2;
+
+    public JIComVersion ()
+    {
+    }
+
+    public JIComVersion ( final int majorVersion, final int minorVersion )
+    {
+        this.majorVersion = majorVersion;
+        this.minorVersion = minorVersion;
+    }
+
+    public void setMajorVersion ( final int majorVersion )
+    {
+        this.majorVersion = majorVersion;
+    }
+
+    public int getMajorVersion ()
+    {
+        return this.majorVersion;
+    }
+
+    public void setMinorVersion ( final int minorVersion )
+    {
+        this.minorVersion = minorVersion;
+    }
+
+    public int getMinorVersion ()
+    {
+        return this.minorVersion;
+    }
+
 }

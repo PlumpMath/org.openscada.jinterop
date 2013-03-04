@@ -20,142 +20,164 @@ package org.jinterop.dcom.core;
 import org.jinterop.dcom.common.IJIUnreferenced;
 import org.jinterop.dcom.common.JIException;
 
-/** Internal Framework class.
+/**
+ * Internal Framework class.
  * 
- * @exclude 
+ * @exclude
  * @since 1.0
  **/
-public class JIComObjectImplWrapper implements IJIComObject {
+public class JIComObjectImplWrapper implements IJIComObject
+{
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6142976024482507753L;
-	protected final IJIComObject comObject;
-	
-	protected JIComObjectImplWrapper(IJIComObject comObject)
-	{
-		this.comObject = comObject;
-	}
-	
+    private static final long serialVersionUID = 6142976024482507753L;
 
-	public IJIComObject queryInterface(String iid) throws JIException {
-		
-		return comObject.queryInterface(iid);
-	}
+    protected final IJIComObject comObject;
 
-	public void addRef() throws JIException
-	{
-		comObject.addRef();
-	}
-	
-	public void release() throws JIException
-	{
-		comObject.release();
-	}
-	
-	public String getIpid()
-	{
-		return comObject.getIpid();
-	}
-	
-	public Object[] call(JICallBuilder obj) throws JIException
-	{
-		return comObject.call(obj);
-	}
-	
-	public JIInterfacePointer internal_getInterfacePointer()
-	{
-		return comObject.internal_getInterfacePointer();
-	}
-	
-	public JISession getAssociatedSession()
-	{
-		return comObject.getAssociatedSession();
-	}
-	
-	/** Returns the <i>IID</i> of this object
-	 * 
-	 * @return String representation of 128 bit uuid.
-	 */
-	public String getInterfaceIdentifier()
-	{
-		return comObject.getInterfaceIdentifier();
-	}
-	
-//	/**
-//	 * @exclude
-//	 */
-//	public JIComServer getAssociatedComServer()
-//	{
-//		return comObject.getAssociatedComServer();
-//	}
-	
-	public boolean isDispatchSupported()
-	{
-		return comObject.isDispatchSupported();
-	}
+    protected JIComObjectImplWrapper ( final IJIComObject comObject )
+    {
+        this.comObject = comObject;
+    }
 
+    @Override
+    public IJIComObject queryInterface ( final String iid ) throws JIException
+    {
 
-	public String internal_setConnectionInfo(IJIComObject connectionPoint, Integer cookie) {
-		return comObject.internal_setConnectionInfo(connectionPoint,cookie);
-	}
+        return this.comObject.queryInterface ( iid );
+    }
 
+    @Override
+    public void addRef () throws JIException
+    {
+        this.comObject.addRef ();
+    }
 
-	public Object[] internal_getConnectionInfo(String identifier) {
-		return comObject.internal_getConnectionInfo(identifier);
-	}
+    @Override
+    public void release () throws JIException
+    {
+        this.comObject.release ();
+    }
 
+    @Override
+    public String getIpid ()
+    {
+        return this.comObject.getIpid ();
+    }
 
-	public Object[] internal_removeConnectionInfo(String identifier) {
-		return comObject.internal_removeConnectionInfo(identifier);
-	}
+    @Override
+    public Object[] call ( final JICallBuilder obj ) throws JIException
+    {
+        return this.comObject.call ( obj );
+    }
 
+    @Override
+    public JIInterfacePointer internal_getInterfacePointer ()
+    {
+        return this.comObject.internal_getInterfacePointer ();
+    }
 
-	public IJIUnreferenced getUnreferencedHandler() {
-		return comObject.getUnreferencedHandler();
-	}
+    @Override
+    public JISession getAssociatedSession ()
+    {
+        return this.comObject.getAssociatedSession ();
+    }
 
+    /**
+     * Returns the <i>IID</i> of this object
+     * 
+     * @return String representation of 128 bit uuid.
+     */
+    @Override
+    public String getInterfaceIdentifier ()
+    {
+        return this.comObject.getInterfaceIdentifier ();
+    }
 
-	public void registerUnreferencedHandler(IJIUnreferenced unreferenced) {
-		comObject.registerUnreferencedHandler(unreferenced);
-	}
+    //	/**
+    //	 * @exclude
+    //	 */
+    //	public JIComServer getAssociatedComServer()
+    //	{
+    //		return comObject.getAssociatedComServer();
+    //	}
 
+    @Override
+    public boolean isDispatchSupported ()
+    {
+        return this.comObject.isDispatchSupported ();
+    }
 
-	public void unregisterUnreferencedHandler() {
-		comObject.unregisterUnreferencedHandler();
-	}
+    @Override
+    public String internal_setConnectionInfo ( final IJIComObject connectionPoint, final Integer cookie )
+    {
+        return this.comObject.internal_setConnectionInfo ( connectionPoint, cookie );
+    }
 
+    @Override
+    public Object[] internal_getConnectionInfo ( final String identifier )
+    {
+        return this.comObject.internal_getConnectionInfo ( identifier );
+    }
 
-	public Object[] call(JICallBuilder obj, int timeout) throws JIException
-	{
-		return comObject.call(obj, timeout);
-	}
+    @Override
+    public Object[] internal_removeConnectionInfo ( final String identifier )
+    {
+        return this.comObject.internal_removeConnectionInfo ( identifier );
+    }
 
+    @Override
+    public IJIUnreferenced getUnreferencedHandler ()
+    {
+        return this.comObject.getUnreferencedHandler ();
+    }
 
-	public int getInstanceLevelSocketTimeout()
-	{
-		return comObject.getInstanceLevelSocketTimeout();
-	}
+    @Override
+    public void registerUnreferencedHandler ( final IJIUnreferenced unreferenced )
+    {
+        this.comObject.registerUnreferencedHandler ( unreferenced );
+    }
 
+    @Override
+    public void unregisterUnreferencedHandler ()
+    {
+        this.comObject.unregisterUnreferencedHandler ();
+    }
 
-	public void setInstanceLevelSocketTimeout(int timeout)
-	{
-		comObject.setInstanceLevelSocketTimeout(timeout);
-	}
+    @Override
+    public Object[] call ( final JICallBuilder obj, final int timeout ) throws JIException
+    {
+        return this.comObject.call ( obj, timeout );
+    }
 
+    @Override
+    public int getInstanceLevelSocketTimeout ()
+    {
+        return this.comObject.getInstanceLevelSocketTimeout ();
+    }
 
-	public void internal_setDeffered(boolean deffered) {
-		comObject.internal_setDeffered(deffered);
-	}
+    @Override
+    public void setInstanceLevelSocketTimeout ( final int timeout )
+    {
+        this.comObject.setInstanceLevelSocketTimeout ( timeout );
+    }
 
+    @Override
+    public void internal_setDeffered ( final boolean deffered )
+    {
+        this.comObject.internal_setDeffered ( deffered );
+    }
 
-	public boolean isLocalReference() {
-		return comObject.isLocalReference();
-	}
-	
-	public String toString()
-	{
-		return comObject.toString();
-	}
+    @Override
+    public boolean isLocalReference ()
+    {
+        return this.comObject.isLocalReference ();
+    }
+
+    @Override
+    public String toString ()
+    {
+        return this.comObject.toString ();
+    }
 }

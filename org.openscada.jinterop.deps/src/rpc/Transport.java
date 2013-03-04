@@ -15,8 +15,6 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc;
 
 import java.io.IOException;
@@ -25,18 +23,19 @@ import java.util.Properties;
 import ndr.NdrBuffer;
 import rpc.core.PresentationSyntax;
 
-public interface Transport {
+public interface Transport
+{
 
-    public String getProtocol();
+    public String getProtocol ();
 
-    public Properties getProperties();
+    public Properties getProperties ();
 
-    public Endpoint attach(PresentationSyntax syntax) throws IOException;
+    public Endpoint attach ( PresentationSyntax syntax ) throws IOException;
 
-    public void send(NdrBuffer buffer) throws IOException;
+    public void send ( NdrBuffer buffer ) throws IOException;
 
-    public void receive(NdrBuffer buffer) throws IOException;
+    public void receive ( NdrBuffer buffer ) throws IOException;
 
-    public void close() throws IOException;
+    public void close () throws IOException;
 
 }

@@ -19,12 +19,11 @@ package rpc;
 
 import java.io.IOException;
 
-public interface Connection {
+public interface Connection
+{
 
-    public void transmit(ConnectionOrientedPdu pdu, Transport transport)
-            throws IOException;
+    public void transmit ( ConnectionOrientedPdu pdu, Transport transport ) throws IOException;
 
-    public ConnectionOrientedPdu receive(Transport transport)
-            throws IOException;
+    public ConnectionOrientedPdu receive ( Transport transport ) throws IOException;
 
 }

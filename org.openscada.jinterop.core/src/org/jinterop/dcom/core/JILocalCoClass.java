@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
 
 import ndr.NetworkDataRepresentation;
 
@@ -34,670 +33,742 @@ import org.jinterop.dcom.common.JIErrorCodes;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
 import org.jinterop.dcom.impls.JIObjectFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import rpc.core.UUID;
 
-
-/**<p>Represents a Java <code>COCLASS</code>.
+/**
  * <p>
- * <i>Please refer to MSInternetExplorer, Test_ITestServer2_Impl, SampleTestServer
- * and MSShell examples for more details on how to use this class.</i><br>
- *
+ * Represents a Java <code>COCLASS</code>.
+ * <p>
+ * <i>Please refer to MSInternetExplorer, Test_ITestServer2_Impl,
+ * SampleTestServer and MSShell examples for more details on how to use this
+ * class.</i><br>
+ * 
  * @since 2.0 (formerly JIJavaCoClass)
- *
  */
 public final class JILocalCoClass implements Serializable
 {
+    private final static Logger logger = LoggerFactory.getLogger ( JILocalCoClass.class );
 
-	private static final long serialVersionUID = 5542223845228327383L;
-	private static Random randomGen = new Random(Double.doubleToRawLongBits(Math.random()));
-	private final int identifier ;
-	private WeakReference interfacePointer = null;
-	private boolean isAlreadyExported = false;
-	private byte[] objectID = null;
-	private JILocalInterfaceDefinition interfaceDefinition = null;
+    private static final long serialVersionUID = 5542223845228327383L;
 
-	private static final String IID_IDispatch = "00020400-0000-0000-c000-000000000046";
+    private static Random randomGen = new Random ( Double.doubleToRawLongBits ( Math.random () ) );
 
-	private  ArrayList listOfSupportedInterfaces = new ArrayList();
+    private final int identifier;
 
-	private ArrayList listOfSupportedEventInterfaces = new ArrayList();
+    private WeakReference interfacePointer = null;
 
-	private HashMap mapOfIIDsToInterfaceDefinitions = new HashMap();
+    private boolean isAlreadyExported = false;
 
-	private JISession session = null;
+    private byte[] objectID = null;
 
-	private boolean realIID = false;
+    private JILocalInterfaceDefinition interfaceDefinition = null;
 
-	static
-	{
+    private static final String IID_IDispatch = "00020400-0000-0000-c000-000000000046";
 
-	}
+    private final ArrayList listOfSupportedInterfaces = new ArrayList ();
 
-	private Map ipidVsIID = new HashMap();// will use this to identify which IID is being talked about
-										  //if it is IDispatch then delegate to it's invoke.
+    private final ArrayList listOfSupportedEventInterfaces = new ArrayList ();
 
-	private Map IIDvsIpid = new HashMap();// will use this to identify which IPID is being talked about
+    private final HashMap mapOfIIDsToInterfaceDefinitions = new HashMap ();
 
-	private void init(JILocalInterfaceDefinition interfaceDefinition,Class clazz,Object instance,boolean realIID)
-	{
-		listOfSupportedInterfaces.add(IID_IDispatch.toUpperCase()); //IDispatch
-		listOfSupportedInterfaces.add("00000131-0000-0000-C000-000000000046"); //IRemUnknown
-		this.interfaceDefinition = interfaceDefinition;
-		interfaceDefinition .clazz = clazz;
-		interfaceDefinition.instance = instance;
-		listOfSupportedInterfaces.add(interfaceDefinition.getInterfaceIdentifier().toUpperCase());
-		mapOfIIDsToInterfaceDefinitions.put(interfaceDefinition.getInterfaceIdentifier().toUpperCase(),interfaceDefinition);
-		this.realIID = realIID;
-	}
+    private JISession session = null;
 
+    private boolean realIID = false;
 
+    static
+    {
 
-	/** Creates a local class instance. The framework will try to create a instance of the <code>clazz</code>
-	 *  using <code>Class.newInstance</code>. Make sure that <code>clazz</code> has a visible <code>null</code>
-	 *  constructor.
-	 *
-	 * @param interfaceDefinition implementing structurally the definition of the COM callback interface.
-	 * @param clazz <code>class</code> to instantiate for serving requests from COM client. Must implement
-	 * the <code>interfaceDefinition</code> fully.
-	 * @throws IllegalArgumentException if <code>interfaceDefinition</code> or <code>clazz</code> are <code>null</code>.
+    }
+
+    private final Map ipidVsIID = new HashMap ();// will use this to identify which IID is being talked about
+
+    //if it is IDispatch then delegate to it's invoke.
+
+    private final Map IIDvsIpid = new HashMap ();// will use this to identify which IPID is being talked about
+
+    private void init ( final JILocalInterfaceDefinition interfaceDefinition, final Class clazz, final Object instance, final boolean realIID )
+    {
+        this.listOfSupportedInterfaces.add ( IID_IDispatch.toUpperCase () ); //IDispatch
+        this.listOfSupportedInterfaces.add ( "00000131-0000-0000-C000-000000000046" ); //IRemUnknown
+        this.interfaceDefinition = interfaceDefinition;
+        interfaceDefinition.clazz = clazz;
+        interfaceDefinition.instance = instance;
+        this.listOfSupportedInterfaces.add ( interfaceDefinition.getInterfaceIdentifier ().toUpperCase () );
+        this.mapOfIIDsToInterfaceDefinitions.put ( interfaceDefinition.getInterfaceIdentifier ().toUpperCase (), interfaceDefinition );
+        this.realIID = realIID;
+    }
+
+    /**
+     * Creates a local class instance. The framework will try to create a
+     * instance of the <code>clazz</code> using <code>Class.newInstance</code>.
+     * Make sure that <code>clazz</code> has a visible <code>null</code>
+     * constructor.
+     * 
+     * @param interfaceDefinition
+     *            implementing structurally the definition of the COM callback
+     *            interface.
+     * @param clazz
+     *            <code>class</code> to instantiate for serving requests from
+     *            COM client. Must implement
+     *            the <code>interfaceDefinition</code> fully.
+     * @throws IllegalArgumentException
+     *             if <code>interfaceDefinition</code> or <code>clazz</code> are
+     *             <code>null</code>.
      */
-	public JILocalCoClass(JILocalInterfaceDefinition interfaceDefinition,Class clazz)
-	{
-		if (interfaceDefinition == null || clazz == null)
-		{
-			throw new IllegalArgumentException(JISystem.getLocalizedMessage(JIErrorCodes.JI_COM_RUNTIME_INVALID_CONTAINER_INFO));
-		}
-		this.identifier = clazz.hashCode() ^ new Object().hashCode() ^ randomGen.nextInt();
-		init(interfaceDefinition,clazz,null,false);
-	}
+    public JILocalCoClass ( final JILocalInterfaceDefinition interfaceDefinition, final Class clazz )
+    {
+        if ( interfaceDefinition == null || clazz == null )
+        {
+            throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_COM_RUNTIME_INVALID_CONTAINER_INFO ) );
+        }
+        this.identifier = clazz.hashCode () ^ new Object ().hashCode () ^ randomGen.nextInt ();
+        init ( interfaceDefinition, clazz, null, false );
+    }
 
-	/** Refer {@link #JILocalCoClass(JILocalInterfaceDefinition, Class)}.
-	 *
-	 * @param interfaceDefinition implementing structurally the definition of the COM callback interface.
-	 * @param clazz <code>class</code> to instantiate for serving requests from COM client. Must implement
-	 * the <code>interfaceDefinition</code> fully.
-	 * @param useInterfaceDefinitionIID <code>true</code> if the <code>IID</code> of <code>interfaceDefinition</code
-	 * should be used as to create the local COM Object. Use this when a reference other than <code>IUnknown*</code> is required.
-	 * For all {@link JIObjectFactory#attachEventHandler(IJIComObject, String, IJIComObject)} operations this should be set to
-	 * <code>false</code> since the <code>IConnectionPoint::Advise</code> method takes in a <code>IUnknown*</code> reference.
-	 * @throws IllegalArgumentException if <code>interfaceDefinition</code> or <code>clazz</code> are <code>null</code>.
-	 */
-	public JILocalCoClass(JILocalInterfaceDefinition interfaceDefinition,Class clazz, boolean useInterfaceDefinitionIID)
-	{
-		if (interfaceDefinition == null || clazz == null)
-		{
-			throw new IllegalArgumentException(JISystem.getLocalizedMessage(JIErrorCodes.JI_COM_RUNTIME_INVALID_CONTAINER_INFO));
-		}
-		this.identifier = clazz.hashCode() ^ new Object().hashCode() ^ randomGen.nextInt();
-		init(interfaceDefinition,clazz,null,useInterfaceDefinitionIID);
-	}
+    /**
+     * Refer {@link #JILocalCoClass(JILocalInterfaceDefinition, Class)}.
+     * 
+     * @param interfaceDefinition
+     *            implementing structurally the definition of the COM callback
+     *            interface.
+     * @param clazz
+     *            <code>class</code> to instantiate for serving requests from
+     *            COM client. Must implement
+     *            the <code>interfaceDefinition</code> fully.
+     * @param useInterfaceDefinitionIID
+     *            <code>true</code> if the <code>IID</code> of
+     *            <code>interfaceDefinition</code should be used as to create
+     *            the local COM Object. Use this when a reference other than
+     *            <code>IUnknown*</code> is required.
+     *            For all
+     *            {@link JIObjectFactory#attachEventHandler(IJIComObject, String, IJIComObject)}
+     *            operations this should be set to <code>false</code> since the
+     *            <code>IConnectionPoint::Advise</code> method takes in a
+     *            <code>IUnknown*</code> reference.
+     * @throws IllegalArgumentException
+     *             if <code>interfaceDefinition</code> or <code>clazz</code> are
+     *             <code>null</code>.
+     */
+    public JILocalCoClass ( final JILocalInterfaceDefinition interfaceDefinition, final Class clazz, final boolean useInterfaceDefinitionIID )
+    {
+        if ( interfaceDefinition == null || clazz == null )
+        {
+            throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_COM_RUNTIME_INVALID_CONTAINER_INFO ) );
+        }
+        this.identifier = clazz.hashCode () ^ new Object ().hashCode () ^ randomGen.nextInt ();
+        init ( interfaceDefinition, clazz, null, useInterfaceDefinitionIID );
+    }
 
-	/**Creates a local class instance.
-	 *
-	 * @param interfaceDefinition implementing structurally the definition of the COM callback interface.
-	 * @param instance instance for serving requests from COM client. Must implement
-	 * the <code>interfaceDefinition</code> fully.
-	 * @throws IllegalArgumentException if <code>interfaceDefinition</code> or <code>instance</code> are <code>null</code>.
-	 */
-	public JILocalCoClass(JILocalInterfaceDefinition interfaceDefinition,Object instance)
-	{
-		if (interfaceDefinition == null || instance == null)
-		{
-			throw new IllegalArgumentException(JISystem.getLocalizedMessage(JIErrorCodes.JI_COM_RUNTIME_INVALID_CONTAINER_INFO));
-		}
-		this.identifier = instance.hashCode() ^ new Object().hashCode() ^ randomGen.nextInt();
-		init(interfaceDefinition,null,instance,false);
-	}
+    /**
+     * Creates a local class instance.
+     * 
+     * @param interfaceDefinition
+     *            implementing structurally the definition of the COM callback
+     *            interface.
+     * @param instance
+     *            instance for serving requests from COM client. Must implement
+     *            the <code>interfaceDefinition</code> fully.
+     * @throws IllegalArgumentException
+     *             if <code>interfaceDefinition</code> or <code>instance</code>
+     *             are <code>null</code>.
+     */
+    public JILocalCoClass ( final JILocalInterfaceDefinition interfaceDefinition, final Object instance )
+    {
+        if ( interfaceDefinition == null || instance == null )
+        {
+            throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_COM_RUNTIME_INVALID_CONTAINER_INFO ) );
+        }
+        this.identifier = instance.hashCode () ^ new Object ().hashCode () ^ randomGen.nextInt ();
+        init ( interfaceDefinition, null, instance, false );
+    }
 
-	/**Creates a local class instance.
-	 *
-	 * @param interfaceDefinition implementing structurally the definition of the COM callback interface.
-	 * @param instance instance for serving requests from COM client. Must implement
-	 * the <code>interfaceDefinition</code> fully.
-	 * @param useInterfaceDefinitionIID <code>true</code> if the <code>IID</code> of <code>interfaceDefinition</code
-	 * should be used as to create the local COM Object. Use this when a reference other than <code>IUnknown*</code> is required.
-	 * For all {@link JIObjectFactory#attachEventHandler(IJIComObject, String, IJIComObject)} operations this should be set to
-	 * <code>false</code> since the <code>IConnectionPoint::Advise</code> method takes in a <code>IUnknown*</code> reference.
-	 * @throws IllegalArgumentException if <code>interfaceDefinition</code> or <code>instance</code> are <code>null</code>.
-	 */
-	public JILocalCoClass(JILocalInterfaceDefinition interfaceDefinition,Object instance,boolean useInterfaceDefinitionIID)
-	{
-		if (interfaceDefinition == null || instance == null)
-		{
-			throw new IllegalArgumentException(JISystem.getLocalizedMessage(JIErrorCodes.JI_COM_RUNTIME_INVALID_CONTAINER_INFO));
-		}
-		this.identifier = instance.hashCode() ^ new Object().hashCode() ^ randomGen.nextInt();
-		init(interfaceDefinition,null,instance,useInterfaceDefinitionIID);
-	}
+    /**
+     * Creates a local class instance.
+     * 
+     * @param interfaceDefinition
+     *            implementing structurally the definition of the COM callback
+     *            interface.
+     * @param instance
+     *            instance for serving requests from COM client. Must implement
+     *            the <code>interfaceDefinition</code> fully.
+     * @param useInterfaceDefinitionIID
+     *            <code>true</code> if the <code>IID</code> of
+     *            <code>interfaceDefinition</code should be used as to create
+     *            the local COM Object. Use this when a reference other than
+     *            <code>IUnknown*</code> is required.
+     *            For all
+     *            {@link JIObjectFactory#attachEventHandler(IJIComObject, String, IJIComObject)}
+     *            operations this should be set to <code>false</code> since the
+     *            <code>IConnectionPoint::Advise</code> method takes in a
+     *            <code>IUnknown*</code> reference.
+     * @throws IllegalArgumentException
+     *             if <code>interfaceDefinition</code> or <code>instance</code>
+     *             are <code>null</code>.
+     */
+    public JILocalCoClass ( final JILocalInterfaceDefinition interfaceDefinition, final Object instance, final boolean useInterfaceDefinitionIID )
+    {
+        if ( interfaceDefinition == null || instance == null )
+        {
+            throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_COM_RUNTIME_INVALID_CONTAINER_INFO ) );
+        }
+        this.identifier = instance.hashCode () ^ new Object ().hashCode () ^ randomGen.nextInt ();
+        init ( interfaceDefinition, null, instance, useInterfaceDefinitionIID );
+    }
 
+    /**
+     * Sets the interface identifiers (<code>IID</code>s) of the event
+     * interfaces this class would support. This in case the same
+     * <code>clazz</code> or <code>instance</code> is implementing more than one
+     * <code>IID</code>.
+     * 
+     * @param listOfIIDs
+     * @see #JILocalCoClass(JILocalInterfaceDefinition, Class)
+     * @see #JILocalCoClass(JILocalInterfaceDefinition, Object)
+     */
+    public void setSupportedEventInterfaces ( final List listOfIIDs )
+    {
+        if ( listOfIIDs != null )
+        {
+            for ( int i = 0; i < listOfIIDs.size (); i++ )
+            {
+                final String s = ( (String)listOfIIDs.get ( i ) ).toUpperCase ();
+                this.listOfSupportedInterfaces.add ( s );
+                this.listOfSupportedEventInterfaces.add ( s );
+                this.mapOfIIDsToInterfaceDefinitions.put ( s, this.interfaceDefinition );
+            }
 
+        }
+    }
 
-	/**Sets the interface identifiers (<code>IID</code>s) of the event interfaces this class would support. This in case the same
-	 * <code>clazz</code> or <code>instance</code> is implementing more than one <code>IID</code>.
-	 *
-	 * @param listOfIIDs
-	 * @see #JILocalCoClass(JILocalInterfaceDefinition, Class)
-	 * @see #JILocalCoClass(JILocalInterfaceDefinition, Object)
-	 */
-	public void setSupportedEventInterfaces(List listOfIIDs)
-	{
-		if (listOfIIDs != null)
-		{
-			for (int i = 0;i < listOfIIDs.size(); i++)
-			{
-				String s = ((String)listOfIIDs.get(i)).toUpperCase();
-				listOfSupportedInterfaces.add(s);
-				listOfSupportedEventInterfaces.add(s);
-				mapOfIIDsToInterfaceDefinitions.put(s,interfaceDefinition);
-			}
+    /**
+     * Add another interface definition and it's supporting object instance.
+     * 
+     * @param interfaceDefinition
+     *            implementing structurally the definition of the COM callback
+     *            interface.
+     * @param instance
+     *            instance for serving requests from COM client. Must implement
+     *            the <code>interfaceDefinition</code> fully.
+     * @throws IllegalArgumentException
+     *             if <code>interfaceDefinition</code> or <code>instance</code>
+     *             are <code>null</code>.
+     */
+    public void addInterfaceDefinition ( final JILocalInterfaceDefinition interfaceDefinition, final Object instance )
+    {
+        if ( interfaceDefinition == null || instance == null )
+        {
+            throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_COM_RUNTIME_INVALID_CONTAINER_INFO ) );
+        }
+        interfaceDefinition.instance = instance;
+        final String s = interfaceDefinition.getInterfaceIdentifier ().toUpperCase ();
+        this.listOfSupportedInterfaces.add ( s );
+        this.listOfSupportedEventInterfaces.add ( s );
+        this.mapOfIIDsToInterfaceDefinitions.put ( s, interfaceDefinition );
+    }
 
-		}
-	}
+    /**
+     * Add another interface definition and it's class. Make sure that this
+     * class has a default constructor,
+     * so that instantiation using <i>reflection</i> can take place.
+     * 
+     * @param interfaceDefinition
+     *            implementing structurally the definition of the COM callback
+     *            interface.
+     * @param clazz
+     *            instance for serving requests from COM client. Must implement
+     *            the <code>interfaceDefinition</code> fully.
+     * @throws IllegalArgumentException
+     *             if <code>interfaceDefinition</code> or <code>clazz</code> are
+     *             <code>null</code>.
+     */
+    public void addInterfaceDefinition ( final JILocalInterfaceDefinition interfaceDefinition, final Class clazz )
+    {
+        if ( interfaceDefinition == null || clazz == null )
+        {
+            throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_COM_RUNTIME_INVALID_CONTAINER_INFO ) );
+        }
+        interfaceDefinition.clazz = clazz;
+        final String s = interfaceDefinition.getInterfaceIdentifier ().toUpperCase ();
+        this.listOfSupportedInterfaces.add ( s );
+        this.listOfSupportedEventInterfaces.add ( s );
+        this.mapOfIIDsToInterfaceDefinitions.put ( s, interfaceDefinition );
+    }
 
-	/**Add another interface definition and it's supporting object instance.
-	 *
-	 * @param interfaceDefinition implementing structurally the definition of the COM callback interface.
-	 * @param instance instance for serving requests from COM client. Must implement
-	 * the <code>interfaceDefinition</code> fully.
-	 * @throws IllegalArgumentException if <code>interfaceDefinition</code> or <code>instance</code> are <code>null</code>.
-	 */
-	public void addInterfaceDefinition(JILocalInterfaceDefinition interfaceDefinition, Object instance )
-	{
-		if (interfaceDefinition == null || instance == null)
-		{
-			throw new IllegalArgumentException(JISystem.getLocalizedMessage(JIErrorCodes.JI_COM_RUNTIME_INVALID_CONTAINER_INFO));
-		}
-		interfaceDefinition.instance = instance;
-		String s = interfaceDefinition.getInterfaceIdentifier().toUpperCase();
-		listOfSupportedInterfaces.add(s);
-		listOfSupportedEventInterfaces.add(s);
-		mapOfIIDsToInterfaceDefinitions.put(s,interfaceDefinition);
-	}
+    /**
+     * Returns the instance representing the interface definition. <br>
+     * 
+     * @return
+     * @see #JILocalCoClass(JILocalInterfaceDefinition, Object)
+     */
+    public Object getServerInstance ()
+    {
+        return this.interfaceDefinition.instance;
+    }
 
-	/** Add another interface definition and it's class. Make sure that this class has a default constructor,
-	 * so that instantiation using <i>reflection</i> can take place.
-	 *
-	 * @param interfaceDefinition implementing structurally the definition of the COM callback interface.
-	 * @param clazz instance for serving requests from COM client. Must implement
-	 * the <code>interfaceDefinition</code> fully.
-	 * @throws IllegalArgumentException if <code>interfaceDefinition</code> or <code>clazz</code> are <code>null</code>.
-	 */
-	public void addInterfaceDefinition(JILocalInterfaceDefinition interfaceDefinition, Class clazz )
-	{
-		if (interfaceDefinition == null || clazz == null)
-		{
-			throw new IllegalArgumentException(JISystem.getLocalizedMessage(JIErrorCodes.JI_COM_RUNTIME_INVALID_CONTAINER_INFO));
-		}
-		interfaceDefinition.clazz = clazz;
-		String s = interfaceDefinition.getInterfaceIdentifier().toUpperCase();
-		listOfSupportedInterfaces.add(s);
-		listOfSupportedEventInterfaces.add(s);
-		mapOfIIDsToInterfaceDefinitions.put(s,interfaceDefinition);
-	}
+    /**
+     * Returns the actual class representing the interface definition. <br>
+     * 
+     * @return
+     * @see #JILocalCoClass(JILocalInterfaceDefinition, Class)
+     */
+    public Class getServerClass ()
+    {
+        return this.interfaceDefinition.clazz;
+    }
 
-	/**
-	 * Returns the instance representing the interface definition. <br>
-	 * @return
-	 * @see #JILocalCoClass(JILocalInterfaceDefinition, Object)
-	 */
-	public Object getServerInstance()
-	{
-		return interfaceDefinition.instance;
-	}
+    //	public boolean isDispatchSupported()
+    //	{
+    //		return isDispatchSupported;
+    //	}
 
-	/**
-	 * Returns the actual class representing the interface definition. <br>
-	 * @return
-	 * @see #JILocalCoClass(JILocalInterfaceDefinition, Class)
-	 */
-	public Class getServerClass()
-	{
-		return interfaceDefinition.clazz;
-	}
+    //called from com runtime.
+    /**
+     * @exclude
+     */
+    void setObjectId ( final byte[] objectId )
+    {
+        this.objectID = objectId;
+    }
 
-//	public boolean isDispatchSupported()
-//	{
-//		return isDispatchSupported;
-//	}
+    /**
+     * @exclude
+     */
+    void setAssociatedInterfacePointer ( final JIInterfacePointer interfacePointer )
+    {
+        this.isAlreadyExported = true;
+        this.interfacePointer = new WeakReference ( interfacePointer );
+        final String ipid = interfacePointer.getIPID ().toUpperCase ();
+        final String iid = interfacePointer.getIID ().toUpperCase ();
+        this.IIDvsIpid.put ( iid, ipid );
+        this.ipidVsIID.put ( ipid, iid );
+    }
 
-	//called from com runtime.
-	/**
-	 * @exclude
-	 */
-	void setObjectId(byte[] objectId)
-	{
-		this.objectID = objectId;
-	}
+    /**
+     * @exclude
+     */
+    boolean isAssociatedReferenceAlive ()
+    {
+        return this.interfacePointer == null ? false : this.interfacePointer.get () == null ? false : true;
+    }
 
-	/**
-	 * @exclude
-	 */
-	 void setAssociatedInterfacePointer(JIInterfacePointer interfacePointer)
-	{
-		 isAlreadyExported = true;
-		 this.interfacePointer = new WeakReference(interfacePointer);
-		 String ipid = interfacePointer.getIPID().toUpperCase();
-		 String iid = interfacePointer.getIID().toUpperCase();
-		 IIDvsIpid.put(iid,ipid);
-		 ipidVsIID.put(ipid,iid);
-	}
+    boolean isAlreadyExported ()
+    {
+        return this.isAlreadyExported;
+    }
 
-	/**
-	 *
-	 * @exclude
-	 */
-	boolean isAssociatedReferenceAlive()
-	{
-		return interfacePointer == null ? false : (interfacePointer.get() == null ? false : true);
-	}
+    /**
+     * @exclude
+     */
+    byte[] getObjectId ()
+    {
+        return this.objectID;
+    }
 
-	 boolean isAlreadyExported()
-	 {
-		 return isAlreadyExported;
-	 }
+    /**
+     * @exclude
+     * @param iid
+     * @return
+     */
+    boolean isPresent ( String iid )
+    {
+        iid = iid.toUpperCase ();
+        return this.listOfSupportedInterfaces.contains ( iid );
+    }
 
-	/**
-	 * @exclude
-	 */
-	 byte[] getObjectId()
-	{
-		return objectID;
-	}
+    /**
+     * @exclude
+     * @param uniqueIID
+     * @param IPID
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
+    //advances the index...it cannot be reversed.
+    synchronized boolean exportInstance ( final String uniqueIID, String IPID ) throws InstantiationException, IllegalAccessException
+    {
+        //Object retval = null;
+        IPID = IPID.toUpperCase ();
 
-	/**
-	 * @exclude
-	 * @param iid
-	 * @return
-	 */
-	 boolean isPresent(String iid)
-	{
-		iid = iid.toUpperCase();
-		return listOfSupportedInterfaces.contains(iid);
-	}
+        if ( !isPresent ( uniqueIID ) )//not supported IID.
+        {
+            return false;
+        }
 
-	/**
-	 * @exclude
-	 * @param uniqueIID
-	 * @param IPID
-	 * @throws InstantiationException
-	 * @throws IllegalAccessException
-	 */
-	//advances the index...it cannot be reversed.
-	 synchronized boolean exportInstance(String uniqueIID,String IPID) throws InstantiationException, IllegalAccessException
-	{
-		//Object retval = null;
-		IPID = IPID.toUpperCase();
+        this.IIDvsIpid.put ( uniqueIID.toUpperCase (), IPID );
+        this.ipidVsIID.put ( IPID, uniqueIID.toUpperCase () );
+        return true;
+    }
 
-		if (!isPresent(uniqueIID))//not supported IID.
-		{
-			return false;
-		}
+    /**
+     * Returns the interface identifier of this COCLASS. <br>
+     * 
+     * @return
+     * @see #JILocalCoClass(JILocalInterfaceDefinition, Class)
+     * @see #JILocalCoClass(JILocalInterfaceDefinition, Object)
+     * @see JILocalInterfaceDefinition#getInterfaceIdentifier()
+     */
+    public String getCoClassIID ()
+    {
+        return this.interfaceDefinition.getInterfaceIdentifier ();
+    }
 
-		IIDvsIpid.put(uniqueIID.toUpperCase(), IPID);
-		ipidVsIID.put(IPID,uniqueIID.toUpperCase());
-		return true;
-	}
+    /**
+     * @exclude
+     * @param IPID
+     * @param Opnum
+     * @param inparams
+     * @return
+     * @throws JIException
+     */
+    //This will invoke the API via reflection and return the results of the call back to the
+    //actual COM object. This API is to be invoked via the RemUnknown Object
+    Object[] invokeMethod ( String IPID, int Opnum, final NetworkDataRepresentation ndr ) throws JIException
+    {
+        IPID = IPID.toUpperCase ();
+        //somehow identify the method from the Opnum
+        //this will come from the IDL.
 
-	/**
-	 * Returns the interface identifier of this COCLASS. <br>
-	 * @return
-	 * @see #JILocalCoClass(JILocalInterfaceDefinition, Class)
-	 * @see #JILocalCoClass(JILocalInterfaceDefinition, Object)
-	 * @see JILocalInterfaceDefinition#getInterfaceIdentifier()
-	 */
-	public String getCoClassIID()
-	{
-		return interfaceDefinition.getInterfaceIdentifier();
-	}
+        Object retVal = null;//will be an array.
 
-	/**
-	 * @exclude
-	 * @param IPID
-	 * @param Opnum
-	 * @param inparams
-	 * @return
-	 * @throws JIException
-	 */
-	//This will invoke the API via reflection and return the results of the call back to the
-	//actual COM object. This API is to be invoked via the RemUnknown Object
-	Object[] invokeMethod(String IPID,int Opnum ,NetworkDataRepresentation ndr) throws JIException
-	{
-		IPID = IPID.toUpperCase();
-		//somehow identify the method from the Opnum
-		//this will come from the IDL.
+        final String iid = (String)this.ipidVsIID.get ( IPID );
+        if ( iid == null )
+        {
+            throw new JIException ( JIErrorCodes.RPC_E_INVALID_OBJECT );
+        }
 
-		Object retVal = null;//will be an array.
+        JILocalInterfaceDefinition interfaceDefinitionOfClass = (JILocalInterfaceDefinition)this.mapOfIIDsToInterfaceDefinitions.get ( iid );
+        interfaceDefinitionOfClass = interfaceDefinitionOfClass == null ? this.interfaceDefinition : interfaceDefinitionOfClass;
 
-		String iid = (String)ipidVsIID.get(IPID);
-		if (iid == null)
-		{
-			throw new JIException(JIErrorCodes.RPC_E_INVALID_OBJECT);
-		}
+        JILocalMethodDescriptor methodDescriptor = null;
+        boolean execute = false;
+        Object[] params = null;
 
-		JILocalInterfaceDefinition interfaceDefinitionOfClass = (JILocalInterfaceDefinition)mapOfIIDsToInterfaceDefinitions.get(iid) ;
-		interfaceDefinitionOfClass = interfaceDefinitionOfClass == null ? interfaceDefinition : interfaceDefinitionOfClass;
+        //that means the calls will come as IUnknown + IDispatch op numbers...0,1,2 & 3,4,5,6
+        //from 7th (inclusive) onwards are the actual COM servers calls
+        //now check for dispinterface and take a call...
+        //if dispinterface is supported then all calls will come with base of 6 {0,1,2 & 3,4,5,6}
+        //i.e 6th will be invoke and 7th(inclusive) onwards will be standard api calls.
+        //if not supported than it will be base 2 {0,1,2} i.e real method calls will start from 3(inclusive) onwards.
+        boolean isStandardCall = true;
+        if ( this.interfaceDefinition.isDispInterface () )
+        {
+            isStandardCall = false;
+            switch ( Opnum )
+            {
+                case 3: //getTypeInfoCount
+                    //not supported
+                    retVal = new Object[1];
+                    ( (Object[])retVal )[0] = new Integer ( 0 ); //not supported
+                    break;
+                case 4: //getTypeInfo
+                    throw new JIException ( JIErrorCodes.E_NOTIMPL );
+                case 5: //getIDOfNames
 
-		JILocalMethodDescriptor methodDescriptor = null;
-		boolean execute = false;
-		Object[] params = null;
+                    JILocalParamsDescriptor paramObject = new JILocalParamsDescriptor ();
 
-		//that means the calls will come as IUnknown + IDispatch op numbers...0,1,2 & 3,4,5,6
-		//from 7th (inclusive) onwards are the actual COM servers calls
-		//now check for dispinterface and take a call...
-		//if dispinterface is supported then all calls will come with base of 6 {0,1,2 & 3,4,5,6}
-		//i.e 6th will be invoke and 7th(inclusive) onwards will be standard api calls.
-		//if not supported than it will be base 2 {0,1,2} i.e real method calls will start from 3(inclusive) onwards.
-		boolean isStandardCall = true;
-		if (interfaceDefinition.isDispInterface())
-		{
-			isStandardCall = false;
-			switch(Opnum)
-			{
-				case 3: //getTypeInfoCount
-					//not supported
-					retVal = new Object[1];
-					((Object[])retVal)[0] = new Integer(0); //not supported
-					break;
-				case 4: //getTypeInfo
-					throw new JIException(JIErrorCodes.E_NOTIMPL);
-				case 5: //getIDOfNames
+                    paramObject.addInParamAsType ( UUID.class, JIFlags.FLAG_NULL );
+                    paramObject.addInParamAsObject ( new JIArray ( new JIString ( JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR ), null, 1, true ), JIFlags.FLAG_NULL );
+                    paramObject.addInParamAsType ( Integer.class, JIFlags.FLAG_NULL );
+                    paramObject.addInParamAsType ( Integer.class, JIFlags.FLAG_NULL );
 
-					JILocalParamsDescriptor paramObject = new JILocalParamsDescriptor();
+                    //now read and then send the result back.
+                    JIArray array = (JIArray)paramObject.read ( ndr )[1];
 
-					paramObject.addInParamAsType(UUID.class,JIFlags.FLAG_NULL);
-					paramObject.addInParamAsObject(new JIArray(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR),null,1,true),JIFlags.FLAG_NULL);
-					paramObject.addInParamAsType(Integer.class,JIFlags.FLAG_NULL);
-					paramObject.addInParamAsType(Integer.class,JIFlags.FLAG_NULL);
+                    final Object[] arrayObj = (Object[])array.getArrayInstance ();
+                    final Integer[] dispIds = new Integer[arrayObj.length];
+                    //get the first member of the Array , which is the APINAME and send the retVal with it's dispId
+                    final JIString apiName = (JIString)arrayObj[0];
+                    JILocalMethodDescriptor info = interfaceDefinitionOfClass.getMethodDescriptor ( apiName.getString () );
+                    if ( info == null )
+                    {
+                        dispIds[0] = new Integer ( JIErrorCodes.DISP_E_UNKNOWNNAME );
+                    }
+                    else
+                    {
+                        dispIds[0] = new Integer ( info.getMethodNum () );
+                    }
 
-					//now read and then send the result back.
-					JIArray array = (JIArray)paramObject.read(ndr)[1];
+                    //rest are all 0,1,2...parameters
+                    for ( int i = 1; i < arrayObj.length; i++ )
+                    {
+                        dispIds[i] = new Integer ( i - 1 );
+                    }
 
-					Object[] arrayObj = (Object[])array.getArrayInstance();
-					Integer[] dispIds = new Integer[arrayObj.length];
-					//get the first member of the Array , which is the APINAME and send the retVal with it's dispId
-					JIString apiName = (JIString)arrayObj[0];
-					JILocalMethodDescriptor info = interfaceDefinitionOfClass.getMethodDescriptor(apiName.getString());
-					if (info == null)
-					{
-						dispIds[0] = new Integer(JIErrorCodes.DISP_E_UNKNOWNNAME);
-					}
-					else
-					{
-						dispIds[0] = new Integer(info.getMethodNum());
-					}
+                    final JIArray results = new JIArray ( dispIds );
 
-					//rest are all 0,1,2...parameters
-					for (int i = 1;i < arrayObj.length;i++ )
-					{
-						dispIds[i] = new Integer(i - 1);
-					}
+                    retVal = new Object[1];
+                    ( (Object[])retVal )[0] = results;
 
-					JIArray results = new JIArray(dispIds);
+                    break;
+                case 6: //invoke of IDispatch
 
-					retVal = new Object[1];
-					((Object[])retVal)[0] = results;
+                    paramObject = new JILocalParamsDescriptor ();
+                    paramObject.setSession ( this.session );
+                    paramObject.addInParamAsType ( Integer.class, JIFlags.FLAG_NULL );
+                    paramObject.addInParamAsType ( UUID.class, JIFlags.FLAG_NULL );
+                    paramObject.addInParamAsType ( Integer.class, JIFlags.FLAG_NULL );
+                    paramObject.addInParamAsType ( Integer.class, JIFlags.FLAG_NULL );
 
-					break;
-				case 6: //invoke of IDispatch
+                    JIStruct dispParams = new JIStruct ();
+                    dispParams.addMember ( new JIPointer ( new JIArray ( JIVariant.class, null, 1, true ) ) );
+                    dispParams.addMember ( new JIPointer ( new JIArray ( Integer.class, null, 1, true ) ) );
+                    dispParams.addMember ( Integer.class );
+                    dispParams.addMember ( Integer.class );
 
-					paramObject = new JILocalParamsDescriptor();
-					paramObject.setSession(session);
-					paramObject.addInParamAsType(Integer.class,JIFlags.FLAG_NULL);
-					paramObject.addInParamAsType(UUID.class,JIFlags.FLAG_NULL);
-					paramObject.addInParamAsType(Integer.class,JIFlags.FLAG_NULL);
-					paramObject.addInParamAsType(Integer.class,JIFlags.FLAG_NULL);
+                    paramObject.addInParamAsObject ( dispParams, JIFlags.FLAG_REPRESENTATION_IDISPATCH_INVOKE );
+                    paramObject.addInParamAsType ( Integer.class, JIFlags.FLAG_NULL );
+                    paramObject.addInParamAsObject ( new JIArray ( Integer.class, null, 1, true ), JIFlags.FLAG_NULL );
+                    paramObject.addInParamAsObject ( new JIArray ( JIVariant.class, null, 1, true ), JIFlags.FLAG_NULL );
 
-					JIStruct dispParams = new JIStruct();
-					dispParams.addMember(new JIPointer(new JIArray(JIVariant.class,null,1,true)));
-					dispParams.addMember(new JIPointer(new JIArray(Integer.class,null,1,true)));
-					dispParams.addMember(Integer.class);
-					dispParams.addMember(Integer.class);
+                    final Object[] retresults = paramObject.read ( ndr );
+                    //named params not supported
+                    final int dispId = ( (Integer)retresults[0] ).intValue ();
 
-					paramObject.addInParamAsObject(dispParams,JIFlags.FLAG_REPRESENTATION_IDISPATCH_INVOKE);
-					paramObject.addInParamAsType(Integer.class,JIFlags.FLAG_NULL);
-					paramObject.addInParamAsObject(new JIArray(Integer.class,null,1,true),JIFlags.FLAG_NULL);
-					paramObject.addInParamAsObject(new JIArray(JIVariant.class,null,1,true),JIFlags.FLAG_NULL);
+                    info = interfaceDefinitionOfClass.getMethodDescriptorForDispId ( dispId );
+                    if ( info == null )
+                    {
+                        logger.error ( "MethodDescriptor not found for DispId :- {}", dispId );
 
-					Object[] retresults = paramObject.read(ndr);
-					//named params not supported
-					int dispId = ((Integer)retresults[0]).intValue();
+                        throw new JIException ( JIErrorCodes.DISP_E_MEMBERNOTFOUND );
+                    }
 
-					info = interfaceDefinitionOfClass.getMethodDescriptorForDispId(dispId);
-					if (info == null)
-					{
-                        if(JISystem.getLogger().isLoggable(Level.SEVERE))
+                    dispParams = (JIStruct)retresults[4];
+                    final JIPointer ptrToParamsArray = (JIPointer)dispParams.getMember ( 0 );
+
+                    params = new Object[0];
+                    if ( !ptrToParamsArray.isNull () )
+                    {
+                        //form the real array
+                        array = (JIArray)ptrToParamsArray.getReferent ();
+                        final Object[] variants = (Object[])array.getArrayInstance ();
+                        params = new Object[variants.length];
+                        for ( int i = 0; i < variants.length; i++ )
                         {
-                        	JISystem.getLogger().severe("MethodDescriptor not found for DispId :- " + dispId);
+                            params[i] = ( (JIVariant)variants[i] ).getObject ();
+                        }
+                    }
+
+                    if ( ( (Integer)retresults[5] ).intValue () != 0 )
+                    {
+                        //now replace the params at index from the index array.
+                        array = (JIArray)retresults[6];
+                        final Integer[] indexs = (Integer[])array.getArrayInstance ();
+                        array = (JIArray)retresults[7];
+                        final JIVariant[] variants = (JIVariant[])array.getArrayInstance ();
+                        for ( int i = 0; i < indexs.length; i++ )
+                        {
+                            params[indexs[i].intValue ()] = variants[i];
                         }
 
-						throw new JIException(JIErrorCodes.DISP_E_MEMBERNOTFOUND);
-					}
+                    }
 
-					dispParams = (JIStruct)retresults[4];
-					JIPointer ptrToParamsArray = (JIPointer)dispParams.getMember(0);
+                    //now to reverse this array of params.
+                    final int halflength = params.length / 2;
+                    for ( int i = 0; i < halflength; i++ )
+                    {
+                        final Object t = params[i];
+                        params[i] = params[params.length - 1 - i];
+                        params[params.length - 1 - i] = t;
+                    }
 
-					params = new Object[0];
-					if (!ptrToParamsArray.isNull())
-					{
-						//form the real array
-						array = (JIArray)ptrToParamsArray.getReferent();
-						Object[] variants = (Object[])array.getArrayInstance();
-						params = new Object[variants.length];
-						for (int i = 0;i < variants.length;i++)
-						{
-							params[i] = ((JIVariant)variants[i]).getObject();
-						}
-					}
+                    methodDescriptor = info;
+                    execute = true;
+                    break;
+                default: //others are normal API calls ...Opnum - 6 is there real Opnum. 0,1,2 and 3,4,5,6
+                    isStandardCall = true;
+                    Opnum = Opnum - 4; //adjust for only IDispatch(3,4,5,6) , IUnknown(0,1,2) will get adjusted below.
+                    logger.info ( "Standard call came: Opnum is {}", Opnum );
 
-					if (((Integer)retresults[5]).intValue() != 0)
-					{
-						//now replace the params at index from the index array.
-						array = (JIArray)retresults[6];
-						Integer[] indexs = (Integer[])array.getArrayInstance();
-						array = (JIArray)retresults[7];
-						JIVariant[] variants = (JIVariant[])array.getArrayInstance();
-						for (int i = 0;i < indexs.length; i++)
-						{
-							params[indexs[i].intValue()] = variants[i];
-						}
+            }
+        }
 
+        if ( isStandardCall )
+        {
+            methodDescriptor = interfaceDefinitionOfClass.getMethodDescriptor ( Opnum - 3 ); //adjust for IUnknown
+            if ( methodDescriptor == null )
+            {
+                throw new JIException ( JIErrorCodes.RPC_S_PROCNUM_OUT_OF_RANGE );
+            }
+            methodDescriptor.getParameterObject ().setSession ( this.session );
+            params = methodDescriptor.getParameterObject ().read ( ndr );
+            execute = true;
+        }
 
-					}
+        if ( execute )
+        {
+            //JILocalInterfaceDefinition interfaceDefinitionOfCall = interfaceDefinition;
+            final Class calleeClazz = interfaceDefinitionOfClass.instance == null ? interfaceDefinitionOfClass.clazz : interfaceDefinitionOfClass.instance.getClass ();
+            Method method = null;
+            try
+            {
+                logger.info ( "methodDescriptor: {}", methodDescriptor.getMethodName () );
+                method = calleeClazz.getDeclaredMethod ( methodDescriptor.getMethodName (), methodDescriptor.getInparametersAsClass () );
+                final Object calleeInstance = interfaceDefinitionOfClass.instance == null ? calleeClazz.newInstance () : interfaceDefinitionOfClass.instance;
+                logger.info ( "Call Back Method to be executed: {} , to be executed on {}", method, calleeInstance );
+                final Object result = method.invoke ( calleeInstance, params );
 
-					//now to reverse this array of params.
-					int halflength = params.length/2;
-					for (int i = 0;i < halflength; i++)
-					{
-						Object t = params[i];
-						params[i] = params[params.length - 1 - i];
-						params[params.length - 1 - i] = t;
-					}
+                if ( result == null )
+                {
+                    retVal = null;
+                }
+                else if ( ! ( result instanceof Object[] ) )
+                {
+                    retVal = new Object[1];
+                    ( (Object[])retVal )[0] = result;
+                }
+                else
+                {
+                    retVal = result;
+                }
 
+            }
+            catch ( final IllegalArgumentException e )
+            {
+                logger.warn ( "invokeMethod", e );
+                throw new JIException ( JIErrorCodes.E_INVALIDARG, e );
+            }
+            catch ( final IllegalAccessException e )
+            {
+                logger.warn ( "invokeMethod", e );
+                throw new JIException ( JIErrorCodes.ERROR_ACCESS_DENIED, e );
+            }
+            catch ( final InvocationTargetException e )
+            {
+                logger.warn ( "invokeMethod", e );
+                throw new JIException ( JIErrorCodes.E_UNEXPECTED, e );
+            }
+            catch ( final SecurityException e )
+            {
+                logger.warn ( "invokeMethod", e );
+                throw new JIException ( JIErrorCodes.ERROR_ACCESS_DENIED, e );
+            }
+            catch ( final NoSuchMethodException e )
+            {
+                logger.warn ( "invokeMethod", e );
+                throw new JIException ( JIErrorCodes.RPC_S_PROCNUM_OUT_OF_RANGE, e );
+            }
+            catch ( final InstantiationException e )
+            {
+                logger.warn ( "invokeMethod", e );
+                throw new JIException ( JIErrorCodes.E_UNEXPECTED, e );
+            }
 
+        }
 
-					methodDescriptor = info;
-					execute = true;
-					break;
-				default: //others are normal API calls ...Opnum - 6 is there real Opnum. 0,1,2 and 3,4,5,6
-					isStandardCall = true;
-					Opnum = Opnum - 4; //adjust for only IDispatch(3,4,5,6) , IUnknown(0,1,2) will get adjusted below.
-					if(JISystem.getLogger().isLoggable(Level.INFO))
-					{
-						JISystem.getLogger().info("Standard call came: Opnum is " + Opnum);
-					}
+        return (Object[])retVal;
+    }
 
-			}
-		}
+    /**
+     * Returns the primary interfaceDefinition. <br>
+     * 
+     * @return
+     * @see #JILocalCoClass(JILocalInterfaceDefinition, Class)
+     * @see #JILocalCoClass(JILocalInterfaceDefinition, Object)
+     */
+    public JILocalInterfaceDefinition getInterfaceDefinition ()
+    {
+        return this.interfaceDefinition;
+    }
 
-		if (isStandardCall)
-		{
-			methodDescriptor = interfaceDefinitionOfClass.getMethodDescriptor(Opnum - 3); //adjust for IUnknown
-			if (methodDescriptor == null)
-			{
-				throw new JIException(JIErrorCodes.RPC_S_PROCNUM_OUT_OF_RANGE);
-			}
-			methodDescriptor.getParameterObject().setSession(session);
-			params = methodDescriptor.getParameterObject().read(ndr);
-			execute = true;
-		}
+    /**
+     * @exclude
+     */
+    @Override
+    public boolean equals ( final Object target )
+    {
+        if ( target == null || ! ( target instanceof JILocalCoClass ) )
+        {
+            return false;
+        }
 
-		if (execute)
-		{
-			//JILocalInterfaceDefinition interfaceDefinitionOfCall = interfaceDefinition;
-			Class calleeClazz = interfaceDefinitionOfClass.instance == null ? interfaceDefinitionOfClass.clazz : interfaceDefinitionOfClass.instance.getClass();
-			Method method = null;
-			try {
-				if (JISystem.getLogger().isLoggable(Level.INFO))
-				{
-					JISystem.getLogger().info("methodDescriptor: " + methodDescriptor.getMethodName());
-				}
-				method = calleeClazz.getDeclaredMethod(methodDescriptor.getMethodName(),methodDescriptor.getInparametersAsClass());
-				Object calleeInstance = interfaceDefinitionOfClass.instance == null ? calleeClazz.newInstance() : interfaceDefinitionOfClass.instance;
-				if (JISystem.getLogger().isLoggable(Level.INFO))
-				{
-					JISystem.getLogger().info("Call Back Method to be executed: " + method + " , to be executed on " + calleeInstance);
-				}
-				Object result = method.invoke(calleeInstance,params);
+        return this.identifier == ( (JILocalCoClass)target ).identifier;
+    }
 
-				if (result == null)
-				{
-					retVal = null;
-				}
-				else
-				if (!(result instanceof Object[]))
-				{
-					retVal = new Object[1];
-					((Object[])retVal)[0] = result;
-				}
-				else
-				{
-					retVal = result;
-				}
+    /**
+     * @exclude
+     */
+    @Override
+    public int hashCode ()
+    {
+        return this.identifier;
+    }
 
+    /**
+     * Returns the interface definition based on the IID of the interface.
+     * 
+     * @return <code>null</code> if no interface definition matching the
+     *         <code>IID</code> has been found.
+     */
+    public JILocalInterfaceDefinition getInterfaceDefinition ( final String IID )
+    {
+        return (JILocalInterfaceDefinition)this.mapOfIIDsToInterfaceDefinitions.get ( IID.toUpperCase () );
+    }
 
-			} catch (IllegalArgumentException e) {
-				JISystem.getLogger().throwing("JILocalCoClass","invokeMethod",e);
-				throw new JIException(JIErrorCodes.E_INVALIDARG,e);
-			} catch (IllegalAccessException e) {
-				JISystem.getLogger().throwing("JILocalCoClass","invokeMethod",e);
-				throw new JIException(JIErrorCodes.ERROR_ACCESS_DENIED,e);
-			} catch (InvocationTargetException e) {
-				JISystem.getLogger().throwing("JILocalCoClass","invokeMethod",e);
-				throw new JIException(JIErrorCodes.E_UNEXPECTED,e);
-			} catch (SecurityException e) {
-				JISystem.getLogger().throwing("JILocalCoClass","invokeMethod",e);
-				throw new JIException(JIErrorCodes.ERROR_ACCESS_DENIED,e);
-			} catch (NoSuchMethodException e) {
-				JISystem.getLogger().throwing("JILocalCoClass","invokeMethod",e);
-				throw new JIException(JIErrorCodes.RPC_S_PROCNUM_OUT_OF_RANGE,e);
-			} catch (InstantiationException e) {
-				JISystem.getLogger().throwing("JILocalCoClass","invokeMethod",e);
-				throw new JIException(JIErrorCodes.E_UNEXPECTED,e);
-			}
+    /**
+     * @exclude
+     * @param IPID
+     * @return
+     */
+    JILocalInterfaceDefinition getInterfaceDefinitionFromIPID ( final String IPID )
+    {
+        return (JILocalInterfaceDefinition)this.mapOfIIDsToInterfaceDefinitions.get ( this.ipidVsIID.get ( IPID.toUpperCase () ) );
+    }
 
-		}
+    /**
+     * @exclude
+     */
+    String getIpidFromIID ( final String uniqueIID )
+    {
+        return (String)this.IIDvsIpid.get ( uniqueIID.toUpperCase () );
+    }
 
-		return (Object[])retVal;
-	}
+    /**
+     * @param uniqueIID
+     * @return
+     */
+    String getIIDFromIpid ( final String ipid )
+    {
+        return (String)this.ipidVsIID.get ( ipid.toUpperCase () );
+    }
 
+    /**
+     * <p>
+     * Returns <code>true</code> if the primary interface definition represents
+     * a real <code>IID</code> .
+     * 
+     * @return
+     */
+    //	 The bind-auth3 and all are then all done as per this <code>IID</code> and not IUnknown.
+    public boolean isCoClassUnderRealIID ()
+    {
+        return this.realIID;
+    }
 
-	/**Returns the primary interfaceDefinition. <br>
-	 *
-	 * @return
-	 * @see #JILocalCoClass(JILocalInterfaceDefinition, Class)
-	 * @see #JILocalCoClass(JILocalInterfaceDefinition, Object)
-	 */
-	public JILocalInterfaceDefinition getInterfaceDefinition()
-	{
-		return interfaceDefinition;
-	}
+    /**
+     * Associate the Session with this CoClass. Called by the framework.
+     * 
+     * @exclude
+     * @param session
+     */
+    void setSession ( final JISession session )
+    {
+        this.session = session;
+    }
 
-	/**
-	 * @exclude
-	 */
-	public boolean equals(Object target)
-	{
-		if (target == null || !(target instanceof JILocalCoClass))
-		{
-			return false;
-		}
+    /**
+     * Returns the session associated with this CoClass.
+     * 
+     * @return
+     */
+    JISession getSession ()
+    {
+        return this.session;
+    }
 
-		return identifier == ((JILocalCoClass)target).identifier;
-	}
-	/**
-	 * @exclude
-	 */
-	public int hashCode()
-	{
-		return identifier;
-	}
-
-	/**Returns the interface definition based on the IID of the interface.
-	 *
-	 * @return <code>null</code> if no interface definition matching the <code>IID</code> has been found.
-	 */
-	public JILocalInterfaceDefinition getInterfaceDefinition(String IID)
-	{
-		return (JILocalInterfaceDefinition)mapOfIIDsToInterfaceDefinitions.get(IID.toUpperCase());
-	}
-
-	/**
-	 * @exclude
-	 * @param IPID
-	 * @return
-	 */
-	 JILocalInterfaceDefinition getInterfaceDefinitionFromIPID(String IPID)
-	{
-		return (JILocalInterfaceDefinition)mapOfIIDsToInterfaceDefinitions.get((String)ipidVsIID.get(IPID.toUpperCase()));
-	}
-	/**
-	 * @exclude
-	 */
-	 String getIpidFromIID(String uniqueIID)
-	{
-		return (String)IIDvsIpid.get(uniqueIID.toUpperCase());
-	}
-
-	/**
-	 *
-	 * @param uniqueIID
-	 * @return
-	 */
-	 String getIIDFromIpid(String ipid)
-	{
-		return (String)ipidVsIID.get(ipid.toUpperCase());
-	}
-
-	/** <p> Returns <code>true</code> if the primary interface definition represents a real <code>IID</code> .
-	 *
-	 * @return
-	 */
-//	 The bind-auth3 and all are then all done as per this <code>IID</code> and not IUnknown.
-	public boolean isCoClassUnderRealIID()
-	{
-		return realIID;
-	}
-
-	/**
-	 * Associate the Session with this CoClass. Called by the framework.
-	 * @exclude
-	 * @param session
-	 */
-	void setSession(JISession session) {
-		this.session = session;
-	}
-
-	/**
-	 * Returns the session associated with this CoClass.
-	 * @return
-	 */
-	JISession getSession() {
-		return session;
-	}
-
-	List getSupportedInterfaces()
-	{
-		return listOfSupportedInterfaces;
-	}
+    List getSupportedInterfaces ()
+    {
+        return this.listOfSupportedInterfaces;
+    }
 }

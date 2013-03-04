@@ -21,17 +21,25 @@ import java.util.List;
 
 import rpc.core.UUID;
 
-/** Framework Internal.
+/**
+ * Framework Internal.
  * 
  * @exclude
  * @since 1.0
  */
-public interface IJICOMRuntimeWorker {
-	public void setOpnum(int opnum);
-	public void setCurrentIID(String iid);
-	public void setCurrentObjectID(UUID objectId);
-	public UUID getCurrentObjectID();
-	public List getQIedIIDs();
-	public boolean isResolver();
-	public boolean workerOver();
+public interface IJICOMRuntimeWorker
+{
+    public void setOpnum ( int opnum );
+
+    public void setCurrentIID ( String iid );
+
+    public void setCurrentObjectID ( UUID objectId );
+
+    public UUID getCurrentObjectID ();
+
+    public List getQIedIIDs ();
+
+    public boolean isResolver ();
+
+    public boolean workerOver ();
 }

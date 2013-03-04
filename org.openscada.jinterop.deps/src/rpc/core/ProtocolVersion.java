@@ -15,8 +15,6 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc.core;
 
 import ndr.NdrBuffer;
@@ -24,32 +22,40 @@ import ndr.NdrException;
 import ndr.NdrObject;
 import ndr.NetworkDataRepresentation;
 
-public class ProtocolVersion extends NdrObject {
+public class ProtocolVersion extends NdrObject
+{
 
-	int majorVersion, minorVersion;
+    int majorVersion, minorVersion;
 
-    public int getMajorVersion() {
-		return majorVersion;
+    public int getMajorVersion ()
+    {
+        return majorVersion;
     }
 
-    public void setMajorVersion(short majorVersion) {
-		this.majorVersion = majorVersion;
+    public void setMajorVersion ( short majorVersion )
+    {
+        this.majorVersion = majorVersion;
     }
 
-    public int getMinorVersion() {
-		return minorVersion;
+    public int getMinorVersion ()
+    {
+        return minorVersion;
     }
 
-    public void setMinorVersion(short minorVersion) {
-		this.minorVersion = minorVersion;
+    public void setMinorVersion ( short minorVersion )
+    {
+        this.minorVersion = minorVersion;
     }
 
-    public void encode(NetworkDataRepresentation ndr, NdrBuffer dst) throws NdrException {
-        dst.enc_ndr_small(majorVersion);
-        dst.enc_ndr_small(minorVersion);
+    public void encode ( NetworkDataRepresentation ndr, NdrBuffer dst ) throws NdrException
+    {
+        dst.enc_ndr_small ( majorVersion );
+        dst.enc_ndr_small ( minorVersion );
     }
-    public void decode(NetworkDataRepresentation ndr, NdrBuffer src) throws NdrException {
-        majorVersion = src.dec_ndr_small();
-        minorVersion = src.dec_ndr_small();
+
+    public void decode ( NetworkDataRepresentation ndr, NdrBuffer src ) throws NdrException
+    {
+        majorVersion = src.dec_ndr_small ();
+        minorVersion = src.dec_ndr_small ();
     }
 }

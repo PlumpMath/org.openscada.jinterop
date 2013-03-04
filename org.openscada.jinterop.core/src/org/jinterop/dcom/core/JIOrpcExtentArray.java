@@ -19,43 +19,44 @@ package org.jinterop.dcom.core;
 
 import java.io.Serializable;
 
-
 /**
- *
  * @since 1.0
- *
  */
-final class JIOrpcExtentArray implements Serializable {
+final class JIOrpcExtentArray implements Serializable
+{
 
-	private static final long serialVersionUID = -3594184670915738836L;
-	private String uuid = null;
-	private int size = -1;
-	private Byte[] data = null;
+    private static final long serialVersionUID = -3594184670915738836L;
 
-	JIOrpcExtentArray(String guid,int size,Byte[] data)
-	{
-		uuid = guid;
-		this.size = size;
-		this.data = data;
-	}
+    private String uuid = null;
 
-	public String getGUID()
-	{
-		return uuid;
-	}
+    private int size = -1;
 
-	public int getSizeOfData()
-	{
-		return size;
-	}
+    private Byte[] data = null;
 
-	public byte[] getData()
-	{
-		byte[] newData = new byte[data.length];
-		for (int i = 0;i < data.length;i++)
-		{
-			newData[i] = data[i].byteValue();
-		}
-		return newData;
-	}
+    JIOrpcExtentArray ( final String guid, final int size, final Byte[] data )
+    {
+        this.uuid = guid;
+        this.size = size;
+        this.data = data;
+    }
+
+    public String getGUID ()
+    {
+        return this.uuid;
+    }
+
+    public int getSizeOfData ()
+    {
+        return this.size;
+    }
+
+    public byte[] getData ()
+    {
+        final byte[] newData = new byte[this.data.length];
+        for ( int i = 0; i < this.data.length; i++ )
+        {
+            newData[i] = this.data[i].byteValue ();
+        }
+        return newData;
+    }
 }

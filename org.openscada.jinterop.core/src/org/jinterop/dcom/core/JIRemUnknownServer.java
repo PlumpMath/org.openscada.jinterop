@@ -30,184 +30,206 @@ import rpc.Endpoint;
 import rpc.FaultException;
 import rpc.Stub;
 
+final class JIRemUnknownServer extends Stub
+{
 
+    private static Properties defaults = new Properties ();
+    static
+    {
 
- final class JIRemUnknownServer extends Stub {
+        defaults.put ( "rpc.ntlm.lanManagerKey", "false" );
+        defaults.put ( "rpc.ntlm.sign", "false" );
+        defaults.put ( "rpc.ntlm.seal", "false" );
+        defaults.put ( "rpc.ntlm.keyExchange", "false" );
+        defaults.put ( "rpc.connectionContext", "rpc.security.ntlm.NtlmConnectionContext" );
+        defaults.put ( "rpc.socketTimeout", new Integer ( 0 ).toString () );
+    }
 
-	private static Properties defaults = new Properties();
-	static {
+    private JISession session = null;
 
-		defaults.put("rpc.ntlm.lanManagerKey","false");
-		defaults.put("rpc.ntlm.sign","false");
-		defaults.put("rpc.ntlm.seal","false");
-		defaults.put("rpc.ntlm.keyExchange","false");
-		defaults.put("rpc.connectionContext","rpc.security.ntlm.NtlmConnectionContext");
-		defaults.put("rpc.socketTimeout", new Integer(0).toString());
-	}
+    private String syntax = null;
 
-	private JISession session = null;
-	private String syntax = null;
-	private String remunknownIPID = null;
-	private final Object mutex = new Object();
-	private boolean timeoutModifiedfrom0 = false;
-	
-	/** Interface pointer to the initialized COM server , must be called immediately after the JIComServer has been 
-	 * initialized. And closeStub must be called where we call closeStub of JIComServer.
-	 * 
-	 * @param session
-	 * @param interfacePointer
-	 * @param address in the "ncacn_ip_tcp:host[port]" format
-	 * @throws JIException
-	 */
-	JIRemUnknownServer(JISession session, String remUnknownIpid, String address) throws JIException
-	{
-		super();
+    private String remunknownIPID = null;
 
-		this.session = session;
-		super.setTransportFactory(JIComTransportFactory.getSingleTon());
-		super.setProperties(new Properties(defaults));
-		super.getProperties().setProperty("rpc.socketTimeout", new Integer(session.getGlobalSocketTimeout()).toString());
+    private final Object mutex = new Object ();
 
-		if (session.isNTLMv2Enabled())
-		{
-			super.getProperties().setProperty("rpc.ntlm.ntlmv2", "true");
-		}
+    private boolean timeoutModifiedfrom0 = false;
 
-		if (session.isSSOEnabled())
-		{
-			super.getProperties().setProperty("rpc.ntlm.sso", "true");
-		}
-		else
-		{
-			super.getProperties().setProperty("rpc.security.username", session.getUserName());
-			super.getProperties().setProperty("rpc.security.password", session.getPassword());
-			super.getProperties().setProperty("rpc.ntlm.domain", session.getDomain());
-		}
-		
-		//now set the NTLMv2 Session Security.
-		if (session.isSessionSecurityEnabled())
-		{
-			super.getProperties().setProperty("rpc.ntlm.seal", "true");
-			super.getProperties().setProperty("rpc.ntlm.sign", "true");
-			super.getProperties().setProperty("rpc.ntlm.keyExchange", "true");
-			super.getProperties().setProperty("rpc.ntlm.keyLength", "128");
-			super.getProperties().setProperty("rpc.ntlm.ntlm2", "true");
-		}
+    /**
+     * Interface pointer to the initialized COM server , must be called
+     * immediately after the JIComServer has been
+     * initialized. And closeStub must be called where we call closeStub of
+     * JIComServer.
+     * 
+     * @param session
+     * @param interfacePointer
+     * @param address
+     *            in the "ncacn_ip_tcp:host[port]" format
+     * @throws JIException
+     */
+    JIRemUnknownServer ( final JISession session, final String remUnknownIpid, final String address ) throws JIException
+    {
+        super ();
 
-		
-		// Now will setup syntax for IRemUnknown and the address. 
-		syntax = "00000143-0000-0000-c000-000000000046:0.0";
-		//and currently only TCPIP is supported.
-		setAddress(address);
-		this.remunknownIPID = remUnknownIpid; 
-		this.session.setStub2(this);
-	}
+        this.session = session;
+        super.setTransportFactory ( JIComTransportFactory.getSingleTon () );
+        super.setProperties ( new Properties ( defaults ) );
+        super.getProperties ().setProperty ( "rpc.socketTimeout", new Integer ( session.getGlobalSocketTimeout () ).toString () );
 
-	protected String getSyntax() {
-		return syntax;
-	}
+        if ( session.isNTLMv2Enabled () )
+        {
+            super.getProperties ().setProperty ( "rpc.ntlm.ntlmv2", "true" );
+        }
 
-	/** Execute a Method on the COM Interface identified by the IID
-	 *
-	 *
-	 * @exclude
-	 * @param obj
-	 * @param targetIID
-	 * @return
-	 * @throws JIException
-	 */
-	Object[] call(JICallBuilder obj,String targetIID, int socketTimeout) throws JIException
-	{
-		synchronized (mutex) {
+        if ( session.isSSOEnabled () )
+        {
+            super.getProperties ().setProperty ( "rpc.ntlm.sso", "true" );
+        }
+        else
+        {
+            super.getProperties ().setProperty ( "rpc.security.username", session.getUserName () );
+            super.getProperties ().setProperty ( "rpc.security.password", session.getPassword () );
+            super.getProperties ().setProperty ( "rpc.ntlm.domain", session.getDomain () );
+        }
 
-			if (session.isSessionInDestroy() && !obj.fromDestroySession)
-			{
-				throw new JIException(JIErrorCodes.JI_SESSION_DESTROYED);
-			}
+        //now set the NTLMv2 Session Security.
+        if ( session.isSessionSecurityEnabled () )
+        {
+            super.getProperties ().setProperty ( "rpc.ntlm.seal", "true" );
+            super.getProperties ().setProperty ( "rpc.ntlm.sign", "true" );
+            super.getProperties ().setProperty ( "rpc.ntlm.keyExchange", "true" );
+            super.getProperties ().setProperty ( "rpc.ntlm.keyLength", "128" );
+            super.getProperties ().setProperty ( "rpc.ntlm.ntlm2", "true" );
+        }
 
-			if (socketTimeout != 0)
-			{
-				setSocketTimeOut(socketTimeout);
-			}
-			else //for cases where it was something earlier, but is now being set to 0.
-			{
-				if (timeoutModifiedfrom0)
-				{
-					setSocketTimeOut(socketTimeout);
-				}
-			}
+        // Now will setup syntax for IRemUnknown and the address. 
+        this.syntax = "00000143-0000-0000-c000-000000000046:0.0";
+        //and currently only TCPIP is supported.
+        setAddress ( address );
+        this.remunknownIPID = remUnknownIpid;
+        this.session.setStub2 ( this );
+    }
 
-			try {
+    @Override
+    protected String getSyntax ()
+    {
+        return this.syntax;
+    }
 
-				attach();
-				if (!getEndpoint().getSyntax().getUuid().toString().equalsIgnoreCase(targetIID))
-				{
-					//first send an AlterContext to the IID of the interface
-					getEndpoint().getSyntax().setUuid(new rpc.core.UUID(targetIID));
-					getEndpoint().getSyntax().setVersion(0,0);
-					((JIComEndpoint)getEndpoint()).rebindEndPoint();
-				}
+    /**
+     * Execute a Method on the COM Interface identified by the IID
+     * 
+     * @exclude
+     * @param obj
+     * @param targetIID
+     * @return
+     * @throws JIException
+     */
+    Object[] call ( final JICallBuilder obj, final String targetIID, final int socketTimeout ) throws JIException
+    {
+        synchronized ( this.mutex )
+        {
 
-				setObject(obj.getParentIpid());
-				call(Endpoint.IDEMPOTENT,obj);
+            if ( this.session.isSessionInDestroy () && !obj.fromDestroySession )
+            {
+                throw new JIException ( JIErrorCodes.JI_SESSION_DESTROYED );
+            }
 
-			}catch(FaultException e)
-			{
-				throw new JIException(e.status,e);
-			}catch (IOException e) {
-				throw new JIException(JIErrorCodes.RPC_E_UNEXPECTED,e);
-			}catch (JIRuntimeException e1)
-			{
-				throw new JIException(e1);
-			}
+            if ( socketTimeout != 0 )
+            {
+                setSocketTimeOut ( socketTimeout );
+            }
+            else
+            //for cases where it was something earlier, but is now being set to 0.
+            {
+                if ( this.timeoutModifiedfrom0 )
+                {
+                    setSocketTimeOut ( socketTimeout );
+                }
+            }
 
-			return obj.getResults();
-		}
+            try
+            {
 
-	}
+                attach ();
+                if ( !getEndpoint ().getSyntax ().getUuid ().toString ().equalsIgnoreCase ( targetIID ) )
+                {
+                    //first send an AlterContext to the IID of the interface
+                    getEndpoint ().getSyntax ().setUuid ( new rpc.core.UUID ( targetIID ) );
+                    getEndpoint ().getSyntax ().setVersion ( 0, 0 );
+                    ( (JIComEndpoint)getEndpoint () ).rebindEndPoint ();
+                }
 
-	void addRef_ReleaseRef(JICallBuilder obj) throws JIException
-	{
-		synchronized (mutex) {
+                setObject ( obj.getParentIpid () );
+                call ( Endpoint.IDEMPOTENT, obj );
 
-			if (remunknownIPID == null)
-			{
-				return;
-			}
-			//now also set the Object ID for IRemUnknown call this will be the IPID of the returned JIRemActivation or IOxidResolver
-			obj.setParentIpid(remunknownIPID);
-			obj.attachSession(session);
-			try {
-				call(obj,JIRemUnknown.IID_IUnknown, session.getGlobalSocketTimeout());
-			} catch (JIRuntimeException e1)
-			{
-				throw new JIException(e1);
-			}
+            }
+            catch ( final FaultException e )
+            {
+                throw new JIException ( e.status, e );
+            }
+            catch ( final IOException e )
+            {
+                throw new JIException ( JIErrorCodes.RPC_E_UNEXPECTED, e );
+            }
+            catch ( final JIRuntimeException e1 )
+            {
+                throw new JIException ( e1 );
+            }
 
-		}
-	}
+            return obj.getResults ();
+        }
 
-	void closeStub()
-	{
-		try {
-			detach();
-		} catch (IOException e) {
-//			e.printStackTrace();
-		}
-	}
+    }
 
-	void setSocketTimeOut(int timeout)
-	{
-		if (timeout == 0)
-		{
-			timeoutModifiedfrom0 = false;
-		}
-		else
-		{
-			timeoutModifiedfrom0 = true;
-		}
+    void addRef_ReleaseRef ( final JICallBuilder obj ) throws JIException
+    {
+        synchronized ( this.mutex )
+        {
 
-		getProperties().setProperty("rpc.socketTimeout", new Integer(timeout).toString());
-	}
+            if ( this.remunknownIPID == null )
+            {
+                return;
+            }
+            //now also set the Object ID for IRemUnknown call this will be the IPID of the returned JIRemActivation or IOxidResolver
+            obj.setParentIpid ( this.remunknownIPID );
+            obj.attachSession ( this.session );
+            try
+            {
+                call ( obj, JIRemUnknown.IID_IUnknown, this.session.getGlobalSocketTimeout () );
+            }
+            catch ( final JIRuntimeException e1 )
+            {
+                throw new JIException ( e1 );
+            }
+
+        }
+    }
+
+    void closeStub ()
+    {
+        try
+        {
+            detach ();
+        }
+        catch ( final IOException e )
+        {
+            //			e.printStackTrace();
+        }
+    }
+
+    void setSocketTimeOut ( final int timeout )
+    {
+        if ( timeout == 0 )
+        {
+            this.timeoutModifiedfrom0 = false;
+        }
+        else
+        {
+            this.timeoutModifiedfrom0 = true;
+        }
+
+        getProperties ().setProperty ( "rpc.socketTimeout", new Integer ( timeout ).toString () );
+    }
 
 }

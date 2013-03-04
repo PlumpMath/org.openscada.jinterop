@@ -17,112 +17,123 @@
 
 package org.jinterop.dcom.core;
 
-import org.jinterop.dcom.common.JISystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-
-/**Stores the oxid details in memory.
+/**
+ * Stores the oxid details in memory.
  * 
  * @since 1.0
- *
  */
-final class JIComOxidDetails {
+final class JIComOxidDetails
+{
 
-	private JILocalCoClass referent = null;
-	private String ipid = null;
-	private String remUnknownIpid = null;
-	private JIOxid oxid = null;
-	private JIObjectId oid = null;
-	private String iid = null;
-	private JIComOxidRuntimeHelper comRuntimeHelper = null;
-	private int portForRemUnknown = -1;
-	private int protectionLevel = 2;
-	private ThreadGroup remUnknownThread = null;
-	
-	JIComOxidDetails(JILocalCoClass javaInstance, JIOxid oxid, JIObjectId oid
-					,String iid,String ipid,JIInterfacePointer ptr, JIComOxidRuntimeHelper helper,int protectionLevel)
-	{
-		referent = javaInstance;
-		this.ipid = ipid;
-		this.oxid = oxid;
-		this.oid = oid;
-		this.iid = iid;
-		this.protectionLevel = protectionLevel;
-		comRuntimeHelper = helper;
-	}
+    private final static Logger logger = LoggerFactory.getLogger ( JIComOxidDetails.class );
 
-	void setPortForRemUnknown(int port)
-	{
-		portForRemUnknown = port;
-	}
-	
-	int getPortForRemUnknown()
-	{
-		return portForRemUnknown;
-	}
-	
-	String getIID()
-	{
-		return iid;
-	}
+    private JILocalCoClass referent = null;
 
-	String getIpid() 
-	{
-		return ipid;
-	}
+    private String ipid = null;
 
-	String getRemUnknownIpid() 
-	{
-		return remUnknownIpid;
-	}
-	
-	void setRemUnknownIpid(String ipid)
-	{
-		this.remUnknownIpid = ipid;
-	}
-	
-	JIObjectId getOid() 
-	{
-		return oid;
-	}
+    private String remUnknownIpid = null;
 
-	JIOxid getOxid() 
-	{
-		return oxid;
-	}
+    private JIOxid oxid = null;
 
-	JILocalCoClass getReferent()
-	{
-		return referent;
-	}
-	
-	
-	JIComOxidRuntimeHelper getCOMRuntimeHelper()
-	{
-		return comRuntimeHelper;
-	}
-	
-	int getProtectionLevel()
-	{
-		return protectionLevel;
-	}
-	
-	void setRemUnknownThreadGroup(ThreadGroup remUnknown)
-	{
-	    this.remUnknownThread = remUnknown;
-	}
-	
-	void interruptRemUnknownThreadGroup()
-	{
-		if (remUnknownThread != null)
-		{
-			try
-			{
-				remUnknownThread.interrupt();
-//				remUnknownThread.destroy();
-			}catch(Exception e)
-			{
-				JISystem.getLogger().info("JIComOxidDetails interruptRemUnknownThreadGroup " +  e.toString());
-			}
-		}
-	}
+    private JIObjectId oid = null;
+
+    private String iid = null;
+
+    private JIComOxidRuntimeHelper comRuntimeHelper = null;
+
+    private int portForRemUnknown = -1;
+
+    private int protectionLevel = 2;
+
+    private ThreadGroup remUnknownThread = null;
+
+    JIComOxidDetails ( final JILocalCoClass javaInstance, final JIOxid oxid, final JIObjectId oid, final String iid, final String ipid, final JIInterfacePointer ptr, final JIComOxidRuntimeHelper helper, final int protectionLevel )
+    {
+        this.referent = javaInstance;
+        this.ipid = ipid;
+        this.oxid = oxid;
+        this.oid = oid;
+        this.iid = iid;
+        this.protectionLevel = protectionLevel;
+        this.comRuntimeHelper = helper;
+    }
+
+    void setPortForRemUnknown ( final int port )
+    {
+        this.portForRemUnknown = port;
+    }
+
+    int getPortForRemUnknown ()
+    {
+        return this.portForRemUnknown;
+    }
+
+    String getIID ()
+    {
+        return this.iid;
+    }
+
+    String getIpid ()
+    {
+        return this.ipid;
+    }
+
+    String getRemUnknownIpid ()
+    {
+        return this.remUnknownIpid;
+    }
+
+    void setRemUnknownIpid ( final String ipid )
+    {
+        this.remUnknownIpid = ipid;
+    }
+
+    JIObjectId getOid ()
+    {
+        return this.oid;
+    }
+
+    JIOxid getOxid ()
+    {
+        return this.oxid;
+    }
+
+    JILocalCoClass getReferent ()
+    {
+        return this.referent;
+    }
+
+    JIComOxidRuntimeHelper getCOMRuntimeHelper ()
+    {
+        return this.comRuntimeHelper;
+    }
+
+    int getProtectionLevel ()
+    {
+        return this.protectionLevel;
+    }
+
+    void setRemUnknownThreadGroup ( final ThreadGroup remUnknown )
+    {
+        this.remUnknownThread = remUnknown;
+    }
+
+    void interruptRemUnknownThreadGroup ()
+    {
+        if ( this.remUnknownThread != null )
+        {
+            try
+            {
+                this.remUnknownThread.interrupt ();
+                //				remUnknownThread.destroy();
+            }
+            catch ( final Exception e )
+            {
+                logger.info ( "JIComOxidDetails interruptRemUnknownThreadGroup", e );
+            }
+        }
+    }
 }

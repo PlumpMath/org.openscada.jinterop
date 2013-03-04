@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.openscada.jinterop"
+      label="%featureName"
+      version="1.0.0.qualifier"
+      provider-name="openSCADA"
+      plugin="org.openscada.jinterop.core">
+
+   <description url="http://openscada.org">
+      The openSCADA version of j-Interop.
+   </description>
+
+   <copyright url="http://opensource.org/licenses/lgpl-3.0.html">
+      %copyright
+   </copyright>
+
+   <license url="http://opensource.org/licenses/lgpl-3.0.html">
+      %license
+   </license>
+
+   <plugin
+         id="org.openscada.jinterop.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.openscada.jinterop.deps"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

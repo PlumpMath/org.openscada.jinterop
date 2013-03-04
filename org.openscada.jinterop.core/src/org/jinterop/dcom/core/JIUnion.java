@@ -30,236 +30,250 @@ import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JIRuntimeException;
 import org.jinterop.dcom.common.JISystem;
 
-
-/**<p> This class represents the <code>Union</code> data type. Its usage is dictated by the discriminant
- * which acts as a "switch" to select the correct member to be serialized\deserialzed. <p>
- *
- * Sample Usage :-
- *
- * <br>
+/**
+ * <p>
+ * This class represents the <code>Union</code> data type. Its usage is dictated
+ * by the discriminant which acts as a "switch" to select the correct member to
+ * be serialized\deserialzed.
+ * <p>
+ * Sample Usage :- <br>
  * <code>
  * 	JIUnion forTypeDesc = new JIUnion(Short.class); <br>
- *	JIPointer ptrToTypeDesc = new JIPointer(typeDesc); <br>
- *	JIPointer ptrToArrayDesc = new JIPointer(arrayDesc); <br>
- *	forTypeDesc.addMember(TypeDesc.VT_PTR,ptrToTypeDesc); <br>
- *	forTypeDesc.addMember(TypeDesc.VT_SAFEARRAY,ptrToTypeDesc); <br>
- *	forTypeDesc.addMember(TypeDesc.VT_CARRAY,ptrToArrayDesc); <br>
- *	forTypeDesc.addMember(TypeDesc.VT_USERDEFINED,Integer.class); <p>
- * </code>
- *
- *	The TypeDesc.VT_PTR is an <code>Integer</code> and is used as a discriminant to select ptrTypeDesc, TypeDesc.VT_CARRAY
- *  chooses ptrArrayDesc. <br>
- *
- *
- *
+ * 	JIPointer ptrToTypeDesc = new JIPointer(typeDesc); <br>
+ * 	JIPointer ptrToArrayDesc = new JIPointer(arrayDesc); <br>
+ * 	forTypeDesc.addMember(TypeDesc.VT_PTR,ptrToTypeDesc); <br>
+ * 	forTypeDesc.addMember(TypeDesc.VT_SAFEARRAY,ptrToTypeDesc); <br>
+ * 	forTypeDesc.addMember(TypeDesc.VT_CARRAY,ptrToArrayDesc); <br>
+ * 	forTypeDesc.addMember(TypeDesc.VT_USERDEFINED,Integer.class); <p>
+ * </code> The TypeDesc.VT_PTR is an <code>Integer</code> and is used as a
+ * discriminant to select ptrTypeDesc, TypeDesc.VT_CARRAY chooses ptrArrayDesc.
+ * <br>
+ * 
  * @since 1.0
  */
-public final class JIUnion implements Serializable {
+public final class JIUnion implements Serializable
+{
 
+    private static final long serialVersionUID = -3353313619137076876L;
 
-	private static final long serialVersionUID = -3353313619137076876L;
-	private HashMap dsVsMember = new HashMap();
-	private Class discriminantClass = null;
-	//private int length = 0;
-	//private int lengthOfDisc = 0;
-	//private Union clone = null;
-	private JIUnion() {}
+    private final HashMap dsVsMember = new HashMap ();
 
-	/** Creates an object with discriminant type specified. Used only during deserializing
-	 *  the union. Can only be of the type <code>Integer</code>,<code>Short</code>,<code>Boolean</code>
-	 *  or <code>Character</code>. <br>
-	 *
-	 * @param discriminantClass
-	 * @throws IllegalArgumentException if the <code>discriminantClass</code> is not of the type as specified
-	 * above.
-	 */
-	public JIUnion(Class discriminantClass)
-	{
-		//the discriminant can only be a int, boolean or char
+    private Class discriminantClass = null;
 
-		if (!discriminantClass.equals(Integer.class) && !discriminantClass.equals(Short.class)
-		&& !discriminantClass.equals(Boolean.class) && !discriminantClass.equals(Character.class))
-		{
-			//has to be from one of these. Rule from IDL.
-			throw new IllegalArgumentException(JISystem.getLocalizedMessage(JIErrorCodes.JI_UNION_INCORRECT_DISC));
-		}
+    //private int length = 0;
+    //private int lengthOfDisc = 0;
+    //private Union clone = null;
+    private JIUnion ()
+    {
+    }
 
-		this.discriminantClass = discriminantClass;
+    /**
+     * Creates an object with discriminant type specified. Used only during
+     * deserializing
+     * the union. Can only be of the type <code>Integer</code>,
+     * <code>Short</code>,<code>Boolean</code> or <code>Character</code>. <br>
+     * 
+     * @param discriminantClass
+     * @throws IllegalArgumentException
+     *             if the <code>discriminantClass</code> is not of the type as
+     *             specified
+     *             above.
+     */
+    public JIUnion ( final Class discriminantClass )
+    {
+        //the discriminant can only be a int, boolean or char
 
-	}
+        if ( !discriminantClass.equals ( Integer.class ) && !discriminantClass.equals ( Short.class ) && !discriminantClass.equals ( Boolean.class ) && !discriminantClass.equals ( Character.class ) )
+        {
+            //has to be from one of these. Rule from IDL.
+            throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_UNION_INCORRECT_DISC ) );
+        }
 
-	/** Adds a member to this Union. The <code>member</code> is distinguished using the <code>discriminant</code>. <br>
-	 *
-	 * @param discriminant
-	 * @param member
-	 * @throws JIException
-	 * @throws IllegalArgumentException if any parameter is <code>null</code>
-	 */
-	public void addMember(Object discriminant, Object member) throws JIException
-	{
-		if (discriminant == null || member == null)
-		{
-			throw new IllegalArgumentException(JISystem.getLocalizedMessage(JIErrorCodes.JI_UNION_NULL_DISCRMINANT));
-		}
+        this.discriminantClass = discriminantClass;
 
-		if (!discriminant.getClass().equals(discriminantClass))
-		{
-			throw new JIException(JIErrorCodes.JI_UNION_DISCRMINANT_MISMATCH);
-		}
+    }
 
-		if (member.getClass().equals(JIPointer.class) && !((JIPointer)member).isReference())
-		{
-			((JIPointer)member).setDeffered(true);
-		}
-		else
-		if (member.getClass().equals(JIString.class))
-		{
-			((JIString)member).setDeffered(true);
-		}
+    /**
+     * Adds a member to this Union. The <code>member</code> is distinguished
+     * using the <code>discriminant</code>. <br>
+     * 
+     * @param discriminant
+     * @param member
+     * @throws JIException
+     * @throws IllegalArgumentException
+     *             if any parameter is <code>null</code>
+     */
+    public void addMember ( final Object discriminant, final Object member ) throws JIException
+    {
+        if ( discriminant == null || member == null )
+        {
+            throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_UNION_NULL_DISCRMINANT ) );
+        }
 
-		dsVsMember.put(discriminant,member);
-	}
+        if ( !discriminant.getClass ().equals ( this.discriminantClass ) )
+        {
+            throw new JIException ( JIErrorCodes.JI_UNION_DISCRMINANT_MISMATCH );
+        }
 
-	/** Adds a member to this Union. The <code>member</code> is distinguished using the <code>discriminant</code>. <br>
-	 *
-	 * @param discriminant
-	 * @param member
-	 * @throws JIException
-	 * @throws IllegalArgumentException if <code>discriminant</code> is <code>null</code>
-	 */
-	//used both for reading and writing
-	public void addMember(Object discriminant, JIStruct member) throws JIException
-	{
-		if (discriminant == null)
-		{
-			throw new IllegalArgumentException(JISystem.getLocalizedMessage(JIErrorCodes.JI_UNION_NULL_DISCRMINANT));
-		}
+        if ( member.getClass ().equals ( JIPointer.class ) && ! ( (JIPointer)member ).isReference () )
+        {
+            ( (JIPointer)member ).setDeffered ( true );
+        }
+        else if ( member.getClass ().equals ( JIString.class ) )
+        {
+            ( (JIString)member ).setDeffered ( true );
+        }
 
-		if (!discriminant.getClass().equals(discriminantClass))
-		{
-			throw new JIException(JIErrorCodes.JI_UNION_DISCRMINANT_MISMATCH);
-		}
+        this.dsVsMember.put ( discriminant, member );
+    }
 
-		if (member == null)
-		{
-			member = JIStruct.MEMBER_IS_EMPTY;
-		}
+    /**
+     * Adds a member to this Union. The <code>member</code> is distinguished
+     * using the <code>discriminant</code>. <br>
+     * 
+     * @param discriminant
+     * @param member
+     * @throws JIException
+     * @throws IllegalArgumentException
+     *             if <code>discriminant</code> is <code>null</code>
+     */
+    //used both for reading and writing
+    public void addMember ( final Object discriminant, JIStruct member ) throws JIException
+    {
+        if ( discriminant == null )
+        {
+            throw new IllegalArgumentException ( JISystem.getLocalizedMessage ( JIErrorCodes.JI_UNION_NULL_DISCRMINANT ) );
+        }
 
-		dsVsMember.put(discriminant,member);
-		//do not need a seperate list of pointers like the struct , since based on the discriminant only 1 pointer
-		//(if present) can be deserialized\serialized.
- 	}
+        if ( !discriminant.getClass ().equals ( this.discriminantClass ) )
+        {
+            throw new JIException ( JIErrorCodes.JI_UNION_DISCRMINANT_MISMATCH );
+        }
 
-	/**Removes the entry , identified by it's <code>discriminant</code> from the parameter list of the union. <br>
-	 *
-	 * @param discriminant
-	 */
-	public void removeMember(Object discriminant)
-	{
-		dsVsMember.remove(discriminant);
-	}
+        if ( member == null )
+        {
+            member = JIStruct.MEMBER_IS_EMPTY;
+        }
 
-	/** Returns the discriminant Vs there members Map. <br>
-	 *
-	 * @return
-	 */
-	public Map getMembers()
-	{
-		return dsVsMember;
-	}
+        this.dsVsMember.put ( discriminant, member );
+        //do not need a seperate list of pointers like the struct , since based on the discriminant only 1 pointer
+        //(if present) can be deserialized\serialized.
+    }
 
-	void encode(NetworkDataRepresentation ndr, List listOfDefferedPointers,int FLAGS)
-	{
-		if (dsVsMember.size() == 0 || dsVsMember.size() > 1)
-		{
-			throw new JIRuntimeException(JIErrorCodes.JI_UNION_DISCRMINANT_SERIALIZATION_ERROR);
-		}
+    /**
+     * Removes the entry , identified by it's <code>discriminant</code> from the
+     * parameter list of the union. <br>
+     * 
+     * @param discriminant
+     */
+    public void removeMember ( final Object discriminant )
+    {
+        this.dsVsMember.remove ( discriminant );
+    }
 
-		//first write the discriminant and then the member
-		Iterator keys = dsVsMember.keySet().iterator();
-		JIMarshalUnMarshalHelper.serialize(ndr,discriminantClass,keys.next(),listOfDefferedPointers,FLAGS);
+    /**
+     * Returns the discriminant Vs there members Map. <br>
+     * 
+     * @return
+     */
+    public Map getMembers ()
+    {
+        return this.dsVsMember;
+    }
 
-		keys = dsVsMember.values().iterator();
-		Object value = keys.next();
+    void encode ( final NetworkDataRepresentation ndr, final List listOfDefferedPointers, final int FLAGS )
+    {
+        if ( this.dsVsMember.size () == 0 || this.dsVsMember.size () > 1 )
+        {
+            throw new JIRuntimeException ( JIErrorCodes.JI_UNION_DISCRMINANT_SERIALIZATION_ERROR );
+        }
 
-		//will not write empty union members
-		if (!value.equals(JIStruct.MEMBER_IS_EMPTY))
-		{
-			JIMarshalUnMarshalHelper.serialize(ndr,value.getClass(),value,listOfDefferedPointers,FLAGS);
-		}
+        //first write the discriminant and then the member
+        Iterator keys = this.dsVsMember.keySet ().iterator ();
+        JIMarshalUnMarshalHelper.serialize ( ndr, this.discriminantClass, keys.next (), listOfDefferedPointers, FLAGS );
 
-	}
+        keys = this.dsVsMember.values ().iterator ();
+        final Object value = keys.next ();
 
-	JIUnion decode(NetworkDataRepresentation ndr, List listOfDefferedPointers,int FLAGS,Map additionalData)
-	{
-		//first read discriminant, and then call the appropriate deserializer of the member
-		if (dsVsMember.size() == 0)
-		{
-			throw new JIRuntimeException(JIErrorCodes.JI_UNION_DISCRMINANT_DESERIALIZATION_ERROR);
-		}
+        //will not write empty union members
+        if ( !value.equals ( JIStruct.MEMBER_IS_EMPTY ) )
+        {
+            JIMarshalUnMarshalHelper.serialize ( ndr, value.getClass (), value, listOfDefferedPointers, FLAGS );
+        }
 
-		//shallowClone();
-		//first write the discriminant and then the member
-		JIUnion retVal = new JIUnion();
-		retVal.discriminantClass = discriminantClass;
+    }
 
-		Object key = JIMarshalUnMarshalHelper.deSerialize(ndr,discriminantClass,listOfDefferedPointers,FLAGS,additionalData);
+    JIUnion decode ( final NetworkDataRepresentation ndr, final List listOfDefferedPointers, final int FLAGS, final Map additionalData )
+    {
+        //first read discriminant, and then call the appropriate deserializer of the member
+        if ( this.dsVsMember.size () == 0 )
+        {
+            throw new JIRuntimeException ( JIErrorCodes.JI_UNION_DISCRMINANT_DESERIALIZATION_ERROR );
+        }
 
-		//next thing to be deserialized is the member
-		Object value = dsVsMember.get(key);
+        //shallowClone();
+        //first write the discriminant and then the member
+        final JIUnion retVal = new JIUnion ();
+        retVal.discriminantClass = this.discriminantClass;
 
-		//should allow null since this could be a "default"
-		if (value == null)
-		{
-			value = JIStruct.MEMBER_IS_EMPTY;
-		}
+        final Object key = JIMarshalUnMarshalHelper.deSerialize ( ndr, this.discriminantClass, listOfDefferedPointers, FLAGS, additionalData );
 
-		//will not write empty union members
-		if (!value.equals(JIStruct.MEMBER_IS_EMPTY))
-		{
-			retVal.dsVsMember.put(key,JIMarshalUnMarshalHelper.deSerialize(ndr,value,listOfDefferedPointers,FLAGS,additionalData));
-		}
-		else
-		{
-			retVal.dsVsMember.put(key,value);
-		}
+        //next thing to be deserialized is the member
+        Object value = this.dsVsMember.get ( key );
 
-		return retVal;
-	}
+        //should allow null since this could be a "default"
+        if ( value == null )
+        {
+            value = JIStruct.MEMBER_IS_EMPTY;
+        }
 
-	int getLength()
-	{
-		int length = 0;
-		Iterator itr = dsVsMember.keySet().iterator();
-		while (itr.hasNext())
-		{
-			Object o = itr.next();
-			int temp = JIMarshalUnMarshalHelper.getLengthInBytes(o.getClass(),o,JIFlags.FLAG_NULL);
-			length = length > temp ? length : temp; //length of the largest member
-		}
+        //will not write empty union members
+        if ( !value.equals ( JIStruct.MEMBER_IS_EMPTY ) )
+        {
+            retVal.dsVsMember.put ( key, JIMarshalUnMarshalHelper.deSerialize ( ndr, value, listOfDefferedPointers, FLAGS, additionalData ) );
+        }
+        else
+        {
+            retVal.dsVsMember.put ( key, value );
+        }
 
-		return length + JIMarshalUnMarshalHelper.getLengthInBytes(discriminantClass,null,JIFlags.FLAG_NULL);
-	}
+        return retVal;
+    }
 
-	int getAlignment()
-	{
-		int alignment = 0;
+    int getLength ()
+    {
+        int length = 0;
+        final Iterator itr = this.dsVsMember.keySet ().iterator ();
+        while ( itr.hasNext () )
+        {
+            final Object o = itr.next ();
+            final int temp = JIMarshalUnMarshalHelper.getLengthInBytes ( o.getClass (), o, JIFlags.FLAG_NULL );
+            length = length > temp ? length : temp; //length of the largest member
+        }
 
-		if(discriminantClass.equals(Integer.class))
-		{
-			//align with 4 bytes
-			alignment =  4 ;
-		}else if (discriminantClass.equals(Short.class))
-		{
-			//align with 2
-			alignment = 2 ;
-		}
+        return length + JIMarshalUnMarshalHelper.getLengthInBytes ( this.discriminantClass, null, JIFlags.FLAG_NULL );
+    }
 
-		return alignment;
-	}
+    int getAlignment ()
+    {
+        int alignment = 0;
 
-//	public String toString()
-//	{
-//		return  "[" + dsVsMember +  "]";
-//	}
+        if ( this.discriminantClass.equals ( Integer.class ) )
+        {
+            //align with 4 bytes
+            alignment = 4;
+        }
+        else if ( this.discriminantClass.equals ( Short.class ) )
+        {
+            //align with 2
+            alignment = 2;
+        }
+
+        return alignment;
+    }
+
+    //	public String toString()
+    //	{
+    //		return  "[" + dsVsMember +  "]";
+    //	}
 }

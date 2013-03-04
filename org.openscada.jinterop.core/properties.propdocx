@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="ASCII"?>
+<properties:properties xmlns:properties="urn:openscada:doc:content:properties">
+  <properties:groups properties:prefix="org.openscada.jinterop.core">
+    <properties:properties properties:name="os.name"/>
+    <properties:properties properties:name="file.encoding"/>
+  </properties:groups>
+</properties:properties>

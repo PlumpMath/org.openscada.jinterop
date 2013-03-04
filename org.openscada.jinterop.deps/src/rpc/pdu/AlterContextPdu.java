@@ -15,15 +15,14 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc.pdu;
 
 import ndr.NetworkDataRepresentation;
 import rpc.ConnectionOrientedPdu;
 import rpc.core.PresentationContext;
 
-public class AlterContextPdu extends ConnectionOrientedPdu {
+public class AlterContextPdu extends ConnectionOrientedPdu
+{
 
     public static final int ALTER_CONTEXT_TYPE = 0x0e;
 
@@ -35,68 +34,79 @@ public class AlterContextPdu extends ConnectionOrientedPdu {
 
     private int associationGroupId = 0;
 
-    public int getType() {
+    public int getType ()
+    {
         return ALTER_CONTEXT_TYPE;
     }
 
-    public int getMaxTransmitFragment() {
+    public int getMaxTransmitFragment ()
+    {
         return maxTransmitFragment;
     }
 
-    public void setMaxTransmitFragment(int maxTransmitFragment) {
+    public void setMaxTransmitFragment ( int maxTransmitFragment )
+    {
         this.maxTransmitFragment = maxTransmitFragment;
     }
 
-    public int getMaxReceiveFragment() {
+    public int getMaxReceiveFragment ()
+    {
         return maxReceiveFragment;
     }
 
-    public void setMaxReceiveFragment(int maxReceiveFragment) {
+    public void setMaxReceiveFragment ( int maxReceiveFragment )
+    {
         this.maxReceiveFragment = maxReceiveFragment;
     }
 
-    public int getAssociationGroupId() {
+    public int getAssociationGroupId ()
+    {
         return associationGroupId;
     }
 
-    public void setAssociationGroupId(int associationGroupId) {
+    public void setAssociationGroupId ( int associationGroupId )
+    {
         this.associationGroupId = associationGroupId;
     }
 
-    public PresentationContext[] getContextList() {
+    public PresentationContext[] getContextList ()
+    {
         return contextList;
     }
 
-    public void setContextList(PresentationContext[] contextList) {
+    public void setContextList ( PresentationContext[] contextList )
+    {
         this.contextList = contextList;
     }
 
-    protected void readBody(NetworkDataRepresentation ndr) {
-        setMaxTransmitFragment(ndr.readUnsignedShort());
-        setMaxReceiveFragment(ndr.readUnsignedShort());
-        setAssociationGroupId((int) ndr.readUnsignedLong());
-        int count = ndr.readUnsignedSmall();
+    protected void readBody ( NetworkDataRepresentation ndr )
+    {
+        setMaxTransmitFragment ( ndr.readUnsignedShort () );
+        setMaxReceiveFragment ( ndr.readUnsignedShort () );
+        setAssociationGroupId ( (int)ndr.readUnsignedLong () );
+        int count = ndr.readUnsignedSmall ();
         PresentationContext[] contextList = new PresentationContext[count];
-        for (int i = 0; i < count; i++) {
-            contextList[i] = new PresentationContext();
-            contextList[i].read(ndr);
+        for ( int i = 0; i < count; i++ )
+        {
+            contextList[i] = new PresentationContext ();
+            contextList[i].read ( ndr );
         }
-        setContextList(contextList);
+        setContextList ( contextList );
     }
 
-    protected void writeBody(NetworkDataRepresentation ndr) {
-        int maxTransmitFragment = getMaxTransmitFragment();
-        int maxReceiveFragment = getMaxReceiveFragment();
-        ndr.writeUnsignedShort((maxTransmitFragment == -1) ?
-                ndr.getBuffer().getCapacity() : maxTransmitFragment);
-        ndr.writeUnsignedShort((maxReceiveFragment == -1) ?
-                ndr.getBuffer().getCapacity() : maxReceiveFragment);
-        ndr.writeUnsignedLong(getAssociationGroupId());
-        PresentationContext[] contextList = getContextList();
+    protected void writeBody ( NetworkDataRepresentation ndr )
+    {
+        int maxTransmitFragment = getMaxTransmitFragment ();
+        int maxReceiveFragment = getMaxReceiveFragment ();
+        ndr.writeUnsignedShort ( ( maxTransmitFragment == -1 ) ? ndr.getBuffer ().getCapacity () : maxTransmitFragment );
+        ndr.writeUnsignedShort ( ( maxReceiveFragment == -1 ) ? ndr.getBuffer ().getCapacity () : maxReceiveFragment );
+        ndr.writeUnsignedLong ( getAssociationGroupId () );
+        PresentationContext[] contextList = getContextList ();
         int count = contextList.length;
-        ndr.writeUnsignedSmall((short) count);
-        for (int i = 0; i < count; i++) {
-            contextList[i].write(ndr);
+        ndr.writeUnsignedSmall ( (short)count );
+        for ( int i = 0; i < count; i++ )
+        {
+            contextList[i].write ( ndr );
         }
     }
 

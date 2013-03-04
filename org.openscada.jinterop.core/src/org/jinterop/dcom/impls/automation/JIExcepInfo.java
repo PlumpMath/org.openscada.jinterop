@@ -18,70 +18,77 @@
 package org.jinterop.dcom.impls.automation;
 
 /**
- * Exposes error code , exception source, exception description and help file path
+ * Exposes error code , exception source, exception description and help file
+ * path
  * for an unsuccessful {@link IJIDispatch} operation.
- *
+ * 
  * @since 2.0
  */
 public final class JIExcepInfo
 {
     String excepSource = null;
+
     String excepDesc = null;
+
     String excepHelpfile = null;
 
     int errorCode = -1;
-    JIExcepInfo()
+
+    JIExcepInfo ()
     {
     }
 
-    void clearAll()
+    void clearAll ()
     {
-        errorCode = -1;
-        excepSource = null;
-        excepDesc = null;
-        excepHelpfile = null;
+        this.errorCode = -1;
+        this.excepSource = null;
+        this.excepDesc = null;
+        this.excepHelpfile = null;
     }
 
     /**
      * An error code identifying the error.
-     *
+     * 
      * @return
      */
-    public int getErrorCode()
+    public int getErrorCode ()
     {
-        return errorCode;
+        return this.errorCode;
     }
 
     /**
-     * A textual, human-readable name of the source of the exception. Typically, this is an
+     * A textual, human-readable name of the source of the exception. Typically,
+     * this is an
      * application name.
-     *
+     * 
      * @return
      */
-    public String getExcepSource()
+    public String getExcepSource ()
     {
-        return excepSource;
+        return this.excepSource;
     }
 
     /**
-     * A textual, human-readable description of the error intended for the customer. If no
+     * A textual, human-readable description of the error intended for the
+     * customer. If no
      * description is available it returns <code>null</code>.
-     *
+     * 
      * @return
      */
-    public String getExcepDesc()
+    public String getExcepDesc ()
     {
-        return excepDesc;
+        return this.excepDesc;
     }
 
     /**
-     * The fully qualified drive, path, and file name of a Help file that has more information
+     * The fully qualified drive, path, and file name of a Help file that has
+     * more information
      * about the error. If no Help is available it returns <code>null</code>.
-     *
+     * 
      * @return
      */
-    public String getHelpFilePath()
+    public String getHelpFilePath ()
     {
-        return excepHelpfile;
+        return this.excepHelpfile;
     }
 }

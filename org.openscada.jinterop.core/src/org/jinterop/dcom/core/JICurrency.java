@@ -17,88 +17,99 @@
 
 package org.jinterop.dcom.core;
 
-
-/**Definition from MSDN: <i> encapsulates the CURRENCY data type used in Automation. CURRENCY is implemented
- * as an 8-byte, two's-complement integer value scaled by 10,000. This gives a fixed-point number
- * with 15 digits to the left of the decimal point and 4 digits to the right. The CURRENCY data type
- * is extremely useful for calculations involving money, or for any fixed-point calculation where accuracy
- * is important. It is one of the possible types for the VARIANT data type of Automation.<p>
- *
+/**
+ * Definition from MSDN: <i> encapsulates the CURRENCY data type used in
+ * Automation. CURRENCY is implemented
+ * as an 8-byte, two's-complement integer value scaled by 10,000. This gives a
+ * fixed-point number
+ * with 15 digits to the left of the decimal point and 4 digits to the right.
+ * The CURRENCY data type
+ * is extremely useful for calculations involving money, or for any fixed-point
+ * calculation where accuracy
+ * is important. It is one of the possible types for the VARIANT data type of
+ * Automation.
+ * <p>
  * for example :- <br>
- * If the absolute value of the fractional part is greater than 10,000, the appropriate adjustment
- * is made to the units, as shown in the third of the following examples. <p>
- *
- * Note that the units and fractional part are specified by signed long values. The fourth of the following
- * examples shows what happens when the parameters have different signs. <p>
- *
- * COleCurrency curA;           // value: 0.0000 <br>
- * curA.SetCurrency(4, 500);    // value: 4.0500 <br>
- * curA.SetCurrency(2, 11000);  // value: 3.1000 <br>
- * curA.SetCurrency(2, -50);    // value: 1.9950 <br>
- *
+ * If the absolute value of the fractional part is greater than 10,000, the
+ * appropriate adjustment is made to the units, as shown in the third of the
+ * following examples.
+ * <p>
+ * Note that the units and fractional part are specified by signed long values.
+ * The fourth of the following examples shows what happens when the parameters
+ * have different signs.
+ * <p>
+ * COleCurrency curA; // value: 0.0000 <br>
+ * curA.SetCurrency(4, 500); // value: 4.0500 <br>
+ * curA.SetCurrency(2, 11000); // value: 3.1000 <br>
+ * curA.SetCurrency(2, -50); // value: 1.9950 <br>
  * </i>
+ * 
  * @since 1.0
  */
-public final class JICurrency {
+public final class JICurrency
+{
 
-	private int units = 0;
-	private int fractionalUnits = 0;
+    private int units = 0;
 
-//	private double value = 0;
-	
-	public JICurrency(String value)
-	{
-		if (value.startsWith("."))
-		{
-			value = "0" + value;
-		}
-		
-		if (value.endsWith("."))
-		{
-			value = value + "0";
-		}
-		
-		String[] str = value.split("\\.");
-		
-		units = Integer.parseInt(str[0]);
-		if (str.length > 1)
-		{
-			fractionalUnits = Integer.parseInt(str[1]);
-		}	
-		
-	}
+    private int fractionalUnits = 0;
 
-	public JICurrency(int units, int fractionalUnits)
-	{
-		this.units = units;
-		this.fractionalUnits = fractionalUnits;
-	}
+    //	private double value = 0;
 
-	/**Returns the units value. <br>
-	 *
-	 * @return
-	 */
-	public int getUnits()
-	{
-		return units;
-	}
+    public JICurrency ( String value )
+    {
+        if ( value.startsWith ( "." ) )
+        {
+            value = "0" + value;
+        }
 
-	/**Returns the fractionalUnits value. <br>
-	 *
-	 * @return
-	 */
-	public int getFractionalUnits()
-	{
-		return fractionalUnits;
-	}
+        if ( value.endsWith ( "." ) )
+        {
+            value = value + "0";
+        }
 
-//	/**Returns the encapsulated value.
-//	 *
-//	 * @return
-//	 */
-//	public double getValue()
-//	{
-//		return value;
-//	}
+        final String[] str = value.split ( "\\." );
+
+        this.units = Integer.parseInt ( str[0] );
+        if ( str.length > 1 )
+        {
+            this.fractionalUnits = Integer.parseInt ( str[1] );
+        }
+
+    }
+
+    public JICurrency ( final int units, final int fractionalUnits )
+    {
+        this.units = units;
+        this.fractionalUnits = fractionalUnits;
+    }
+
+    /**
+     * Returns the units value. <br>
+     * 
+     * @return
+     */
+    public int getUnits ()
+    {
+        return this.units;
+    }
+
+    /**
+     * Returns the fractionalUnits value. <br>
+     * 
+     * @return
+     */
+    public int getFractionalUnits ()
+    {
+        return this.fractionalUnits;
+    }
+
+    //	/**Returns the encapsulated value.
+    //	 *
+    //	 * @return
+    //	 */
+    //	public double getValue()
+    //	{
+    //		return value;
+    //	}
 
 }

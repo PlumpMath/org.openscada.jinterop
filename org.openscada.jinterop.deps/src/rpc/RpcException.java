@@ -15,24 +15,26 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
 package rpc;
 
 import java.io.IOException;
 
-public class RpcException extends IOException {
+public class RpcException extends IOException
+{
 
     /**
 	 *
 	 */
-	private static final long serialVersionUID = -6529915206074406077L;
+    private static final long serialVersionUID = -6529915206074406077L;
 
-	public RpcException() {
-        super();
+    public RpcException ()
+    {
+        super ();
     }
 
-    public RpcException(String message) {
-        super(message);
+    public RpcException ( String message )
+    {
+        super ( message );
     }
 
 }

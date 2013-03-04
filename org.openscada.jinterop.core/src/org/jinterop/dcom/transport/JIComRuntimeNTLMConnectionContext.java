@@ -36,128 +36,136 @@ import rpc.security.ntlm.NtlmConnectionContext;
 /**
  * @exclude
  * @since 1.0
- *
  */
-public final class JIComRuntimeNTLMConnectionContext extends NtlmConnectionContext {
+public final class JIComRuntimeNTLMConnectionContext extends NtlmConnectionContext
+{
 
-	  private static final String IID = "IID";
-	  private static final String IID2 = "IID2";
+    private static final String IID = "IID";
 
-	  private boolean established = false;
-	  private Properties properties = null;
-	  private List listOfInterfacesSupported = Collections.synchronizedList(new ArrayList());
+    private static final String IID2 = "IID2";
 
-	  // this returns null, so that a recieve is performed first.
-	  public ConnectionOrientedPdu init(PresentationContext context,
-	            Properties properties) throws IOException {
-	      super.init2(context,properties);
-	      this.properties = properties;
-	      listOfInterfacesSupported.add(((String)properties.getProperty(IID)).toUpperCase());
-	      listOfInterfacesSupported.add(((String)properties.getProperty(IID2)).toUpperCase() + ":0.0");
-	      updateListOfInterfacesSupported2((List)properties.get("LISTOFSUPPORTEDINTERFACES"));
-	      return null;
-	   }
+    private boolean established = false;
 
-	  public ConnectionOrientedPdu accept(ConnectionOrientedPdu pdu)
-      throws IOException {
-		  ConnectionOrientedPdu reply = null;
-		  switch (pdu.getType()) {
-		  	case BindPdu.BIND_TYPE:
-		  		established = true;
-		  		PresentationContext[] presentationContexts = ((BindPdu)pdu).getContextList();
-		  		reply = new BindAcknowledgePdu();
-  				PresentationResult[] result = new PresentationResult[1];
-		  		for (int i = 0; i < presentationContexts.length;i++)
-		  		{
-		  			PresentationContext presentationContext = presentationContexts[i];
+    private Properties properties = null;
 
-		  			boolean contains = false;
-		  			synchronized (listOfInterfacesSupported) {
-		  				contains = listOfInterfacesSupported.contains(presentationContext.abstractSyntax.toString().toUpperCase());
-					}
-		  			if (!contains)
-		  			{
-		  				//create a fault PDU stating the syntax is not supported.
-		  				result[0] = new PresentationResult(PresentationResult.PROVIDER_REJECTION,PresentationResult.ABSTRACT_SYNTAX_NOT_SUPPORTED,new PresentationSyntax(UUID.NIL_UUID + ":0.0"));
-		  				((BindAcknowledgePdu)reply).setResultList(result);
-		  				break;
-		  			}
-		  		}
+    private final List listOfInterfacesSupported = Collections.synchronizedList ( new ArrayList () );
 
-		  		//all okay
-		  		if (((BindAcknowledgePdu)reply).getResultList() == null)
-		  		{
-		  			result[0] = new PresentationResult();//this will be acceptance.
-		  			((BindAcknowledgePdu)reply).setAssociationGroupId(new Object().hashCode()); //TODO should I save this ?
-		  			((BindAcknowledgePdu)reply).setResultList(result);
-		  		}
-		  		((BindAcknowledgePdu)reply).setCallId(pdu.getCallId());
+    // this returns null, so that a recieve is performed first.
+    @Override
+    public ConnectionOrientedPdu init ( final PresentationContext context, final Properties properties ) throws IOException
+    {
+        super.init2 ( context, properties );
+        this.properties = properties;
+        this.listOfInterfacesSupported.add ( properties.getProperty ( IID ).toUpperCase () );
+        this.listOfInterfacesSupported.add ( properties.getProperty ( IID2 ).toUpperCase () + ":0.0" );
+        updateListOfInterfacesSupported2 ( (List)properties.get ( "LISTOFSUPPORTEDINTERFACES" ) );
+        return null;
+    }
 
+    @Override
+    public ConnectionOrientedPdu accept ( final ConnectionOrientedPdu pdu ) throws IOException
+    {
+        ConnectionOrientedPdu reply = null;
+        switch ( pdu.getType () )
+        {
+            case BindPdu.BIND_TYPE:
+                this.established = true;
+                PresentationContext[] presentationContexts = ( (BindPdu)pdu ).getContextList ();
+                reply = new BindAcknowledgePdu ();
+                PresentationResult[] result = new PresentationResult[1];
+                for ( int i = 0; i < presentationContexts.length; i++ )
+                {
+                    final PresentationContext presentationContext = presentationContexts[i];
 
-		  		//issue a challenge against the request info
+                    boolean contains = false;
+                    synchronized ( this.listOfInterfacesSupported )
+                    {
+                        contains = this.listOfInterfacesSupported.contains ( presentationContext.abstractSyntax.toString ().toUpperCase () );
+                    }
+                    if ( !contains )
+                    {
+                        //create a fault PDU stating the syntax is not supported.
+                        result[0] = new PresentationResult ( PresentationResult.PROVIDER_REJECTION, PresentationResult.ABSTRACT_SYNTAX_NOT_SUPPORTED, new PresentationSyntax ( UUID.NIL_UUID + ":0.0" ) );
+                        ( (BindAcknowledgePdu)reply ).setResultList ( result );
+                        break;
+                    }
+                }
 
+                //all okay
+                if ( ( (BindAcknowledgePdu)reply ).getResultList () == null )
+                {
+                    result[0] = new PresentationResult ();//this will be acceptance.
+                    ( (BindAcknowledgePdu)reply ).setAssociationGroupId ( new Object ().hashCode () ); //TODO should I save this ?
+                    ( (BindAcknowledgePdu)reply ).setResultList ( result );
+                }
+                ( (BindAcknowledgePdu)reply ).setCallId ( pdu.getCallId () );
 
-		  		break;
-		  	case AlterContextPdu.ALTER_CONTEXT_TYPE:
-		  		established = true;
+                //issue a challenge against the request info
 
-		  		presentationContexts = ((AlterContextPdu)pdu).getContextList();
-		  		reply = new AlterContextResponsePdu();
-  				result = new PresentationResult[1];
-		  		for (int i = 0; i < presentationContexts.length;i++)
-		  		{
-		  			PresentationContext presentationContext = presentationContexts[i];
-		  			boolean contains = false;
-		  			synchronized (listOfInterfacesSupported) {
-		  				contains = listOfInterfacesSupported.contains(presentationContext.abstractSyntax.toString().toUpperCase());
-					}
-		  			if (!contains)
-		  			{
-		  				//create a fault PDU stating the syntax is not supported.
-		  				result[0] = new PresentationResult(PresentationResult.PROVIDER_REJECTION,PresentationResult.ABSTRACT_SYNTAX_NOT_SUPPORTED,new PresentationSyntax(UUID.NIL_UUID + ":0.0"));
-		  				((AlterContextResponsePdu)reply).setResultList(result);
-		  				break;
-		  			}
-		  		}
+                break;
+            case AlterContextPdu.ALTER_CONTEXT_TYPE:
+                this.established = true;
 
-		  		//all okay
-		  		if (((AlterContextResponsePdu)reply).getResultList() == null)
-		  		{
-		  			result[0] = new PresentationResult();//this will be acceptance.
-		  			((AlterContextResponsePdu)reply).setAssociationGroupId(new Object().hashCode()); //TODO should I save this ?
-		  			((AlterContextResponsePdu)reply).setResultList(result);
-		  		}
+                presentationContexts = ( (AlterContextPdu)pdu ).getContextList ();
+                reply = new AlterContextResponsePdu ();
+                result = new PresentationResult[1];
+                for ( int i = 0; i < presentationContexts.length; i++ )
+                {
+                    final PresentationContext presentationContext = presentationContexts[i];
+                    boolean contains = false;
+                    synchronized ( this.listOfInterfacesSupported )
+                    {
+                        contains = this.listOfInterfacesSupported.contains ( presentationContext.abstractSyntax.toString ().toUpperCase () );
+                    }
+                    if ( !contains )
+                    {
+                        //create a fault PDU stating the syntax is not supported.
+                        result[0] = new PresentationResult ( PresentationResult.PROVIDER_REJECTION, PresentationResult.ABSTRACT_SYNTAX_NOT_SUPPORTED, new PresentationSyntax ( UUID.NIL_UUID + ":0.0" ) );
+                        ( (AlterContextResponsePdu)reply ).setResultList ( result );
+                        break;
+                    }
+                }
 
-		  		((AlterContextResponsePdu)reply).setCallId(pdu.getCallId());
+                //all okay
+                if ( ( (AlterContextResponsePdu)reply ).getResultList () == null )
+                {
+                    result[0] = new PresentationResult ();//this will be acceptance.
+                    ( (AlterContextResponsePdu)reply ).setAssociationGroupId ( new Object ().hashCode () ); //TODO should I save this ?
+                    ( (AlterContextResponsePdu)reply ).setResultList ( result );
+                }
 
-		  		//issue a challenge against the request info
+                ( (AlterContextResponsePdu)reply ).setCallId ( pdu.getCallId () );
 
+                //issue a challenge against the request info
 
-		  	break;
-		  	default:
-		  		reply = super.accept(reply);
-		  }
+                break;
+            default:
+                reply = super.accept ( reply );
+        }
 
-		  return reply;
-	  }
+        return reply;
+    }
 
-	  public boolean isEstablished() {
-	        return super.isEstablished() | established;
-	    }
+    @Override
+    public boolean isEstablished ()
+    {
+        return super.isEstablished () | this.established;
+    }
 
-	  void updateListOfInterfacesSupported(List newList)
-	  {
-		  synchronized (listOfInterfacesSupported) {
-			listOfInterfacesSupported.addAll(newList);
-		  }
-	  }
+    void updateListOfInterfacesSupported ( final List newList )
+    {
+        synchronized ( this.listOfInterfacesSupported )
+        {
+            this.listOfInterfacesSupported.addAll ( newList );
+        }
+    }
 
-	  void updateListOfInterfacesSupported2(List newList)
-	  {
-		for (int i = 0;i < newList.size();i++)
-		{
-			listOfInterfacesSupported.add(newList.get(i) + ":0.0");
-		}
-	  }
+    void updateListOfInterfacesSupported2 ( final List newList )
+    {
+        for ( int i = 0; i < newList.size (); i++ )
+        {
+            this.listOfInterfacesSupported.add ( newList.get ( i ) + ":0.0" );
+        }
+    }
 
 }

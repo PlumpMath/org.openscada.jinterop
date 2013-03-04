@@ -15,17 +15,17 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc.pdu;
 
 import rpc.ConnectionOrientedPdu;
 
-public class CancelCoPdu extends ConnectionOrientedPdu {
+public class CancelCoPdu extends ConnectionOrientedPdu
+{
 
     public static final int CANCEL_TYPE = 0x12;
 
-    public int getType() {
+    public int getType ()
+    {
         return CANCEL_TYPE;
     }
 

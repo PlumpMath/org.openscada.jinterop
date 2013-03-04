@@ -15,22 +15,24 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
 package rpc;
 
-public class ProviderException extends RpcException {
+public class ProviderException extends RpcException
+{
 
     /**
 	 *
 	 */
-	private static final long serialVersionUID = -1110150203054594627L;
+    private static final long serialVersionUID = -1110150203054594627L;
 
-	public ProviderException() {
-        super();
+    public ProviderException ()
+    {
+        super ();
     }
 
-    public ProviderException(String message) {
-        super(message);
+    public ProviderException ( String message )
+    {
+        super ( message );
     }
 
 }

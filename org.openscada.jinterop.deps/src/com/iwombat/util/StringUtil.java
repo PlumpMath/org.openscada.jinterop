@@ -4,84 +4,95 @@
 
 package com.iwombat.util;
 
-
-
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-
 /**
  * Class StringUtil
- * Description:  General utilities for string manipulation
- *
- * @author  $Author: vikramrc $
- * @version $Revision: 1.2 $
+ * Description: General utilities for string manipulation
  * 
- * <br>
- * <dl><dt><b>Date:</b><dd>$Date: 2007/12/25 10:18:57 $</dd></dl>
+ * @author $Author: vikramrc $
+ * @version $Revision: 1.2 $ <br>
+ *          <dl>
+ *          <dt><b>Date:</b>
+ *          <dd>$Date: 2007/12/25 10:18:57 $</dd>
+ *          </dl>
  */
 
-public final class StringUtil extends Object {
+public final class StringUtil extends Object
+{
 
     /** supress creation of instances of StringUtil */
 
-    private StringUtil() {}
+    private StringUtil ()
+    {
+    }
 
     /**
      * Method replaceString
      * Description: replace all occurances of substring with another
-     *
-     * @param target - the target string
-     * @param match - the substring to be replaced
-     * @param replace - the replacement for match
+     * 
+     * @param target
+     *            - the target string
+     * @param match
+     *            - the substring to be replaced
+     * @param replace
+     *            - the replacement for match
      * @return String
      */
 
-    public static String replaceString(String target, String match, String replace) {
+    public static String replaceString ( String target, String match, String replace )
+    {
 
-        if (null == target) {
+        if ( null == target )
+        {
             return null;
         }
 
-        if ((null == match) || (match.equals(""))) {
+        if ( ( null == match ) || ( match.equals ( "" ) ) )
+        {
             return target;
         }
 
-        String       temp      = new String(target);
-        StringBuffer newString = new StringBuffer();
-        int          loc;
+        String temp = new String ( target );
+        StringBuffer newString = new StringBuffer ();
+        int loc;
 
-        while ((loc = temp.indexOf(match)) != -1) {
-            newString.append(temp.substring(0, loc));
-            newString.append(replace);
+        while ( ( loc = temp.indexOf ( match ) ) != -1 )
+        {
+            newString.append ( temp.substring ( 0, loc ) );
+            newString.append ( replace );
 
-            temp = temp.substring(loc + match.length());
+            temp = temp.substring ( loc + match.length () );
         }
 
-        newString.append(temp);
+        newString.append ( temp );
 
-        return newString.toString();
+        return newString.toString ();
     }
 
     /**
      * Method splitString
      * Description: Split a delimited string into an ArrayList
-     *   Much like the perl split function
-     *
+     * Much like the perl split function
+     * 
      * @param valueList
      * @param delimiter
      * @return $returnType
      */
 
-    public static ArrayList splitString(String valueList, String delimiter) {
+    public static ArrayList splitString ( String valueList, String delimiter )
+    {
 
-        ArrayList result = new ArrayList();
+        ArrayList result = new ArrayList ();
 
-        if ((valueList != null) && (delimiter != null)) {
-            StringTokenizer splitter = new StringTokenizer(valueList, delimiter);
+        if ( ( valueList != null ) && ( delimiter != null ) )
+        {
+            StringTokenizer splitter = new StringTokenizer ( valueList, delimiter );
 
-            while (splitter.hasMoreTokens()) {
-                result.add(splitter.nextToken());
+            while ( splitter.hasMoreTokens () )
+            {
+                result.add ( splitter.nextToken () );
             }
         }
 

@@ -1,7 +1,6 @@
 package org.jinterop.dcom.test;
 
 import java.net.UnknownHostException;
-import java.util.logging.Level;
 
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
@@ -14,7 +13,8 @@ import org.jinterop.dcom.core.JIVariant;
 import org.jinterop.dcom.impls.JIObjectFactory;
 import org.jinterop.dcom.impls.automation.IJIDispatch;
 
-public class QtpComTest {
+public class QtpComTest
+{
 
     private JIComServer comServer = null;
 
@@ -24,112 +24,97 @@ public class QtpComTest {
 
     private JISession session = null;
 
-   
+    public QtpComTest ( final String address, final String domain, final String username, final String password ) throws JIException, UnknownHostException
+    {
 
-   
+        // JR: JISystem.getLogger ().setLevel ( Level.FINEST );
+        // JR: configure using slf4j now
 
-    public QtpComTest(String address, String domain, String username, String password) throws JIException, UnknownHostException{
+        /*Let the j-Interop library do this for you. You can set the "autoRegistration" flag in the
 
-                    JISystem.getLogger().setLevel(Level.FINEST);
+          JISystem class. When the library encounters a "Class not registered" exception, it will
 
-                    /*Let the j-Interop library do this for you. You can set the "autoRegistration" flag in the
+          perform all the registry changes if the autoRegistration flag is set. And then re-attempt
 
-                      JISystem class. When the library encounters a "Class not registered" exception, it will
+          loading the COM Server. Please have a look at MSSysInfo,MSWMI examples.*/
 
-                      perform all the registry changes if the autoRegistration flag is set. And then re-attempt
+        JISystem.setAutoRegisteration ( true );
 
-                      loading the COM Server. Please have a look at MSSysInfo,MSWMI examples.*/
+        this.session = JISession.createSession ( domain, username, password );
 
-                    JISystem.setAutoRegisteration(true);
+        this.comServer = new JIComServer ( JIProgId.valueOf ( "QuickTest.Application" ), address, this.session );
 
-                    session = JISession.createSession(domain,username,password);
-
-                    comServer = new JIComServer(JIProgId.valueOf("QuickTest.Application"), address, session);
-
-//                    session.setGlobalSocketTimeout(30000);
+        //                    session.setGlobalSocketTimeout(30000);
 
     }
 
-   
+    public void startQTP () throws JIException
+    {
 
-    public void startQTP() throws JIException{
+        System.out.println ( this.comServer.getProperties () );
 
-                    System.out.println(comServer.getProperties());
+        this.unknown = this.comServer.createInstance ();
 
-                    unknown = comServer.createInstance();
+        this.dispatch = (IJIDispatch)JIObjectFactory.narrowObject ( this.unknown.queryInterface ( IJIDispatch.IID ) );
 
-                    dispatch = (IJIDispatch)JIObjectFactory.narrowObject(unknown.queryInterface(IJIDispatch.IID));
-
-                    //System.out.println(((JIVariant)dispatch.get("Version")).getObjectAsString().getString());
-
-    }
-
-   
-
-    public void showQtp() throws JIException{
-
-                    int dispId = dispatch.getIDsOfNames("Visible");
-
-                    JIVariant variant = new JIVariant(true);
-
-                    dispatch.put(dispId,variant);
+        //System.out.println(((JIVariant)dispatch.get("Version")).getObjectAsString().getString());
 
     }
 
-   
+    public void showQtp () throws JIException
+    {
 
-    public void envQtp() throws JIException{
+        final int dispId = this.dispatch.getIDsOfNames ( "Visible" );
 
-                    dispatch.callMethodA("Open", new Object[]{new JIString("C:\\Programme\\Mercury Interactive\\QuickTest Professional\\Tests\\Test1"), new JIVariant(false), new JIVariant(true)});
+        final JIVariant variant = new JIVariant ( true );
 
-                    JIVariant variant = dispatch.get("Test");
-
-                    IJIDispatch test = (IJIDispatch)JIObjectFactory.narrowObject(variant.getObjectAsComObject());
-                    System.out.println(test.get("Author"));
-                    
-                    //and this is the original session associated with dispatch.
-                    JISession.destroySession(session);
-                    
-    }
-
-   
-
-   
-
-    public static void main(String[] args) {
-
-                    //"localhost", "ctron", "mpitonia", "ChrisSarah1"
-
-                    //"VPC003", "automation" , "automated_user", "@utom@tion"
-
-                    //"automationsvr01", "AUTOMATION", "Automated_User", "@utom@tion"
-
-                    try {
-
-                                    QtpComTest comQtp = new QtpComTest("localhost", "domain" , "username", "password");
-
-                                    comQtp.startQTP();
-
-                                    comQtp.showQtp();
-
-                                    comQtp.envQtp();
-
-                    } catch (Exception e) {
-
-                                    e.printStackTrace();
-
-                    }
+        this.dispatch.put ( dispId, variant );
 
     }
 
-   
+    public void envQtp () throws JIException
+    {
 
-   
+        this.dispatch.callMethodA ( "Open", new Object[] { new JIString ( "C:\\Programme\\Mercury Interactive\\QuickTest Professional\\Tests\\Test1" ), new JIVariant ( false ), new JIVariant ( true ) } );
 
-   
+        final JIVariant variant = this.dispatch.get ( "Test" );
 
-   
+        final IJIDispatch test = (IJIDispatch)JIObjectFactory.narrowObject ( variant.getObjectAsComObject () );
+        System.out.println ( test.get ( "Author" ) );
 
-   
+        //and this is the original session associated with dispatch.
+        JISession.destroySession ( this.session );
+
+    }
+
+    public static void main ( final String[] args )
+    {
+
+        //"localhost", "ctron", "mpitonia", "ChrisSarah1"
+
+        //"VPC003", "automation" , "automated_user", "@utom@tion"
+
+        //"automationsvr01", "AUTOMATION", "Automated_User", "@utom@tion"
+
+        try
+        {
+
+            final QtpComTest comQtp = new QtpComTest ( "localhost", "domain", "username", "password" );
+
+            comQtp.startQTP ();
+
+            comQtp.showQtp ();
+
+            comQtp.envQtp ();
+
+        }
+        catch ( final Exception e )
+        {
+
+            e.printStackTrace ();
+
+        }
+
+    }
 
 }

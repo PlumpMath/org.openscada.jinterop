@@ -15,24 +15,24 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc;
 
-
-public class IntegrityException extends RpcException {
+public class IntegrityException extends RpcException
+{
 
     /**
 	 *
 	 */
-	private static final long serialVersionUID = 6809424276771390469L;
+    private static final long serialVersionUID = 6809424276771390469L;
 
-	public IntegrityException() {
-        super();
+    public IntegrityException ()
+    {
+        super ();
     }
 
-    public IntegrityException(String message) {
-        super(message);
+    public IntegrityException ( String message )
+    {
+        super ( message );
     }
 
 }

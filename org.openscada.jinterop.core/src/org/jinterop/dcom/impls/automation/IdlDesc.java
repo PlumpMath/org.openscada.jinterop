@@ -25,31 +25,36 @@ import org.jinterop.dcom.core.JIStruct;
 /**
  * @exclude
  * @since 1.0
- *
  */
-public final class IdlDesc implements Serializable{
+public final class IdlDesc implements Serializable
+{
 
-	private static final long serialVersionUID = 7130410752801712935L;
-	public static final short IDLFLAG_NONE    = ParamDesc.PARAMFLAG_NONE;
-	public static final short IDLFLAG_FIN     = ParamDesc.PARAMFLAG_FIN;
-	public static final short IDLFLAG_FOUT    = ParamDesc.PARAMFLAG_FOUT;
-	public static final short IDLFLAG_FLCID   = ParamDesc.PARAMFLAG_FLCID;
-	public static final short IDLFLAG_FRETVAL = ParamDesc.PARAMFLAG_FRETVAL;
+    private static final long serialVersionUID = 7130410752801712935L;
 
+    public static final short IDLFLAG_NONE = ParamDesc.PARAMFLAG_NONE;
 
-	public final JIPointer dwReserved;
-	public final short wIDLFlags;
+    public static final short IDLFLAG_FIN = ParamDesc.PARAMFLAG_FIN;
 
-	IdlDesc(JIStruct values)
-	{
-		if (values == null)
-		{
-			dwReserved = null;
-			wIDLFlags = -1;
-			return;
-		}
-		dwReserved = (JIPointer)values.getMember(0);
-		wIDLFlags = ((Short)values.getMember(1)).shortValue();
-	}
+    public static final short IDLFLAG_FOUT = ParamDesc.PARAMFLAG_FOUT;
+
+    public static final short IDLFLAG_FLCID = ParamDesc.PARAMFLAG_FLCID;
+
+    public static final short IDLFLAG_FRETVAL = ParamDesc.PARAMFLAG_FRETVAL;
+
+    public final JIPointer dwReserved;
+
+    public final short wIDLFlags;
+
+    IdlDesc ( final JIStruct values )
+    {
+        if ( values == null )
+        {
+            this.dwReserved = null;
+            this.wIDLFlags = -1;
+            return;
+        }
+        this.dwReserved = (JIPointer)values.getMember ( 0 );
+        this.wIDLFlags = ( (Short)values.getMember ( 1 ) ).shortValue ();
+    }
 
 }

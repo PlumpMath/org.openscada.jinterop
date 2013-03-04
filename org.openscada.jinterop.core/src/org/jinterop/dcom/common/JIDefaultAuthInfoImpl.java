@@ -16,38 +16,50 @@
  */
 package org.jinterop.dcom.common;
 
-/** Default implementation of <code>IJIAuthInfo</code>.
+/**
+ * Default implementation of <code>IJIAuthInfo</code>.
  * 
  * @since 1.0
  */
-public final class JIDefaultAuthInfoImpl implements IJIAuthInfo {
+public final class JIDefaultAuthInfoImpl implements IJIAuthInfo
+{
 
-	private String username = null;
-	private String password = null;
-	private String domain = null;
-	
-	/**Creates the AuthInfo Object.
-	 * 
-	 * @param domain
-	 * @param username
-	 * @param password
-	 */
-	public JIDefaultAuthInfoImpl(String domain,String username,String password)
-	{
-		this.username = username;
-		this.password = password;
-		this.domain = domain;
-	}
-	public String getUserName() {
-		return username;
-	}
+    private String username = null;
 
-	public String getPassword() {
-		return password;
-	}
+    private String password = null;
 
-	public String getDomain() {
-		return domain;
-	}
+    private String domain = null;
+
+    /**
+     * Creates the AuthInfo Object.
+     * 
+     * @param domain
+     * @param username
+     * @param password
+     */
+    public JIDefaultAuthInfoImpl ( final String domain, final String username, final String password )
+    {
+        this.username = username;
+        this.password = password;
+        this.domain = domain;
+    }
+
+    @Override
+    public String getUserName ()
+    {
+        return this.username;
+    }
+
+    @Override
+    public String getPassword ()
+    {
+        return this.password;
+    }
+
+    @Override
+    public String getDomain ()
+    {
+        return this.domain;
+    }
 
 }

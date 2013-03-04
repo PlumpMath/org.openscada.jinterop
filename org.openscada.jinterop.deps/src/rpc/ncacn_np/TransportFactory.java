@@ -15,8 +15,6 @@
  * Foundation Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110, USA
  */
 
-
-
 package rpc.ncacn_np;
 
 import java.util.Properties;
@@ -24,11 +22,12 @@ import java.util.Properties;
 import rpc.ProviderException;
 import rpc.Transport;
 
-public class TransportFactory extends rpc.TransportFactory {
+public class TransportFactory extends rpc.TransportFactory
+{
 
-    public Transport createTransport(String address, Properties properties)
-            throws ProviderException {
-        return new RpcTransport(address, properties);
+    public Transport createTransport ( String address, Properties properties ) throws ProviderException
+    {
+        return new RpcTransport ( address, properties );
     }
 
 }

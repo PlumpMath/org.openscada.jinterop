@@ -31,18 +31,17 @@ import rpc.ProviderException;
 import rpc.RpcException;
 import rpc.Transport;
 import rpc.core.PresentationSyntax;
+
 /**
  * @exclude
  * @since 1.0
- *
  */
-final class JIComRuntimeTransport implements Transport {
+final class JIComRuntimeTransport implements Transport
+{
 
+    public static final String PROTOCOL = "ncacn_ip_tcp";
 
-	public static final String PROTOCOL = "ncacn_ip_tcp";
-
-    private Properties properties;
-
+    private final Properties properties;
 
     private Socket socket;
 
@@ -52,63 +51,100 @@ final class JIComRuntimeTransport implements Transport {
 
     private boolean attached;
 
-
-    public JIComRuntimeTransport(String address, Properties properties)
-            throws ProviderException {
+    public JIComRuntimeTransport ( final String address, final Properties properties ) throws ProviderException
+    {
         this.properties = properties;
         //address is ignored
     }
 
-    public String getProtocol() {
+    @Override
+    public String getProtocol ()
+    {
         return PROTOCOL;
     }
 
-    public Properties getProperties() {
-        return properties;
+    @Override
+    public Properties getProperties ()
+    {
+        return this.properties;
     }
 
-    public Endpoint attach(PresentationSyntax syntax) throws IOException {
-        if (attached) throw new RpcException("Transport already attached.");
+    @Override
+    public Endpoint attach ( final PresentationSyntax syntax ) throws IOException
+    {
+        if ( this.attached )
+        {
+            throw new RpcException ( "Transport already attached." );
+        }
 
         Endpoint endPoint = null;
-        try {
-            socket = (Socket)JISystem.internal_getSocket();
-            output = null;
-            input = null;
-            attached = true;
-            endPoint = new JIComRuntimeEndpoint(this, syntax);
-        } catch (Exception ex) {
-            try {
-                close();
-            } catch (Exception ignore) { }
+        try
+        {
+            this.socket = (Socket)JISystem.internal_getSocket ();
+            this.output = null;
+            this.input = null;
+            this.attached = true;
+            endPoint = new JIComRuntimeEndpoint ( this, syntax );
+        }
+        catch ( final Exception ex )
+        {
+            try
+            {
+                close ();
+            }
+            catch ( final Exception ignore )
+            {
+            }
         }
         return endPoint;
     }
 
-    public void close() throws IOException {
-        try {
-            if (socket != null) socket.close();
-        } finally {
-            attached = false;
-            socket = null;
-            output = null;
-            input = null;
+    @Override
+    public void close () throws IOException
+    {
+        try
+        {
+            if ( this.socket != null )
+            {
+                this.socket.close ();
+            }
+        }
+        finally
+        {
+            this.attached = false;
+            this.socket = null;
+            this.output = null;
+            this.input = null;
         }
     }
 
-    public void send(NdrBuffer buffer) throws IOException {
-        if (!attached) throw new RpcException("Transport not attached.");
-        if (output == null) output = socket.getOutputStream();
-        output.write(buffer.getBuffer(), 0, buffer.getLength());
-        output.flush();
+    @Override
+    public void send ( final NdrBuffer buffer ) throws IOException
+    {
+        if ( !this.attached )
+        {
+            throw new RpcException ( "Transport not attached." );
+        }
+        if ( this.output == null )
+        {
+            this.output = this.socket.getOutputStream ();
+        }
+        this.output.write ( buffer.getBuffer (), 0, buffer.getLength () );
+        this.output.flush ();
     }
 
-    public void receive(NdrBuffer buffer) throws IOException {
-        if (!attached) throw new RpcException("Transport not attached.");
-        if (input == null) input = socket.getInputStream();
-        buffer.length = (input.read(buffer.getBuffer(), 0,
-                buffer.getCapacity()));
+    @Override
+    public void receive ( final NdrBuffer buffer ) throws IOException
+    {
+        if ( !this.attached )
+        {
+            throw new RpcException ( "Transport not attached." );
+        }
+        if ( this.input == null )
+        {
+            this.input = this.socket.getInputStream ();
+        }
+        buffer.length = this.input.read ( buffer.getBuffer (), 0, buffer.getCapacity () );
     }
-
 
 }

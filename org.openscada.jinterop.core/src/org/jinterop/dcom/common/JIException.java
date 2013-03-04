@@ -16,85 +16,91 @@
  */
 package org.jinterop.dcom.common;
 
-
-/** Exception class for the framework. Developers are expected to catch or re-throw these exceptions. 
+/**
+ * Exception class for the framework. Developers are expected to catch or
+ * re-throw these exceptions.
  * and not create one themselves.
- *  
+ * 
  * @since 1.0
  */
 
 public class JIException extends Exception
 {
 
-	
-	private static final long serialVersionUID = 8648697261032503931L;
-	private String message = null;
-	private int errorCode = -1;
-	//US English messages sent by server , this is used especially during IDispatch exceptions
-	//when the server returns an error.
-	/**
-	 * @exclude
-	 */
-	public JIException(int errorCode,String message)
-	{
-		this(errorCode,message,null);
-	}
+    private static final long serialVersionUID = 8648697261032503931L;
 
-	/**
-	 * @exclude
-	 */
-	public JIException(int errorCode)
-	{
-		this(errorCode,(Throwable)null);
-	}
-	
-	/**
-	 * @exclude
-	 */
-	public JIException(int errorCode, Throwable cause)
-	{
-		this(errorCode,null,cause);
-	}
+    private String message = null;
 
-	/**
-	 * @exclude
-	 */
-	public JIException(JIRuntimeException exception)
-	{
-		this(exception.getHResult(),null,exception);
-	}
-		
-	/**
-	 * @exclude
-	 */
-	public JIException(int errorCode, String message, Throwable cause)
-	{
-		super.initCause(cause);
-		this.errorCode = errorCode;
-		this.message = message;
-	}	
+    private int errorCode = -1;
 
-	/**
-	 * Returns the localized error messages.
-	 * 
-	 * @return
-	 */
-	public String getMessage() {
-        return message == null ? message = initMessageFromBundle() : message;
+    //US English messages sent by server , this is used especially during IDispatch exceptions
+    //when the server returns an error.
+    /**
+     * @exclude
+     */
+    public JIException ( final int errorCode, final String message )
+    {
+        this ( errorCode, message, null );
     }
-	
-	private String initMessageFromBundle()
-	{
-		return (message = JISystem.getLocalizedMessage(errorCode));
-	}
 
-	/** Returns the error code associated with this exception. Please refer 
-	 * <code>JIErrorCodes</code> for a complete list of errors.
-	 * 
-	 * @return int representing the error code.
-	 */
-	public int getErrorCode()
-	{
-		return errorCode;
-	}
+    /**
+     * @exclude
+     */
+    public JIException ( final int errorCode )
+    {
+        this ( errorCode, (Throwable)null );
+    }
+
+    /**
+     * @exclude
+     */
+    public JIException ( final int errorCode, final Throwable cause )
+    {
+        this ( errorCode, null, cause );
+    }
+
+    /**
+     * @exclude
+     */
+    public JIException ( final JIRuntimeException exception )
+    {
+        this ( exception.getHResult (), null, exception );
+    }
+
+    /**
+     * @exclude
+     */
+    public JIException ( final int errorCode, final String message, final Throwable cause )
+    {
+        super.initCause ( cause );
+        this.errorCode = errorCode;
+        this.message = message;
+    }
+
+    /**
+     * Returns the localized error messages.
+     * 
+     * @return
+     */
+    @Override
+    public String getMessage ()
+    {
+        return this.message == null ? this.message = initMessageFromBundle () : this.message;
+    }
+
+    private String initMessageFromBundle ()
+    {
+        return this.message = JISystem.getLocalizedMessage ( this.errorCode );
+    }
+
+    /**
+     * Returns the error code associated with this exception. Please refer
+     * <code>JIErrorCodes</code> for a complete list of errors.
+     * 
+     * @return int representing the error code.
+     */
+    public int getErrorCode ()
+    {
+        return this.errorCode;
+    }
 }

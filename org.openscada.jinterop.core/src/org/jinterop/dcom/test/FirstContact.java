@@ -1,6 +1,7 @@
 package org.jinterop.dcom.test;
 
-public interface FirstContact {
+public interface FirstContact
+{
 
-	public void obtainReference();
+    public void obtainReference ();
 }

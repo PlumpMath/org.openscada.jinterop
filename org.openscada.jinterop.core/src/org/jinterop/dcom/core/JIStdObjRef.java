@@ -17,127 +17,133 @@
 
 package org.jinterop.dcom.core;
 
-
-
 import java.io.Serializable;
 
 import ndr.NdrException;
 import ndr.NetworkDataRepresentation;
 
-import org.jinterop.dcom.common.JISystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-final class JIStdObjRef implements Serializable {
+final class JIStdObjRef implements Serializable
+{
 
+    private final static Logger logger = LoggerFactory.getLogger ( JIStdObjRef.class );
 
-	private static final long serialVersionUID = 7714589108476632990L;
+    private static final long serialVersionUID = 7714589108476632990L;
 
+    private JIStdObjRef ()
+    {
+    }
 
-	private JIStdObjRef() {}
+    private int flags = 0x0;
 
-	private int flags = 0x0;
-	private int publicRefs = -1;
-	private byte[] oxid = null;
-	private byte[] oid = null;
-	private String ipidOfthisObjectRef = null;
-//	private String oidString = null;
+    private int publicRefs = -1;
 
+    private byte[] oxid = null;
 
-	/** Resolver address are taken of localhost
-	 *
-	 */
-	JIStdObjRef(String ipid, JIOxid oxid, JIObjectId oid)
-	{
-		this.ipidOfthisObjectRef = ipid;
-		this.oxid = oxid.getOXID();
-		this.oid = oid.getOID();
-//		this.oidString = oid.toString();
-		this.publicRefs = 5;
-	}
+    private byte[] oid = null;
 
+    private String ipidOfthisObjectRef = null;
 
+    //	private String oidString = null;
 
-	static JIStdObjRef decode(NetworkDataRepresentation ndr)
-	{
-		JIStdObjRef objRef = new JIStdObjRef();
+    /**
+     * Resolver address are taken of localhost
+     */
+    JIStdObjRef ( final String ipid, final JIOxid oxid, final JIObjectId oid )
+    {
+        this.ipidOfthisObjectRef = ipid;
+        this.oxid = oxid.getOXID ();
+        this.oid = oid.getOID ();
+        //		this.oidString = oid.toString();
+        this.publicRefs = 5;
+    }
 
-		objRef.flags = ndr.readUnsignedLong();
-		objRef.publicRefs = ndr.readUnsignedLong();
+    static JIStdObjRef decode ( final NetworkDataRepresentation ndr )
+    {
+        final JIStdObjRef objRef = new JIStdObjRef ();
 
-		objRef.oxid = JIMarshalUnMarshalHelper.readOctetArrayLE(ndr,8);
+        objRef.flags = ndr.readUnsignedLong ();
+        objRef.publicRefs = ndr.readUnsignedLong ();
 
-		objRef.oid = JIMarshalUnMarshalHelper.readOctetArrayLE(ndr,8);
+        objRef.oxid = JIMarshalUnMarshalHelper.readOctetArrayLE ( ndr, 8 );
 
-//		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//	   	jcifs.util.Hexdump.hexdump(new PrintStream(byteArrayOutputStream), objRef.oid, 0, objRef.oid.length);
-//	   	objRef.oidString = byteArrayOutputStream.toString();
+        objRef.oid = JIMarshalUnMarshalHelper.readOctetArrayLE ( ndr, 8 );
 
+        //		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        //	   	jcifs.util.Hexdump.hexdump(new PrintStream(byteArrayOutputStream), objRef.oid, 0, objRef.oid.length);
+        //	   	objRef.oidString = byteArrayOutputStream.toString();
 
-		try {
-			rpc.core.UUID ipid2 = new rpc.core.UUID();
-			ipid2.decode(ndr,ndr.getBuffer());
-			objRef.ipidOfthisObjectRef = ipid2.toString();
-		} catch (NdrException e) {
+        try
+        {
+            final rpc.core.UUID ipid2 = new rpc.core.UUID ();
+            ipid2.decode ( ndr, ndr.getBuffer () );
+            objRef.ipidOfthisObjectRef = ipid2.toString ();
+        }
+        catch ( final NdrException e )
+        {
+            logger.warn ( "decode", e );
+        }
 
-			JISystem.getLogger().throwing("JIStdObjRef","decode",e);
-		}
+        //		if (JISystem.getLogger().isLoggable(Level.WARNING))
+        //        {
+        //			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        //		   	jcifs.util.Hexdump.hexdump(new PrintStream(byteArrayOutputStream), objRef.oid, 0, objRef.oid.length);
+        //		   	JISystem.getLogger().warning("Decode of StdObjref Adding references for " + objRef.ipidOfthisObjectRef + " , num references recieved from COM server: " + objRef.publicRefs + " , the OID is " + byteArrayOutputStream.toString());
+        //		   	JISession.debug_addIpids(objRef.ipidOfthisObjectRef, 5);
+        //        }
 
-//		if (JISystem.getLogger().isLoggable(Level.WARNING))
-//        {
-//			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//		   	jcifs.util.Hexdump.hexdump(new PrintStream(byteArrayOutputStream), objRef.oid, 0, objRef.oid.length);
-//		   	JISystem.getLogger().warning("Decode of StdObjref Adding references for " + objRef.ipidOfthisObjectRef + " , num references recieved from COM server: " + objRef.publicRefs + " , the OID is " + byteArrayOutputStream.toString());
-//		   	JISession.debug_addIpids(objRef.ipidOfthisObjectRef, 5);
-//        }
+        return objRef;
+    }
 
+    public int getFlags ()
+    {
+        return this.flags;
+    }
 
-		return objRef;
-	}
+    public int getPublicRefs ()
+    {
+        return this.publicRefs;
+    }
 
-	public int getFlags()
-	{
-		return flags;
-	}
+    public byte[] getOxid ()
+    {
+        return this.oxid;
+    }
 
-	public int getPublicRefs()
-	{
-		return publicRefs;
-	}
+    public byte[] getObjectId ()
+    {
+        return this.oid;
+    }
 
-	public byte[] getOxid()
-	{
-		return oxid;
-	}
+    public String getIpid ()
+    {
+        return this.ipidOfthisObjectRef;
+    }
 
-	public byte[] getObjectId()
-	{
-		return oid;
-	}
+    public void encode ( final NetworkDataRepresentation ndr )
+    {
+        ndr.writeUnsignedLong ( this.flags );
+        ndr.writeUnsignedLong ( this.publicRefs );
+        JIMarshalUnMarshalHelper.writeOctetArrayLE ( ndr, this.oxid );
+        JIMarshalUnMarshalHelper.writeOctetArrayLE ( ndr, this.oid );
 
-	public String getIpid()
-	{
-		return ipidOfthisObjectRef;
-	}
+        try
+        {
+            final rpc.core.UUID ipid = new rpc.core.UUID ( this.ipidOfthisObjectRef );
+            ipid.encode ( ndr, ndr.getBuffer () );
+        }
+        catch ( final NdrException e )
+        {
+            logger.warn ( "encode", e );
+        }
+    }
 
-
-	public void encode(NetworkDataRepresentation ndr)
-	{
-		ndr.writeUnsignedLong(flags);
-		ndr.writeUnsignedLong(publicRefs);
-		JIMarshalUnMarshalHelper.writeOctetArrayLE(ndr,oxid);
-		JIMarshalUnMarshalHelper.writeOctetArrayLE(ndr,oid);
-
-		try {
-			rpc.core.UUID ipid = new rpc.core.UUID(ipidOfthisObjectRef);
-			ipid.encode(ndr,ndr.getBuffer());
-		} catch (NdrException e) {
-
-			JISystem.getLogger().throwing("JIStdObjRef","encode",e);
-		}
-	}
-
-	public String toString()
-	{
-		String retVal = "IPID: " + ipidOfthisObjectRef ;//+ " , OID: " + oidString;
-		return retVal;
-	}
+    @Override
+    public String toString ()
+    {
+        final String retVal = "IPID: " + this.ipidOfthisObjectRef;//+ " , OID: " + oidString;
+        return retVal;
+    }
 }

@@ -17,7 +17,8 @@
 
 package ndr;
 
-public class Format {
+public class Format
+{
 
     public static final int LITTLE_ENDIAN = 0x10000000;
 
@@ -35,11 +36,9 @@ public class Format {
 
     public static final int IBM_FLOATING_POINT = 0x00110000;
 
-    public static final int DEFAULT_DATA_REPRESENTATION = LITTLE_ENDIAN |
-            ASCII_CHARACTER | IEEE_FLOATING_POINT;
+    public static final int DEFAULT_DATA_REPRESENTATION = LITTLE_ENDIAN | ASCII_CHARACTER | IEEE_FLOATING_POINT;
 
-    public static final Format DEFAULT_FORMAT =
-            new Format(DEFAULT_DATA_REPRESENTATION);
+    public static final Format DEFAULT_FORMAT = new Format ( DEFAULT_DATA_REPRESENTATION );
 
     static final int BYTE_ORDER_MASK = 0xf0000000;
 
@@ -49,41 +48,46 @@ public class Format {
 
     private final int dataRepresentation;
 
-    public Format(int dataRepresentation) {
+    public Format ( int dataRepresentation )
+    {
         this.dataRepresentation = dataRepresentation;
-        if ((dataRepresentation & BYTE_ORDER_MASK) != LITTLE_ENDIAN) {
-            throw new IllegalArgumentException(
-                    "Only little-endian byte order is currently supported.");
+        if ( ( dataRepresentation & BYTE_ORDER_MASK ) != LITTLE_ENDIAN )
+        {
+            throw new IllegalArgumentException ( "Only little-endian byte order is currently supported." );
         }
-        if ((dataRepresentation & CHARACTER_MASK) != ASCII_CHARACTER) {
-            throw new IllegalArgumentException(
-                    "Only ASCII character set is currently supported.");
+        if ( ( dataRepresentation & CHARACTER_MASK ) != ASCII_CHARACTER )
+        {
+            throw new IllegalArgumentException ( "Only ASCII character set is currently supported." );
         }
-        if ((dataRepresentation & FLOATING_POINT_MASK) != IEEE_FLOATING_POINT) {
-            throw new IllegalArgumentException(
-                    "Only IEEE floating point is currently supported.");
+        if ( ( dataRepresentation & FLOATING_POINT_MASK ) != IEEE_FLOATING_POINT )
+        {
+            throw new IllegalArgumentException ( "Only IEEE floating point is currently supported." );
         }
     }
 
-    public int getDataRepresentation() {
+    public int getDataRepresentation ()
+    {
         return dataRepresentation;
     }
 
-    public static Format readFormat(byte[] src, int index,
-            boolean connectionless) {
+    public static Format readFormat ( byte[] src, int index, boolean connectionless )
+    {
         int value = src[index++] << 24;
-        value |= (src[index++] & 0xff) << 16;
-        value |= (src[index++] & 0xff) << 8;
-        if (!connectionless) value |= src[index] & 0xff;
-        return new Format(value);
+        value |= ( src[index++] & 0xff ) << 16;
+        value |= ( src[index++] & 0xff ) << 8;
+        if ( !connectionless )
+            value |= src[index] & 0xff;
+        return new Format ( value );
     }
 
-    public void writeFormat(byte[] dest, int index, boolean connectionless) {
-        int val = getDataRepresentation();
-        dest[index++] = (byte) ((val >> 24) & 0xff);
-        dest[index++] = (byte) ((val >> 16) & 0xff);
-        dest[index] = (byte) 0x00;
-        if (!connectionless) dest[++index] = (byte) 0x00;
+    public void writeFormat ( byte[] dest, int index, boolean connectionless )
+    {
+        int val = getDataRepresentation ();
+        dest[index++] = (byte) ( ( val >> 24 ) & 0xff );
+        dest[index++] = (byte) ( ( val >> 16 ) & 0xff );
+        dest[index] = (byte)0x00;
+        if ( !connectionless )
+            dest[++index] = (byte)0x00;
     }
 
 }

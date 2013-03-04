@@ -54,110 +54,130 @@ import java.util.Map;
  * code, and since there is no proof that the leaked version was in fact
  * RC4 and because "RC4" is a trademark, it is called "ARCFOUR", short for
  * "Allegedly RC4".
- *
- * <p>This class only implements the <i>keystream</i> of ARCFOUR. To use
- * this as a stream cipher, one would say:</p>
- *
- * <pre>    out = in ^ arcfour.nextByte();</pre>
- *
- * <p>This operation works for encryption and decryption.</p>
- *
- * <p>References:</p>
- *
+ * <p>
+ * This class only implements the <i>keystream</i> of ARCFOUR. To use this as a
+ * stream cipher, one would say:
+ * </p>
+ * 
+ * <pre>
+ * out = in &circ; arcfour.nextByte ();
+ * </pre>
+ * <p>
+ * This operation works for encryption and decryption.
+ * </p>
+ * <p>
+ * References:
+ * </p>
  * <ol>
- * <li>Schneier, Bruce: <i>Applied Cryptography: Protocols, Algorithms,
- * and Source Code in C, Second Edition.</i> (1996 John Wiley and Sons),
- * pp. 397--398. ISBN 0-471-11709-9</li>
+ * <li>Schneier, Bruce: <i>Applied Cryptography: Protocols, Algorithms, and
+ * Source Code in C, Second Edition.</i> (1996 John Wiley and Sons), pp.
+ * 397--398. ISBN 0-471-11709-9</li>
  * <li>K. Kaukonen and R. Thayer, "A Stream Cipher Encryption Algorithm
- * 'Arcfour'", Internet Draft (expired), <a
- * href="http://www.mozilla.org/projects/security/pki/nss/draft-kaukonen-cipher-arcfour-03.txt">draft-kaukonen-cipher-arcfour-03.txt</a></li>
+ * 'Arcfour'", Internet Draft (expired), <a href=
+ * "http://www.mozilla.org/projects/security/pki/nss/draft-kaukonen-cipher-arcfour-03.txt"
+ * >draft-kaukonen-cipher-arcfour-03.txt</a></li>
  * </ol>
- *
+ * 
  * @version $Revision: 1.2 $
  */
-public class ARCFour extends BasePRNG {
+public class ARCFour extends BasePRNG
+{
 
-   // Constants and variables.
-   // -----------------------------------------------------------------------
+    // Constants and variables.
+    // -----------------------------------------------------------------------
 
-   /** The attributes property name for the key bytes. */
-   public static final String ARCFOUR_KEY_MATERIAL =
-      "gnu.crypto.prng.arcfour.key-material";
+    /** The attributes property name for the key bytes. */
+    public static final String ARCFOUR_KEY_MATERIAL = "gnu.crypto.prng.arcfour.key-material";
 
-   /** The size of the internal S-box. */
-   public static final int ARCFOUR_SBOX_SIZE = 256;
+    /** The size of the internal S-box. */
+    public static final int ARCFOUR_SBOX_SIZE = 256;
 
-   /** The S-box. */
-   private byte[] s;
+    /** The S-box. */
+    private byte[] s;
 
-   private byte m, n;
+    private byte m, n;
 
-   // Constructors.
-   // -----------------------------------------------------------------------
+    // Constructors.
+    // -----------------------------------------------------------------------
 
-   /** Default 0-arguments constructor. */
-   public ARCFour() {
-      super(Registry.ARCFOUR_PRNG);
-   }
+    /** Default 0-arguments constructor. */
+    public ARCFour ()
+    {
+        super ( Registry.ARCFOUR_PRNG );
+    }
 
-   // Methods implementing BasePRNG.
-   // -----------------------------------------------------------------------
+    // Methods implementing BasePRNG.
+    // -----------------------------------------------------------------------
 
-   public Object clone() {
-      ARCFour copy = new ARCFour();
-      copy.s = (s != null) ? (byte[]) s.clone() : null;
-      copy.m = m;
-      copy.n = n;
-      copy.buffer = (buffer != null) ? (byte[]) buffer.clone() : null;
-      copy.ndx = ndx;
-      copy.initialised = initialised;
-      return copy;
-   }
+    public Object clone ()
+    {
+        ARCFour copy = new ARCFour ();
+        copy.s = ( s != null ) ? (byte[])s.clone () : null;
+        copy.m = m;
+        copy.n = n;
+        copy.buffer = ( buffer != null ) ? (byte[])buffer.clone () : null;
+        copy.ndx = ndx;
+        copy.initialised = initialised;
+        return copy;
+    }
 
-   public void setup(Map attributes) {
-      byte[] kb = (byte[]) attributes.get(ARCFOUR_KEY_MATERIAL);
+    public void setup ( Map attributes )
+    {
+        byte[] kb = (byte[])attributes.get ( ARCFOUR_KEY_MATERIAL );
 
-      if (kb == null) {
-         throw new IllegalArgumentException("ARCFOUR needs a key");
-      }
+        if ( kb == null )
+        {
+            throw new IllegalArgumentException ( "ARCFOUR needs a key" );
+        }
 
-      s = new byte[ARCFOUR_SBOX_SIZE];
-      m = n = 0;
-      byte[] k = new byte[ARCFOUR_SBOX_SIZE];
+        s = new byte[ARCFOUR_SBOX_SIZE];
+        m = n = 0;
+        byte[] k = new byte[ARCFOUR_SBOX_SIZE];
 
-      for (int i = 0; i < ARCFOUR_SBOX_SIZE; i++) {
-         s[i] = (byte) i;
-      }
+        for ( int i = 0; i < ARCFOUR_SBOX_SIZE; i++ )
+        {
+            s[i] = (byte)i;
+        }
 
-      if (kb.length > 0) {
-         for (int i = 0, j = 0; i < ARCFOUR_SBOX_SIZE; i++) {
-            k[i] = kb[j++];
-            if (j >= kb.length) j = 0;
-         }
-      }
+        if ( kb.length > 0 )
+        {
+            for ( int i = 0, j = 0; i < ARCFOUR_SBOX_SIZE; i++ )
+            {
+                k[i] = kb[j++];
+                if ( j >= kb.length )
+                    j = 0;
+            }
+        }
 
-      for (int i = 0, j = 0; i < ARCFOUR_SBOX_SIZE; i++) {
-         j = j + s[i] + k[i];
-         byte temp = s[i];
-         s[i] = s[j & 0xff];
-         s[j & 0xff] = temp;
-      }
+        for ( int i = 0, j = 0; i < ARCFOUR_SBOX_SIZE; i++ )
+        {
+            j = j + s[i] + k[i];
+            byte temp = s[i];
+            s[i] = s[j & 0xff];
+            s[j & 0xff] = temp;
+        }
 
-      buffer = new byte[ARCFOUR_SBOX_SIZE];
-      try {
-         fillBlock();
-      } catch (LimitReachedException wontHappen) { }
-   }
+        buffer = new byte[ARCFOUR_SBOX_SIZE];
+        try
+        {
+            fillBlock ();
+        }
+        catch ( LimitReachedException wontHappen )
+        {
+        }
+    }
 
-   public void fillBlock() throws LimitReachedException {
-      for (int i = 0; i < buffer.length; i++) {
-         m++;
-         n = (byte) (n + s[m & 0xff]);
-         byte temp = s[m & 0xff];
-         s[m & 0xff] = s[n & 0xff];
-         s[n & 0xff] = temp;
-         temp = (byte) (s[m & 0xff] + s[n & 0xff]);
-         buffer[i] = s[temp & 0xff];
-      }
-   }
+    public void fillBlock () throws LimitReachedException
+    {
+        for ( int i = 0; i < buffer.length; i++ )
+        {
+            m++;
+            n = (byte) ( n + s[m & 0xff] );
+            byte temp = s[m & 0xff];
+            s[m & 0xff] = s[n & 0xff];
+            s[n & 0xff] = temp;
+            temp = (byte) ( s[m & 0xff] + s[n & 0xff] );
+            buffer[i] = s[temp & 0xff];
+        }
+    }
 }
