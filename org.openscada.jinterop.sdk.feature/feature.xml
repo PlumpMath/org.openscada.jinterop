@@ -2,7 +2,7 @@
 <feature
       id="org.openscada.jinterop.sdk"
       label="openSCADA j-Interop SDK"
-      version="1.0.0.qualifier"
+      version="1.2.0.qualifier"
       provider-name="openSCADA"
       plugin="org.openscada.jinterop.core">
 
@@ -17,7 +17,7 @@
    <license url="http://opensource.org/licenses/lgpl-3.0.html">
       %license
    </license>
-   
+
    <includes
          id="org.openscada.jinterop"
          version="0.0.0"/>
