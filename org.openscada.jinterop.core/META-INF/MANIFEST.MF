@@ -1,36 +1,23 @@
 Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: openSCADA j-Interop Core
-Bundle-SymbolicName: org.openscada.jinterop.core
-Bundle-Version: 2.0.8.qualifier
+Export-Package: org.jinterop.dcom.common;version="2.0.8";uses:="rpc.co
+ re",org.jinterop.dcom.core;version="2.0.8"; uses:="rpc,  ndr,  rpc.co
+ re,  org.jinterop.dcom.common",org.jinterop.dcom.impls;version="2.0.8
+ ";uses:="org.jinterop.dcom.core",org.jinterop.dcom.impls.automation;v
+ ersion="2.0.8";uses:="org.jinterop.dcom.core,org.jinterop.dcom.common
+ ",org.jinterop.dcom.test;version="2.0.8";uses:="org.jinterop.dcom.cor
+ e,org.jinterop.dcom.impls.automation",org.jinterop.dcom.transport;ver
+ sion="2.0.8"; uses:="rpc.security.ntlm,  ndr,  rpc,  org.jinterop.dco
+ m.common,  rpc.core",org.jinterop.winreg;version="2.0.8";uses:="ndr,o
+ rg.jinterop.dcom.common",org.jinterop.winreg.smb;version="2.0.8";uses
+ :="rpc,org.jinterop.dcom.common,org.jinterop.winreg"
 Bundle-Vendor: openSCADA
+Bundle-Version: 1.1.0.v20130529
+Bundle-Name: openSCADA j-Interop Core
+Bundle-ManifestVersion: 2
+Import-Package: com.iwombat.foundation,com.iwombat.util,jcifs;version=
+ "1.2.25",jcifs.smb;version="1.2.25",jcifs.util;version="1.2.25",ndr,o
+ rg.slf4j;version="1.6.0",rpc,rpc.core,rpc.ncacn_np,rpc.pdu,rpc.securi
+ ty.ntlm
+Bundle-SymbolicName: org.openscada.jinterop.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: com.iwombat.foundation,
- com.iwombat.util,
- jcifs;version="1.2.25",
- jcifs.smb;version="1.2.25",
- jcifs.util;version="1.2.25",
- ndr,
- org.slf4j;version="1.6.0",
- rpc,
- rpc.core,
- rpc.ncacn_np,
- rpc.pdu,
- rpc.security.ntlm
-Export-Package: org.jinterop.dcom.common;version="2.0.8";uses:="rpc.core",
- org.jinterop.dcom.core;version="2.0.8";
-  uses:="rpc,
-   ndr,
-   rpc.core,
-   org.jinterop.dcom.common",
- org.jinterop.dcom.impls;version="2.0.8";uses:="org.jinterop.dcom.core",
- org.jinterop.dcom.impls.automation;version="2.0.8";uses:="org.jinterop.dcom.core,org.jinterop.dcom.common",
- org.jinterop.dcom.test;version="2.0.8";uses:="org.jinterop.dcom.core,org.jinterop.dcom.impls.automation",
- org.jinterop.dcom.transport;version="2.0.8";
-  uses:="rpc.security.ntlm,
-   ndr,
-   rpc,
-   org.jinterop.dcom.common,
-   rpc.core",
- org.jinterop.winreg;version="2.0.8";uses:="ndr,org.jinterop.dcom.common",
- org.jinterop.winreg.smb;version="2.0.8";uses:="rpc,org.jinterop.dcom.common,org.jinterop.winreg"
+

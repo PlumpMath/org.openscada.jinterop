@@ -1,10 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<feature
-      id="org.openscada.jinterop.sdk"
-      label="openSCADA j-Interop SDK"
-      version="1.0.0.qualifier"
-      provider-name="openSCADA"
-      plugin="org.openscada.jinterop.core">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><feature id="org.openscada.jinterop.sdk" label="openSCADA j-Interop SDK" plugin="org.openscada.jinterop.core" provider-name="openSCADA" version="1.1.0.v20130529">
 
    <description url="http://openscada.org">
       The openSCADA version of j-Interop.
@@ -18,12 +12,8 @@
       %license
    </license>
    
-   <includes
-         id="org.openscada.jinterop"
-         version="0.0.0"/>
+   <includes id="org.openscada.jinterop" version="0.0.0"/>
 
-   <includes
-         id="org.openscada.jinterop.source"
-         version="0.0.0"/>
+   <includes id="org.openscada.jinterop.source" version="0.0.0"/>
 
 </feature>
