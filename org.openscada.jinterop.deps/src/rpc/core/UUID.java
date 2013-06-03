@@ -49,30 +49,32 @@ public class UUID extends NdrObject
     {
     }
 
-    public UUID ( String uuid )
+    public UUID ( final String uuid )
     {
         parse ( uuid );
     }
 
-    public void encode ( NetworkDataRepresentation ndr, NdrBuffer dst ) throws NdrException
+    @Override
+    public void encode ( final NetworkDataRepresentation ndr, final NdrBuffer dst ) throws NdrException
     {
-        dst.enc_ndr_long ( timeLow );
-        dst.enc_ndr_short ( timeMid );
-        dst.enc_ndr_short ( timeHighAndVersion );
-        dst.enc_ndr_small ( clockSeqHighAndReserved );
-        dst.enc_ndr_small ( clockSeqLow );
-        System.arraycopy ( node, 0, dst.buf, dst.index, 6 );
+        dst.enc_ndr_long ( this.timeLow );
+        dst.enc_ndr_short ( this.timeMid );
+        dst.enc_ndr_short ( this.timeHighAndVersion );
+        dst.enc_ndr_small ( this.clockSeqHighAndReserved );
+        dst.enc_ndr_small ( this.clockSeqLow );
+        System.arraycopy ( this.node, 0, dst.buf, dst.index, 6 );
         dst.index += 6;
     }
 
-    public void decode ( NetworkDataRepresentation ndr, NdrBuffer src ) throws NdrException
+    @Override
+    public void decode ( final NetworkDataRepresentation ndr, final NdrBuffer src ) throws NdrException
     {
-        timeLow = src.dec_ndr_long ();
-        timeMid = src.dec_ndr_short ();
-        timeHighAndVersion = src.dec_ndr_short ();
-        clockSeqHighAndReserved = src.dec_ndr_small ();
-        clockSeqLow = src.dec_ndr_small ();
-        System.arraycopy ( src.buf, src.index, node, 0, 6 );
+        this.timeLow = src.dec_ndr_long ();
+        this.timeMid = src.dec_ndr_short ();
+        this.timeHighAndVersion = src.dec_ndr_short ();
+        this.clockSeqHighAndReserved = src.dec_ndr_small ();
+        this.clockSeqLow = src.dec_ndr_small ();
+        System.arraycopy ( src.buf, src.index, this.node, 0, 6 );
         src.index += 6;
     }
 
@@ -138,62 +140,63 @@ public class UUID extends NdrObject
         }
     */
 
+    @Override
     public String toString ()
     {
-        StringBuffer buffer = new StringBuffer ();
+        final StringBuffer buffer = new StringBuffer ();
         //        int timeLow = (int) (getTimeLow() & 0xffffffffl);
-        buffer.append ( Integer.toHexString ( ( timeLow >> 28 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( ( timeLow >> 24 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( ( timeLow >> 20 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( ( timeLow >> 16 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( ( timeLow >> 12 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( ( timeLow >> 8 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( ( timeLow >> 4 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( timeLow & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeLow >> 28 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeLow >> 24 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeLow >> 20 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeLow >> 16 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeLow >> 12 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeLow >> 8 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeLow >> 4 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeLow & 0x0f ) );
         buffer.append ( '-' );
         //        int timeMid = getTimeMid();
-        buffer.append ( Integer.toHexString ( ( timeMid >> 12 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( ( timeMid >> 8 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( ( timeMid >> 4 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( timeMid & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeMid >> 12 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeMid >> 8 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeMid >> 4 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeMid & 0x0f ) );
         buffer.append ( '-' );
         //        int timeHighAndVersion = getTimeHighAndVersion();
-        buffer.append ( Integer.toHexString ( ( timeHighAndVersion >> 12 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( ( timeHighAndVersion >> 8 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( ( timeHighAndVersion >> 4 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( timeHighAndVersion & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeHighAndVersion >> 12 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeHighAndVersion >> 8 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeHighAndVersion >> 4 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.timeHighAndVersion & 0x0f ) );
         buffer.append ( '-' );
         //        short clockSeqHighAndReserved = getClockSeqHighAndReserved();
-        buffer.append ( Integer.toHexString ( ( clockSeqHighAndReserved >> 4 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( clockSeqHighAndReserved & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.clockSeqHighAndReserved >> 4 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.clockSeqHighAndReserved & 0x0f ) );
         //        short clockSeqLow = getClockSeqLow();
-        buffer.append ( Integer.toHexString ( ( clockSeqLow >> 4 ) & 0x0f ) );
-        buffer.append ( Integer.toHexString ( clockSeqLow & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.clockSeqLow >> 4 & 0x0f ) );
+        buffer.append ( Integer.toHexString ( this.clockSeqLow & 0x0f ) );
         buffer.append ( '-' );
         //        byte[] node = getNode();
         for ( int i = 0; i < 6; i++ )
         {
-            buffer.append ( Integer.toHexString ( ( node[i] >> 4 ) & 0x0f ) );
-            buffer.append ( Integer.toHexString ( node[i] & 0x0f ) );
+            buffer.append ( Integer.toHexString ( this.node[i] >> 4 & 0x0f ) );
+            buffer.append ( Integer.toHexString ( this.node[i] & 0x0f ) );
         }
         return buffer.toString ();
     }
 
-    public void parse ( String uuid )
+    public void parse ( final String uuid )
     {
-        StringTokenizer tokenizer = new StringTokenizer ( uuid, "-" );
-        timeLow = (int)Long.parseLong ( tokenizer.nextToken (), 16 );
-        timeMid = Integer.parseInt ( tokenizer.nextToken (), 16 );
-        timeHighAndVersion = Integer.parseInt ( tokenizer.nextToken (), 16 );
+        final StringTokenizer tokenizer = new StringTokenizer ( uuid, "-" );
+        this.timeLow = (int)Long.parseLong ( tokenizer.nextToken (), 16 );
+        this.timeMid = Integer.parseInt ( tokenizer.nextToken (), 16 );
+        this.timeHighAndVersion = Integer.parseInt ( tokenizer.nextToken (), 16 );
         String token = tokenizer.nextToken ();
-        clockSeqHighAndReserved = Integer.parseInt ( token.substring ( 0, 2 ), 16 );
-        clockSeqLow = Integer.parseInt ( token.substring ( 2 ), 16 );
+        this.clockSeqHighAndReserved = Integer.parseInt ( token.substring ( 0, 2 ), 16 );
+        this.clockSeqLow = Integer.parseInt ( token.substring ( 2 ), 16 );
         token = tokenizer.nextToken ();
-        node = new byte[6];
+        this.node = new byte[6];
         for ( int i = 0; i < 6; i++ )
         {
-            int offset = i * 2;
-            node[i] = (byte) ( ( Character.digit ( token.charAt ( offset ), 16 ) << 4 ) | Character.digit ( token.charAt ( offset + 1 ), 16 ) );
+            final int offset = i * 2;
+            this.node[i] = (byte) ( Character.digit ( token.charAt ( offset ), 16 ) << 4 | Character.digit ( token.charAt ( offset + 1 ), 16 ) );
         }
         /*
                 setTimeLow(timeLow);

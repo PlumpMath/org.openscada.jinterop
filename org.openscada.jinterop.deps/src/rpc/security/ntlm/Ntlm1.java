@@ -17,9 +17,6 @@
 
 package rpc.security.ntlm;
 
-import gnu.crypto.prng.IRandom;
-import gnu.crypto.util.Util;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -29,6 +26,9 @@ import java.util.logging.Logger;
 import jcifs.ntlmssp.NtlmFlags;
 import ndr.NdrBuffer;
 import ndr.NetworkDataRepresentation;
+
+import org.bouncycastle.crypto.StreamCipher;
+
 import rpc.IntegrityException;
 import rpc.Security;
 
@@ -37,19 +37,19 @@ public class Ntlm1 implements NtlmFlags, Security
 
     private static final int NTLM1_VERIFIER_LENGTH = 16;
 
-    private IRandom clientCipher = null;
+    private final StreamCipher clientCipher;
 
-    private IRandom serverCipher = null;
+    private final StreamCipher serverCipher;
 
-    private byte[] clientSigningKey = null;
+    private final byte[] clientSigningKey;
 
-    private byte[] serverSigningKey = null;
+    private final byte[] serverSigningKey;
 
-    private NTLMKeyFactory keyFactory = null;
+    private final NTLMKeyFactory keyFactory;
 
     private boolean isServer = false;
 
-    private int protectionLevel;
+    private final int protectionLevel;
 
     private int requestCounter = 0;
 
@@ -57,68 +57,88 @@ public class Ntlm1 implements NtlmFlags, Security
 
     private static final Logger logger = Logger.getLogger ( "org.jinterop" );
 
-    public Ntlm1 ( int flags, byte[] sessionKey, boolean isServer )
+    public Ntlm1 ( final int flags, final byte[] sessionKey, final boolean isServer )
     {
 
-        protectionLevel = ( ( flags & NTLMSSP_NEGOTIATE_SEAL ) != 0 ) ? PROTECTION_LEVEL_PRIVACY : PROTECTION_LEVEL_INTEGRITY;
+        this.protectionLevel = ( flags & NTLMSSP_NEGOTIATE_SEAL ) != 0 ? PROTECTION_LEVEL_PRIVACY : PROTECTION_LEVEL_INTEGRITY;
 
         this.isServer = isServer;
-        keyFactory = new NTLMKeyFactory ();
-        clientSigningKey = keyFactory.generateClientSigningKeyUsingNegotiatedSecondarySessionKey ( sessionKey );
-        byte[] clientSealingKey = keyFactory.generateClientSealingKeyUsingNegotiatedSecondarySessionKey ( sessionKey );
+        this.keyFactory = new NTLMKeyFactory ();
+        this.clientSigningKey = this.keyFactory.generateClientSigningKeyUsingNegotiatedSecondarySessionKey ( sessionKey );
+        final byte[] clientSealingKey = this.keyFactory.generateClientSealingKeyUsingNegotiatedSecondarySessionKey ( sessionKey );
 
-        serverSigningKey = keyFactory.generateServerSigningKeyUsingNegotiatedSecondarySessionKey ( sessionKey );
-        byte[] serverSealingKey = keyFactory.generateServerSealingKeyUsingNegotiatedSecondarySessionKey ( sessionKey );
+        this.serverSigningKey = this.keyFactory.generateServerSigningKeyUsingNegotiatedSecondarySessionKey ( sessionKey );
+        final byte[] serverSealingKey = this.keyFactory.generateServerSealingKeyUsingNegotiatedSecondarySessionKey ( sessionKey );
 
         //Used by the server to decrypt client messages
-        clientCipher = keyFactory.getARCFOUR ( clientSealingKey );
+        this.clientCipher = this.keyFactory.getRC4 ( clientSealingKey );
 
         //Used by the client to decrypt server messages
-        serverCipher = keyFactory.getARCFOUR ( serverSealingKey );
+        this.serverCipher = this.keyFactory.getRC4 ( serverSealingKey );
 
         if ( logger.isLoggable ( Level.FINEST ) )
         {
-            logger.finest ( "Client Signing Key derieved from the session key: [" + Util.dumpString ( clientSigningKey ) + "]" );
-            logger.finest ( "Client Sealing Key derieved from the session key: [" + Util.dumpString ( clientSealingKey ) + "]" );
-            logger.finest ( "Server Signing Key derieved from the session key: [" + Util.dumpString ( serverSigningKey ) + "]" );
-            logger.finest ( "Server Sealing Key derieved from the session key: [" + Util.dumpString ( serverSealingKey ) + "]" );
+            logger.finest ( "Client Signing Key derieved from the session key: [" + dumpString ( this.clientSigningKey ) + "]" );
+            logger.finest ( "Client Sealing Key derieved from the session key: [" + dumpString ( clientSealingKey ) + "]" );
+            logger.finest ( "Server Signing Key derieved from the session key: [" + dumpString ( this.serverSigningKey ) + "]" );
+            logger.finest ( "Server Sealing Key derieved from the session key: [" + dumpString ( serverSealingKey ) + "]" );
         }
     }
 
+    private static String dumpString ( final byte[] data )
+    {
+        final StringBuilder sb = new StringBuilder ( data.length * 3 );
+
+        for ( int i = 0; i < data.length; i++ )
+        {
+            if ( i % 20 == 0 && i != 0 )
+            {
+                sb.append ( "\n" );
+            }
+            sb.append ( String.format ( "%02x ", data[i] ) );
+        }
+
+        return sb.toString ();
+    }
+
+    @Override
     public int getVerifierLength ()
     {
         return NTLM1_VERIFIER_LENGTH;
     }
 
+    @Override
     public int getAuthenticationService ()
     {
         return NtlmAuthentication.AUTHENTICATION_SERVICE_NTLM;
     }
 
+    @Override
     public int getProtectionLevel ()
     {
-        return protectionLevel;
+        return this.protectionLevel;
     }
 
-    public void processIncoming ( NetworkDataRepresentation ndr, int index, int length, int verifierIndex, boolean isFragmented ) throws IOException
+    @Override
+    public void processIncoming ( final NetworkDataRepresentation ndr, final int index, final int length, final int verifierIndex, final boolean isFragmented ) throws IOException
     {
         try
         {
-            NdrBuffer buffer = ndr.getBuffer ();
+            final NdrBuffer buffer = ndr.getBuffer ();
 
-            byte[] signingKey = null;
-            IRandom cipher = null;
+            final byte[] signingKey;
+            final StreamCipher cipher;
 
             //reverse of what it is
-            if ( !isServer )
+            if ( !this.isServer )
             {
-                signingKey = serverSigningKey;
-                cipher = serverCipher;
+                signingKey = this.serverSigningKey;
+                cipher = this.serverCipher;
             }
             else
             {
-                signingKey = clientSigningKey;
-                cipher = clientCipher;
+                signingKey = this.clientSigningKey;
+                cipher = this.clientCipher;
             }
 
             byte[] data = new byte[length];
@@ -126,29 +146,29 @@ public class Ntlm1 implements NtlmFlags, Security
 
             if ( getProtectionLevel () == PROTECTION_LEVEL_PRIVACY )
             {
-                data = keyFactory.applyARCFOUR ( cipher, data );
+                data = this.keyFactory.applyRC4 ( cipher, data );
                 System.arraycopy ( data, 0, ndr.getBuffer ().buf, index, data.length );
             }
 
             if ( logger.isLoggable ( Level.FINEST ) )
             {
                 logger.finest ( "\n AFTER Decryption" );
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream ();
+                final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream ();
                 jcifs.util.Hexdump.hexdump ( new PrintStream ( byteArrayOutputStream ), data, 0, data.length );
                 logger.finest ( "\n" + byteArrayOutputStream.toString () );
                 logger.finest ( "\nLength is: " + data.length );
             }
 
-            byte[] verifier = keyFactory.signingPt1 ( responseCounter, signingKey, buffer.getBuffer (), verifierIndex );
-            keyFactory.signingPt2 ( verifier, cipher );
+            final byte[] verifier = this.keyFactory.signingPt1 ( this.responseCounter, signingKey, buffer.getBuffer (), verifierIndex );
+            this.keyFactory.signingPt2 ( verifier, cipher );
 
             buffer.setIndex ( verifierIndex );
             //now read the next 16 bytes and pass compare them
-            byte[] signing = new byte[16];
+            final byte[] signing = new byte[16];
             ndr.readOctetArray ( signing, 0, signing.length );
 
             //this should result in an access denied fault
-            if ( !keyFactory.compareSignature ( verifier, signing ) )
+            if ( !this.keyFactory.compareSignature ( verifier, signing ) )
             {
                 throw new IntegrityException ( "Message out of sequence. Perhaps the user being used to run this application is different from the one under which the COM server is running !." );
             }
@@ -159,47 +179,48 @@ public class Ntlm1 implements NtlmFlags, Security
             //            	responseCounter++;
             //            }
 
-            responseCounter++;
+            this.responseCounter++;
 
         }
-        catch ( IOException ex )
+        catch ( final IOException ex )
         {
             logger.log ( Level.SEVERE, "", ex );
             throw ex;
         }
-        catch ( Exception ex )
+        catch ( final Exception ex )
         {
             logger.log ( Level.SEVERE, "", ex );
             throw new IntegrityException ( "General error: " + ex.getMessage () );
         }
     }
 
-    public void processOutgoing ( NetworkDataRepresentation ndr, int index, int length, int verifierIndex, boolean isFragmented ) throws IOException
+    @Override
+    public void processOutgoing ( final NetworkDataRepresentation ndr, final int index, final int length, final int verifierIndex, final boolean isFragmented ) throws IOException
     {
         try
         {
-            NdrBuffer buffer = ndr.getBuffer ();
+            final NdrBuffer buffer = ndr.getBuffer ();
 
-            byte[] signingKey = null;
-            IRandom cipher = null;
-            if ( isServer )
+            final byte[] signingKey;
+            final StreamCipher cipher;
+            if ( this.isServer )
             {
-                signingKey = serverSigningKey;
-                cipher = serverCipher;
+                signingKey = this.serverSigningKey;
+                cipher = this.serverCipher;
             }
             else
             {
-                signingKey = clientSigningKey;
-                cipher = clientCipher;
+                signingKey = this.clientSigningKey;
+                cipher = this.clientCipher;
             }
 
-            byte[] verifier = keyFactory.signingPt1 ( requestCounter, signingKey, buffer.getBuffer (), verifierIndex );
-            byte[] data = new byte[length];
+            final byte[] verifier = this.keyFactory.signingPt1 ( this.requestCounter, signingKey, buffer.getBuffer (), verifierIndex );
+            final byte[] data = new byte[length];
             System.arraycopy ( ndr.getBuffer ().getBuffer (), index, data, 0, data.length );
             if ( logger.isLoggable ( Level.FINEST ) )
             {
                 logger.finest ( "\n BEFORE Encryption" );
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream ();
+                final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream ();
                 jcifs.util.Hexdump.hexdump ( new PrintStream ( byteArrayOutputStream ), data, 0, data.length );
                 logger.finest ( "\n" + byteArrayOutputStream.toString () );
                 logger.finest ( "\n Length is: " + data.length );
@@ -207,10 +228,10 @@ public class Ntlm1 implements NtlmFlags, Security
 
             if ( getProtectionLevel () == PROTECTION_LEVEL_PRIVACY )
             {
-                byte[] data2 = keyFactory.applyARCFOUR ( cipher, data );
+                final byte[] data2 = this.keyFactory.applyRC4 ( cipher, data );
                 System.arraycopy ( data2, 0, ndr.getBuffer ().buf, index, data2.length );
             }
-            keyFactory.signingPt2 ( verifier, cipher );
+            this.keyFactory.signingPt2 ( verifier, cipher );
             buffer.setIndex ( verifierIndex );
             buffer.writeOctetArray ( verifier, 0, verifier.length );
 
@@ -219,10 +240,10 @@ public class Ntlm1 implements NtlmFlags, Security
             //            	responseCounter++;
             //            }
 
-            requestCounter++;
+            this.requestCounter++;
 
         }
-        catch ( Exception ex )
+        catch ( final Exception ex )
         {
             throw new IntegrityException ( "General error: " + ex.getMessage () );
         }

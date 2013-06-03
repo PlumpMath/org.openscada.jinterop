@@ -17,18 +17,17 @@
 
 package rpc.security.ntlm;
 
-import gnu.crypto.hash.MD4;
-import gnu.crypto.hash.MD5;
-import gnu.crypto.prng.ARCFour;
-import gnu.crypto.prng.IRandom;
-import gnu.crypto.prng.LimitReachedException;
-
 import java.io.UnsupportedEncodingException;
 import java.security.DigestException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Random;
+
+import org.bouncycastle.crypto.StreamCipher;
+import org.bouncycastle.crypto.digests.MD4Digest;
+import org.bouncycastle.crypto.digests.MD5Digest;
+import org.bouncycastle.crypto.engines.RC4Engine;
+import org.bouncycastle.crypto.params.KeyParameter;
 
 class NTLMKeyFactory
 {
@@ -58,25 +57,21 @@ class NTLMKeyFactory
      * @throws UnsupportedEncodingException
      * @throws DigestException
      */
-    byte[] getNTLMUserSessionKey ( String password ) throws UnsupportedEncodingException, DigestException
+    byte[] getNTLMUserSessionKey ( final String password ) throws UnsupportedEncodingException, DigestException
     {
         //look at NTLMPasswordAuthentication in jcifs. It supports only the NTLMUserSessionKey and the LMv2UserSessionKey...we need more :(
-        byte key[] = new byte[16];
-        byte[] ntlmHash = Responses.ntlmHash ( password );
-        MD4 md4 = new MD4 ();
-        md4.update ( ntlmHash, 0, ntlmHash.length );
-        key = md4.digest ();
-        return key;
+        final byte[] ntlmHash = Responses.ntlmHash ( password );
+        return digestMD4 ( ntlmHash );
     }
 
-    byte[] getNTLMv2UserSessionKey ( String target, String user, String password, byte[] challenge, byte[] blob ) throws Exception
+    byte[] getNTLMv2UserSessionKey ( final String target, final String user, final String password, final byte[] challenge, final byte[] blob ) throws Exception
     {
         byte key[] = new byte[16];
-        byte[] ntlm2Hash = Responses.ntlmv2Hash ( target, user, password );
-        byte[] data = new byte[challenge.length + blob.length];
+        final byte[] ntlm2Hash = Responses.ntlmv2Hash ( target, user, password );
+        final byte[] data = new byte[challenge.length + blob.length];
         System.arraycopy ( challenge, 0, data, 0, challenge.length );
         System.arraycopy ( blob, 0, data, challenge.length, blob.length );
-        byte[] mac = Responses.hmacMD5 ( data, ntlm2Hash );
+        final byte[] mac = Responses.hmacMD5 ( data, ntlm2Hash );
         key = Responses.hmacMD5 ( mac, ntlm2Hash );
         return key;
     }
@@ -92,7 +87,7 @@ class NTLMKeyFactory
      * @throws UnsupportedEncodingException
      * @throws NoSuchAlgorithmException
      */
-    byte[] getNTLM2SessionResponseUserSessionKey ( String password, byte[] servernonce ) throws NoSuchAlgorithmException, UnsupportedEncodingException, DigestException
+    byte[] getNTLM2SessionResponseUserSessionKey ( final String password, final byte[] servernonce ) throws NoSuchAlgorithmException, UnsupportedEncodingException, DigestException
     {
         return Responses.hmacMD5 ( servernonce, getNTLMUserSessionKey ( password ) );
     }
@@ -104,23 +99,42 @@ class NTLMKeyFactory
      */
     byte[] getSecondarySessionKey ()
     {
-        byte[] key = new byte[16];
-        random.nextBytes ( key );
+        final byte[] key = new byte[16];
+        this.random.nextBytes ( key );
         return key;
     }
 
-    IRandom getARCFOUR ( byte[] key )
+    StreamCipher getRC4 ( final byte[] key )
     {
-        HashMap attrib = new HashMap ();
-        IRandom keystream = new ARCFour ();
+        final RC4Engine rc4 = new RC4Engine ();
+        rc4.init ( true, new KeyParameter ( key ) );
+        return rc4;
+    }
+
+    /*
+    IRandom getARCFOUR ( final byte[] key )
+    {
+        final HashMap attrib = new HashMap ();
+        final IRandom keystream = new ARCFour ();
         attrib.put ( ARCFour.ARCFOUR_KEY_MATERIAL, key );
         keystream.init ( attrib );
         return keystream;
     }
+    */
 
-    byte[] applyARCFOUR ( IRandom keystream, byte[] data ) throws IllegalStateException, LimitReachedException
+    byte[] applyRC4 ( final StreamCipher streamCipher, final byte[] data )
     {
-        byte[] retData = new byte[data.length];
+        final byte[] retData = new byte[data.length];
+
+        streamCipher.processBytes ( data, 0, data.length, retData, 0 );
+
+        return retData;
+    }
+
+    /*
+    byte[] applyARCFOUR ( final IRandom keystream, final byte[] data ) throws IllegalStateException, LimitReachedException
+    {
+        final byte[] retData = new byte[data.length];
 
         for ( int i = 0; i < data.length; i++ )
         {
@@ -128,78 +142,101 @@ class NTLMKeyFactory
         }
 
         return retData;
-    }
+    }*/
 
-    byte[] decryptSecondarySessionKey ( byte[] encryptedData, byte[] key ) throws IllegalStateException, LimitReachedException
+    /*
+    byte[] decryptSecondarySessionKey ( final byte[] encryptedData, final byte[] key ) throws IllegalStateException, LimitReachedException
     {
         return applyARCFOUR ( getARCFOUR ( key ), encryptedData );
     }
 
-    byte[] encryptSecondarySessionKey ( byte[] plainData, byte[] key ) throws IllegalStateException, LimitReachedException
+    byte[] encryptSecondarySessionKey ( final byte[] plainData, final byte[] key ) throws IllegalStateException, LimitReachedException
     {
         return applyARCFOUR ( getARCFOUR ( key ), plainData );
     }
+    */
 
-    byte[] generateClientSigningKeyUsingNegotiatedSecondarySessionKey ( byte[] secondarySessionKey )
+    byte[] decryptSecondarySessionKey ( final byte[] encryptedData, final byte[] key ) throws IllegalStateException
+    {
+        return applyRC4 ( getRC4 ( key ), encryptedData );
+    }
+
+    byte[] encryptSecondarySessionKey ( final byte[] plainData, final byte[] key ) throws IllegalStateException
+    {
+        return applyRC4 ( getRC4 ( key ), plainData );
+    }
+
+    byte[] generateClientSigningKeyUsingNegotiatedSecondarySessionKey ( final byte[] secondarySessionKey )
     {
         //TODO this can be moved out of here...
-        byte[] dataforhash = new byte[secondarySessionKey.length + clientSigningMagicConstant.length];
+        final byte[] dataforhash = new byte[secondarySessionKey.length + clientSigningMagicConstant.length];
         System.arraycopy ( secondarySessionKey, 0, dataforhash, 0, secondarySessionKey.length );
         System.arraycopy ( clientSigningMagicConstant, 0, dataforhash, secondarySessionKey.length, clientSigningMagicConstant.length );
-        MD5 md5 = new MD5 ();
-        md5.update ( dataforhash, 0, dataforhash.length );
-        return md5.digest ();
+        return digestMD5 ( dataforhash );
     }
 
-    byte[] generateClientSealingKeyUsingNegotiatedSecondarySessionKey ( byte[] secondarySessionKey )
+    byte[] generateClientSealingKeyUsingNegotiatedSecondarySessionKey ( final byte[] secondarySessionKey )
     {
         //TODO this can be moved out of here...
-        byte[] dataforhash = new byte[secondarySessionKey.length + clientSealingMagicConstant.length];
+        final byte[] dataforhash = new byte[secondarySessionKey.length + clientSealingMagicConstant.length];
         System.arraycopy ( secondarySessionKey, 0, dataforhash, 0, secondarySessionKey.length );
         System.arraycopy ( clientSealingMagicConstant, 0, dataforhash, secondarySessionKey.length, clientSealingMagicConstant.length );
-        MD5 md5 = new MD5 ();
-        md5.update ( dataforhash, 0, dataforhash.length );
-        return md5.digest ();
+        return digestMD5 ( dataforhash );
     }
 
-    byte[] generateServerSigningKeyUsingNegotiatedSecondarySessionKey ( byte[] secondarySessionKey )
+    byte[] generateServerSigningKeyUsingNegotiatedSecondarySessionKey ( final byte[] secondarySessionKey )
     {
         //TODO this can be moved out of here...
-        byte[] dataforhash = new byte[secondarySessionKey.length + serverSigningMagicConstant.length];
+        final byte[] dataforhash = new byte[secondarySessionKey.length + serverSigningMagicConstant.length];
         System.arraycopy ( secondarySessionKey, 0, dataforhash, 0, secondarySessionKey.length );
         System.arraycopy ( serverSigningMagicConstant, 0, dataforhash, secondarySessionKey.length, serverSigningMagicConstant.length );
-        MD5 md5 = new MD5 ();
-        md5.update ( dataforhash, 0, dataforhash.length );
-        return md5.digest ();
+        final byte[] digest = digestMD5 ( dataforhash );
+        return digest;
     }
 
-    byte[] generateServerSealingKeyUsingNegotiatedSecondarySessionKey ( byte[] secondarySessionKey )
+    public static byte[] digestMD5 ( final byte[] dataforhash )
+    {
+        final MD5Digest md5 = new MD5Digest ();
+        md5.update ( dataforhash, 0, dataforhash.length );
+        final byte[] digest = new byte[md5.getDigestSize ()];
+        md5.doFinal ( digest, 0 );
+        return digest;
+    }
+
+    public static byte[] digestMD4 ( final byte[] dataforhash )
+    {
+        final MD4Digest md4 = new MD4Digest ();
+        md4.update ( dataforhash, 0, dataforhash.length );
+        final byte[] digest = new byte[md4.getDigestSize ()];
+        md4.doFinal ( digest, 0 );
+        return digest;
+    }
+
+    byte[] generateServerSealingKeyUsingNegotiatedSecondarySessionKey ( final byte[] secondarySessionKey )
     {
         //TODO this can be moved out of here...
-        byte[] dataforhash = new byte[secondarySessionKey.length + serverSealingMagicConstant.length];
+        final byte[] dataforhash = new byte[secondarySessionKey.length + serverSealingMagicConstant.length];
         System.arraycopy ( secondarySessionKey, 0, dataforhash, 0, secondarySessionKey.length );
         System.arraycopy ( serverSealingMagicConstant, 0, dataforhash, secondarySessionKey.length, serverSealingMagicConstant.length );
-        MD5 md5 = new MD5 ();
-        md5.update ( dataforhash, 0, dataforhash.length );
-        return md5.digest ();
+        return digestMD5 ( dataforhash );
     }
 
     //TODO merge the signing routine for both client and server all that they differ by are keys...as expected
-    byte[] signingPt1 ( int sequenceNumber, byte[] signingKey, byte[] data, int lengthOfBuffer ) throws NoSuchAlgorithmException, IllegalStateException, LimitReachedException
+    byte[] signingPt1 ( final int sequenceNumber, final byte[] signingKey, final byte[] data, final int lengthOfBuffer ) throws NoSuchAlgorithmException, IllegalStateException
     {
-        byte[] seqNumPlusData = new byte[4 + lengthOfBuffer];
+        final byte[] seqNumPlusData = new byte[4 + lengthOfBuffer];
 
         seqNumPlusData[0] = (byte) ( sequenceNumber & 0xFF );
-        seqNumPlusData[1] = (byte) ( ( sequenceNumber >> 8 ) & 0xFF );
-        seqNumPlusData[2] = (byte) ( ( sequenceNumber >> 16 ) & 0xFF );
-        seqNumPlusData[3] = (byte) ( ( sequenceNumber >> 24 ) & 0xFF );
+        seqNumPlusData[1] = (byte) ( sequenceNumber >> 8 & 0xFF );
+        seqNumPlusData[2] = (byte) ( sequenceNumber >> 16 & 0xFF );
+        seqNumPlusData[3] = (byte) ( sequenceNumber >> 24 & 0xFF );
 
         System.arraycopy ( data, 0, seqNumPlusData, 4, lengthOfBuffer );
 
-        byte[] retval = new byte[16];
+        final byte[] retval = new byte[16];
         retval[0] = 0x01; //Version number LE 1.
 
-        byte[] sign = Responses.hmacMD5 ( seqNumPlusData, signingKey );
+        final byte[] sign = Responses.hmacMD5 ( seqNumPlusData, signingKey );
 
         for ( int i = 0; i < 8; i++ )
         {
@@ -207,22 +244,32 @@ class NTLMKeyFactory
         }
 
         retval[12] = (byte) ( sequenceNumber & 0xFF );
-        retval[13] = (byte) ( ( sequenceNumber >> 8 ) & 0xFF );
-        retval[14] = (byte) ( ( sequenceNumber >> 16 ) & 0xFF );
-        retval[15] = (byte) ( ( sequenceNumber >> 24 ) & 0xFF );
+        retval[13] = (byte) ( sequenceNumber >> 8 & 0xFF );
+        retval[14] = (byte) ( sequenceNumber >> 16 & 0xFF );
+        retval[15] = (byte) ( sequenceNumber >> 24 & 0xFF );
 
         return retval;
     }
 
-    void signingPt2 ( byte[] verifier, IRandom rc4 ) throws IllegalStateException, LimitReachedException
+    /*
+    void signingPt2 ( final byte[] verifier, final IRandom rc4 ) throws IllegalStateException, LimitReachedException
     {
         for ( int i = 0; i < 8; i++ )
         {
             verifier[i + 4] = (byte) ( verifier[i + 4] ^ rc4.nextByte () );
         }
     }
+    */
 
-    boolean compareSignature ( byte[] src, byte[] target )
+    void signingPt2 ( final byte[] verifier, final StreamCipher rc4 ) throws IllegalStateException
+    {
+        for ( int i = 0; i < 8; i++ )
+        {
+            verifier[i + 4] = rc4.returnByte ( verifier[i + 4] );
+        }
+    }
+
+    boolean compareSignature ( final byte[] src, final byte[] target )
     {
         return Arrays.equals ( src, target );
     }

@@ -42,6 +42,7 @@ import org.jinterop.dcom.common.JIErrorCodes;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JIRuntimeException;
 import org.jinterop.dcom.common.JISystem;
+import org.jinterop.dcom.common.UUIDGenerator;
 import org.jinterop.dcom.transport.JIComRuntimeEndpoint;
 import org.jinterop.dcom.transport.JIComRuntimeTransportFactory;
 import org.slf4j.Logger;
@@ -49,9 +50,6 @@ import org.slf4j.LoggerFactory;
 
 import rpc.Stub;
 import rpc.core.UUID;
-
-import com.iwombat.foundation.IdentifierFactory;
-import com.iwombat.util.GUIDUtil;
 
 /**
  * Used to manipulate Oxid details. one instance is created per binding
@@ -438,7 +436,7 @@ class OxidResolverImpl extends NdrObject implements IJICOMRuntimeWorker
         //		
 
         //randomly create IPID and send, this is the ipid of the remunknown, we store it with remunknown object
-        final UUID uuid = details.getRemUnknownIpid () == null ? new UUID ( GUIDUtil.guidStringFromHexString ( IdentifierFactory.createUniqueIdentifier ().toHexString () ) ) : new UUID ( details.getRemUnknownIpid () );
+        final UUID uuid = details.getRemUnknownIpid () == null ? new UUID ( UUIDGenerator.generateID () ) : new UUID ( details.getRemUnknownIpid () );
 
         //create the bindings for this Java Object.
         //this port will go in the new bindings sent to the COM client.
@@ -911,7 +909,7 @@ class RemUnknownObject extends NdrObject implements IJICOMRuntimeWorker
             try
             {
                 int hresult = 0;
-                String ipid2 = GUIDUtil.guidStringFromHexString ( IdentifierFactory.createUniqueIdentifier ().toHexString () );
+                String ipid2 = UUIDGenerator.generateID ();
                 ;
                 if ( !component.isPresent ( iid.toString () ) )
                 {

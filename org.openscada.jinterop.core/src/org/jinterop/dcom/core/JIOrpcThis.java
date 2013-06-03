@@ -29,13 +29,11 @@ import ndr.NetworkDataRepresentation;
 import org.jinterop.dcom.common.JIComVersion;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
+import org.jinterop.dcom.common.UUIDGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import rpc.core.UUID;
-
-import com.iwombat.foundation.IdentifierFactory;
-import com.iwombat.util.GUIDUtil;
 
 final class JIOrpcThis implements Serializable
 {
@@ -55,7 +53,7 @@ final class JIOrpcThis implements Serializable
 
     public JIOrpcThis ()
     {
-        this.cid = GUIDUtil.guidStringFromHexString ( IdentifierFactory.createUniqueIdentifier ().toHexString () );
+        this.cid = UUIDGenerator.generateID ();
     }
 
     public JIOrpcThis ( final UUID casualityIdentifier )

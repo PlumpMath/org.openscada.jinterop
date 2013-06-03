@@ -24,11 +24,9 @@ import org.jinterop.dcom.common.IJIUnreferenced;
 import org.jinterop.dcom.common.JIErrorCodes;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.common.JISystem;
+import org.jinterop.dcom.common.UUIDGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.iwombat.foundation.IdentifierFactory;
-import com.iwombat.util.GUIDUtil;
 
 /**
  * Implementation for IJIComObject. There is a 1 to 1 mapping between this and a
@@ -238,7 +236,7 @@ final class JIComObjectImpl implements IJIComObject
         {
             this.connectionPointInfo = new HashMap ();
         }
-        final String uniqueId = GUIDUtil.guidStringFromHexString ( IdentifierFactory.createUniqueIdentifier ().toHexString () );
+        final String uniqueId = UUIDGenerator.generateID ();
         this.connectionPointInfo.put ( uniqueId, new Object[] { connectionPoint, cookie } );
         return uniqueId;
     }
