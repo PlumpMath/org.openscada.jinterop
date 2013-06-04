@@ -147,11 +147,15 @@ public final class UUIDGenerator
 
         long l2 = 0;
 
+        // set clock sequence
+
         data[1] = (byte) ( sequence & 0x00FF & 0xff );
         data[0] = (byte) ( ( sequence & 0xFF00 ) >> 8 & 0xff );
 
-        data[0] &= 0x3f; /* clear variant        */
-        data[0] |= 0x80; /* set to IETF variant  */
+        // set variant
+
+        data[0] &= 0x3f;
+        data[0] |= 0x80;
 
         for ( int i = 0; i < 2; i++ )
         {
@@ -159,17 +163,22 @@ public final class UUIDGenerator
         }
 
         // append node
+
         for ( int i = 0; i < 6; i++ )
         {
             l2 = l2 << 8 | node[i] & 0xff;
         }
 
-        // randomBytes[8] &= 0x3f; /* clear variant        */
-        // randomBytes[8] |= 0x80; /* set to IETF variant  */
-
         return new java.util.UUID ( l1, l2 );
     }
 
+    /**
+     * Set the time, increase the clock counter instead
+     * if the time did not change
+     * 
+     * @param time
+     *            the time to set
+     */
     private static void updateTime ( final long time )
     {
         if ( lastTime >= time )
