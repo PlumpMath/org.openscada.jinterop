@@ -194,11 +194,47 @@ public final class UUIDGenerator
 
     private static long TIME_DIFF = 0x01B21DD213814000L;
 
-    private static long makeTime ()
-    {
-        final long time = System.currentTimeMillis () * ( 1000 * 10 );
+    private static long lastMillis; // will be initialized by the first call to makeTime()
 
-        // FIXME: we could fill the nanoseconds in that passed since the last call
+    private static long lastNanos; // will be initialized by the first call to makeTime()
+
+    /**
+     * Create the current time as UUID time
+     * <p>
+     * First the time in milliseconds is used and converted to the UUID time
+     * which is the count of 100ns since their epoch (which is not the UNIX
+     * epoch).
+     * </p>
+     * <p>
+     * Since java only provides time in milliseconds, this leaves a pretty good
+     * gap, which might be filled by the clock sequence, but we still could
+     * improve that. So we use the java
+     * <q>nanos</q>, which is a not the time, but a timer, based on nanoseconds.
+     * So we cannot directly take the time from the nanos, but we can measure
+     * the number of nanos that passed since the last call.
+     * </p>
+     * <p>
+     * So if the time in milliseconds is the same as the last time (in
+     * milliseconds) we add the number of nanos that passed since the last
+     * millisecond change.
+     * </p>
+     * 
+     * @return the number of 100ns that passed since the UUID epoch
+     */
+    static long makeTime ()
+    {
+        long time = System.currentTimeMillis () * ( 1000 * 10 );
+
+        final long nanos = System.nanoTime ();
+        if ( lastMillis == time )
+        {
+            time += ( nanos - lastNanos ) / 100L;
+        }
+        else
+        {
+            lastMillis = time;
+            lastNanos = nanos;
+        }
 
         return TIME_DIFF + time;
     }
