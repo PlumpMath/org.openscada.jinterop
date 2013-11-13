@@ -9,21 +9,21 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<tycho-version>0.17.0</tycho-version>
-		<tychoExtrasVersion>0.17.0</tychoExtrasVersion>
+		<tycho-version>0.19.0</tycho-version>
+		<tychoExtrasVersion>0.19.0</tychoExtrasVersion>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>juno</id>
+			<id>eclipse.kepler</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/juno</url>
+			<url>http://download.eclipse.org/releases/kepler</url>
 		</repository>
 		<repository>
-			<id>openscada.external</id>
+			<id>openscada.p2.external</id>
 			<layout>p2</layout>
-			<url>http://repo.openscada.org/p2/external/I/1.1.0/</url>
+			<url>http://repo.openscada.org/p2/external/I/1.2.0/</url>
 		</repository>
 	</repositories>
 
