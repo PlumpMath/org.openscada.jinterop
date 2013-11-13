@@ -8,6 +8,6 @@
   </parent>
   <groupId>org.openscada.jinterop</groupId>
   <artifactId>org.openscada.jinterop.core</artifactId>
-  <version>2.0.8-SNAPSHOT</version>
+  <version>2.1.8-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 </project>
