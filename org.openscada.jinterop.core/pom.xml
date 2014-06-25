@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>org.openscada.jinterop-parent</artifactId>
+    <artifactId>parent</artifactId>
     <groupId>org.openscada.jinterop</groupId>
     <version>1.2.0-SNAPSHOT</version>
-    <relativePath>../builder_jinterop</relativePath>
+    <relativePath>../org.openscada.jinterop-parent</relativePath>
   </parent>
   <groupId>org.openscada.jinterop</groupId>
   <artifactId>org.openscada.jinterop.core</artifactId>
