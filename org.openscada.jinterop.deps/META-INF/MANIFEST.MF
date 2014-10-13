@@ -2,23 +2,30 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: openSCADA j-Interop Dependencies
 Bundle-SymbolicName: org.openscada.jinterop.deps
-Bundle-Version: 1.2.0.qualifier
+Bundle-Version: 1.3.0.qualifier
 Bundle-Vendor: openSCADA
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Import-Package: jcifs;version="1.2.25",
+Import-Package: javax.crypto,
+ javax.crypto.spec,
+ jcifs;version="1.2.25",
  jcifs.netbios;version="1.2.25",
  jcifs.ntlmssp;version="1.2.25",
  jcifs.smb;version="1.2.25",
  jcifs.util;version="1.2.25",
- org.bouncycastle.crypto,
- org.bouncycastle.crypto.digests,
- org.bouncycastle.crypto.engines,
- org.bouncycastle.crypto.params,
+ org.bouncycastle.crypto;version="1.50.0",
+ org.bouncycastle.crypto.digests;version="1.50.0",
+ org.bouncycastle.crypto.engines;version="1.50.0",
+ org.bouncycastle.crypto.params;version="1.50.0",
  org.slf4j;version="1.6.4"
 Export-Package: ndr,
  org.openscada.uuid;version="1.2.0",
- rpc,
- rpc.core,
- rpc.ncacn_np,
- rpc.pdu,
- rpc.security.ntlm
+ rpc;uses:="ndr,rpc.core",
+ rpc.core;uses:="ndr",
+ rpc.ncacn_np;uses:="ndr,rpc,rpc.core",
+ rpc.pdu;uses:="ndr,rpc,rpc.core",
+ rpc.security.ntlm;
+  uses:="rpc,
+   ndr,
+   org.bouncycastle.crypto,
+   rpc.core,
+   jcifs.ntlmssp"
