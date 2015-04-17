@@ -4,7 +4,7 @@
   <parent>
     <artifactId>parent</artifactId>
     <groupId>org.openscada.jinterop</groupId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>1.4.0-SNAPSHOT</version>
     <relativePath>../org.openscada.jinterop-parent</relativePath>
   </parent>
   <groupId>org.openscada.jinterop</groupId>
